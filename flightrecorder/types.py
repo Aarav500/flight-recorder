@@ -18,6 +18,7 @@ class RolloutBatch:
     ref_logprobs: np.ndarray | None = None         # frozen-SFT-ckpt logprobs
     entropy: np.ndarray | None = None              # token entropy if provided
     completions: list[str] | None = None           # raw text for genstats/labeling
+    logged: dict | None = None                     # trainer-logged scalars (kl, entropy)
 
 
 @dataclass

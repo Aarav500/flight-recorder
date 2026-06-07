@@ -16,5 +16,10 @@ class EntropyExtractor:
             h = float(np.mean(-np.asarray(logprobs, float)))  # surprisal proxy
         else:
             return {"entropy_mean": float("nan"), "entropy_trend": 0.0}
+        return self.update_scalar(h)
+
+    def update_scalar(self, entropy_mean: float) -> dict:
+        """Feed a trainer-logged entropy scalar directly."""
+        h = float(entropy_mean)
         self._s.update(h)
         return {"entropy_mean": h, "entropy_trend": self._s.slope}

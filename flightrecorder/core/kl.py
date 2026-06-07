@@ -16,6 +16,10 @@ class KLExtractor:
             return {"kl_mean": float("nan"), "kl_slope": 0.0, "kl_accel": 0.0}
         d = np.asarray(logprobs, float) - np.asarray(ref_logprobs, float)
         per_tok = d if self.estimator == "k1" else (np.exp(-d) - 1.0 + d)
-        kl = float(np.mean(per_tok))
+        return self.update_scalar(float(np.mean(per_tok)))
+
+    def update_scalar(self, kl_mean: float) -> dict:
+        """Feed a trainer-logged KL scalar directly (TRL logs kl, not per-token logprobs)."""
+        kl = float(kl_mean)
         self._s.update(kl)
         return {"kl_mean": kl, "kl_slope": self._s.slope, "kl_accel": self._s.accel}
