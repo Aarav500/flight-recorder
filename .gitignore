@@ -8,3 +8,15 @@ dist/
 run.jsonl
 *.tmp
 .DS_Store
+
+# web
+web/node_modules/
+web/dist/
+
+# demo + verification artifacts
+demo-runs/
+.playwright-mcp/
+*.png
+web/vite.config.js
+web/vite.config.d.ts
+web/*.tsbuildinfo
