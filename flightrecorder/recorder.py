@@ -29,10 +29,24 @@ class Recorder:
     def record(self, batch: RolloutBatch):
         train_r = float(np.mean(batch.train_rewards))
         self._train.update(train_r)
+        logged = batch.logged or {}
+        # KL: prefer per-token logprobs; fall back to a trainer-logged kl scalar (TRL).
+        if batch.logprobs is not None and batch.ref_logprobs is not None:
+            kl = self._kl.update(batch.logprobs, batch.ref_logprobs)
+        elif logged.get("kl") is not None:
+            kl = self._kl.update_scalar(float(logged["kl"]))
+        else:
+            kl = self._kl.update(None, None)
+        # Entropy: prefer token entropy; fall back to a logged entropy scalar.
+        if batch.entropy is not None:
+            ent = self._ent.update(batch.entropy, batch.logprobs)
+        elif logged.get("entropy") is not None:
+            ent = self._ent.update_scalar(float(logged["entropy"]))
+        else:
+            ent = self._ent.update(None, batch.logprobs)
         rf = RolloutFrame(
             step=batch.step, train_reward=train_r, train_reward_slope=self._train.slope,
-            **self._kl.update(batch.logprobs, batch.ref_logprobs),
-            **self._ent.update(batch.entropy, batch.logprobs),
+            **kl, **ent,
             **self._adv.update(batch.advantages),
             **self._gen.update(batch.completions, batch.logprobs))
         of = None
