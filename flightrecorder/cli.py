@@ -46,6 +46,18 @@ def _cmd_eval(a) -> int:
     return 0
 
 
+def _cmd_serve(a) -> int:
+    try:
+        import uvicorn
+        from .server.app import create_app
+    except Exception as e:
+        print(f"flr serve needs extras: pip install 'flightrecorder[server]' ({e})")
+        return 1
+    print(f"serving runs from {a.runs} on http://{a.host}:{a.port}")
+    uvicorn.run(create_app(a.runs), host=a.host, port=a.port)
+    return 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="flr")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -60,6 +72,11 @@ def main(argv=None) -> int:
     e.add_argument("--seeds", type=int, default=10); e.add_argument("--steps", type=int, default=200)
     e.add_argument("--tstar", type=int, default=100); e.add_argument("--warmup", type=int, default=30)
     e.set_defaults(func=_cmd_eval)
+
+    sv = sub.add_parser("serve", help="serve the REST + WebSocket API over saved runs")
+    sv.add_argument("--runs", default="runs"); sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+    sv.set_defaults(func=_cmd_serve)
 
     args = p.parse_args(argv)
     return args.func(args)
