@@ -79,10 +79,12 @@ def _extract_logged(state) -> dict:
 class FlightRecorderCallback(_TrainerCallback):
     """Drop into TRL's GRPOTrainer(callbacks=[...]). Records one RolloutBatch per step."""
 
-    def __init__(self, recorder, coordinator: TRLCoordinator, group_size: int | None = None):
+    def __init__(self, recorder, coordinator: TRLCoordinator, group_size: int | None = None,
+                 collector: list | None = None):
         self.recorder = recorder
         self.coord = coordinator
         self.group_size = group_size
+        self.collector = collector  # optional list of StepRecord for the integrity report
 
     def on_step_end(self, args=None, state=None, control=None, **kwargs):
         completions, train, oracle = self.coord.drain()
@@ -97,7 +99,12 @@ class FlightRecorderCallback(_TrainerCallback):
             completions=completions,
             logged=_extract_logged(state),
             meta={"group_size": self.group_size})
-        self.recorder.record(batch)
+        rf, of = self.recorder.record(batch)
+        if self.collector is not None:
+            from ..repro.integrity import StepRecord
+            self.collector.append(StepRecord(
+                step=step, rollout=rf, oracle=of, completions=completions or [],
+                train_rewards=train, oracle_rewards=oracle))
         return control
 
     def on_train_end(self, args=None, state=None, control=None, **kwargs):

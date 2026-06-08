@@ -1,0 +1,47 @@
+# Flight Recorder — shakeout job.
+#
+# This is a PIPELINE INTEGRITY TEST, not an experiment. Its result is the four PASS/FAIL
+# checks printed to the job logs (CHECK 1–4), not a lead-time number.
+#
+# Fire it yourself, authenticated as Aarav500 — do not let tooling fire it:
+#     huggingface-cli job run configs/hf_jobs_shakeout.yaml
+#
+# If your hf CLI uses the flag form rather than a YAML file, the equivalent invocation is:
+#     hf jobs run --flavor a100-large --timeout 90m \
+#       <image> bash -lc "git clone <your-repo-url> fr && cd fr && \
+#         pip install -e '.[train]' && \
+#         python -m flightrecorder.repro.trl_grpo_qwen --scale shakeout \
+#           --integrity-report --thresholds configs/thresholds.yaml \
+#           --artifact-dir /opt/flight-recorder/runs"
+#
+# ── GATE 2 — hard timeout and cost ceiling ──────────────────────────────────────────────
+#   timeout = 90 minutes. Estimated max cost at A100 rates ($2.50/hr) = $3.75 for 90 min.
+#   The 20-step shakeout budget completes well before that; when it finishes the job
+#   terminates and billing stops, capping the shakeout at ~$4 worst case.
+# ────────────────────────────────────────────────────────────────────────────────────────
+
+name: flight-recorder-shakeout
+hardware: a100-large            # single A100, 80GB
+timeout: 90                     # minutes (GATE 2 — hard cap)
+
+# Base image with CUDA + PyTorch. The setup step installs the project's [train] extra.
+image: huggingface/transformers-pytorch-gpu:latest
+
+# Replace <your-repo-url> with the GitHub URL once the repo is pushed.
+setup:
+  - git clone <your-repo-url> /workspace/flight-recorder
+  - cd /workspace/flight-recorder && pip install -e ".[train]"
+
+# The integrity report is printed to stdout (captured in the job logs); the artifact is
+# also written to --artifact-dir if that path is persisted.
+command: >
+  cd /workspace/flight-recorder &&
+  python -m flightrecorder.repro.trl_grpo_qwen
+  --scale shakeout
+  --integrity-report
+  --thresholds configs/thresholds.yaml
+  --artifact-dir /opt/flight-recorder/runs
+
+env:
+  # Your Hugging Face token, injected by the CLI — never hardcode it here.
+  HF_TOKEN: ${HF_TOKEN}
