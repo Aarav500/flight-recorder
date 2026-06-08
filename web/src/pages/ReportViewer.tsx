@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Frame from "../components/Frame";
 import Cockpit from "../components/Cockpit";
+import Abstract from "../components/Abstract";
 import Verdict from "../components/Verdict";
 import { getRun } from "../api";
 import { reduceAll, emptyRun, type RunState } from "../lib/runState";
@@ -25,17 +26,28 @@ export default function ReportViewer() {
   return (
     <Frame
       right={
-        <Link to={`/live/${id}`} className="label" style={{ color: C.phos }}>
-          ▶ open live
+        <Link to={`/live/${id}`} className="label" style={{ color: C.ink }}>
+          Open live →
         </Link>
       }
     >
       {err ? (
-        <div className="panel p-4 font-mono text-[12px]" style={{ color: C.alarm }}>
-          run not found in archive
+        <div className="section p-5" style={{ fontSize: 13, color: C.ink2 }}>
+          Run not found in archive.
         </div>
       ) : (
-        <Cockpit runId={id} mode="REPORT" state={state} top={<Verdict state={state} />} />
+        <Cockpit
+          runId={id}
+          mode="REPORT"
+          state={state}
+          showAnnunciator={false}
+          top={
+            <>
+              <Abstract state={state} />
+              <Verdict state={state} />
+            </>
+          }
+        />
       )}
     </Frame>
   );
