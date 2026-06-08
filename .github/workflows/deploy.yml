@@ -1,0 +1,84 @@
+name: deploy
+
+# Build the React app, bake a single container, push to ECR, and roll it on EC2.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   AWS_ACCESS_KEY_ID      IAM user key with ECR push permission
+#   AWS_SECRET_ACCESS_KEY  matching secret
+#   AWS_REGION             e.g. us-east-1
+#   ECR_REGISTRY           <account-id>.dkr.ecr.<region>.amazonaws.com
+#   EC2_HOST               public DNS or IP of the EC2 instance
+#   EC2_SSH_KEY            private key (PEM contents) for the ec2-user
+# None of these are hardcoded here — add them manually in the repo settings.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build React app (fail fast before the expensive steps)
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image
+        env:
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          IMAGE: flight-recorder
+        run: |
+          docker build -t "$ECR_REGISTRY/$IMAGE:${{ github.sha }}" -t "$ECR_REGISTRY/$IMAGE:latest" .
+          docker push "$ECR_REGISTRY/$IMAGE:${{ github.sha }}"
+          docker push "$ECR_REGISTRY/$IMAGE:latest"
+
+      - name: Deploy on EC2 over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            ECR_REGISTRY="${{ secrets.ECR_REGISTRY }}"
+            AWS_REGION="${{ secrets.AWS_REGION }}"
+            aws ecr get-login-password --region "$AWS_REGION" \
+              | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+            docker pull "$ECR_REGISTRY/flight-recorder:latest"
+            docker stop flight-recorder 2>/dev/null || true
+            docker rm flight-recorder 2>/dev/null || true
+            docker run -d --name flight-recorder --restart unless-stopped \
+              -p 8000:8000 \
+              -v /opt/flight-recorder/runs:/opt/flight-recorder/runs \
+              "$ECR_REGISTRY/flight-recorder:latest"
+            docker image prune -f || true
+
+      - name: Verify /health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "http://${{ secrets.EC2_HOST }}:8000/health"; then
+              echo " — container is up"; exit 0
+            fi
+            sleep 3
+          done
+          echo "health check failed after 90s"; exit 1
