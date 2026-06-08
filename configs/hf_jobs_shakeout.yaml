@@ -27,9 +27,12 @@ timeout: 90                     # minutes (GATE 2 — hard cap)
 # Base image with CUDA + PyTorch. The setup step installs the project's [train] extra.
 image: huggingface/transformers-pytorch-gpu:latest
 
-# Replace <your-repo-url> with the GitHub URL once the repo is pushed.
+# The repo is currently PRIVATE. For the job's git clone to succeed, either:
+#   (a) make github.com/Aarav500/flight-recorder public for the run, or
+#   (b) clone with a token: git clone https://<GH_TOKEN>@github.com/Aarav500/flight-recorder.git, or
+#   (c) bake the code into a custom image instead of cloning.
 setup:
-  - git clone <your-repo-url> /workspace/flight-recorder
+  - git clone https://github.com/Aarav500/flight-recorder.git /workspace/flight-recorder
   - cd /workspace/flight-recorder && pip install -e ".[train]"
 
 # The integrity report is printed to stdout (captured in the job logs); the artifact is
