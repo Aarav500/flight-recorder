@@ -6,57 +6,34 @@ export default function Annunciator({ state }: { state: RunState }) {
 
   if (!onset) {
     return (
-      <div className="panel px-5 py-3 flex items-center gap-4 rise">
-        <span className="lamp" style={{ color: C.phos }} />
-        <span className="font-display tracking-[0.2em] text-sm glow-phos" style={{ color: C.phos }}>
-          NO FAULT
-        </span>
-        <span className="label">rollout geometry within contraction tube · detector armed</span>
-        <span className="ml-auto label" style={{ color: C.faint }}>
-          watching kl accel · entropy collapse · advantage drift
-        </span>
+      <div className="section flex items-stretch overflow-hidden">
+        <span style={{ width: 3, background: C.rule }} />
+        <div className="px-5 py-3.5 flex items-center gap-3 flex-wrap">
+          <span className="label" style={{ color: C.muted }}>No onset</span>
+          <span style={{ fontSize: 13.5, color: C.ink2 }}>
+            Rollout geometry within the contraction tube; the detector is armed.
+          </span>
+        </div>
       </div>
     );
   }
 
   const lead = state.lead;
   return (
-    <div
-      className="px-5 py-3.5 rounded relative overflow-hidden animate-alarmpulse rise"
-      style={{ background: "linear-gradient(180deg,#1b060a,#100406)", border: `1px solid ${C.alarm}` }}
-    >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "repeating-linear-gradient(45deg, rgba(255,59,71,.06) 0 11px, transparent 11px 22px)" }}
-      />
-      <div className="relative flex items-center gap-4 flex-wrap">
-        <span className="lamp animate-blink" style={{ color: C.alarm }} />
-        <span className="font-display tracking-[0.22em] text-lg glow-alarm" style={{ color: C.alarm }}>
-          ▲ ONSET DETECTED
-        </span>
-        <span className="font-mono text-sm" style={{ color: C.text }}>
-          step <b style={{ color: C.alarm }}>{state.onsetStep}</b>
-        </span>
-        {lead != null && (
-          <span
-            className="ml-auto font-mono text-[13px] px-3 py-1 rounded"
-            style={{
-              color: lead >= 0 ? C.phos : C.alarm,
-              border: `1px solid ${lead >= 0 ? C.phos : C.alarm}`,
-              boxShadow: lead >= 0 ? "0 0 18px -6px #4fe0a8" : undefined,
-            }}
-          >
-            {lead >= 0
-              ? `▸ FIRED ${lead} STEPS BEFORE ORACLE-GAP TURN`
-              : `LAGGED ${-lead} STEPS`}
+    <div className="section flex items-stretch overflow-hidden rise">
+      <span style={{ width: 3, background: C.accent }} />
+      <div className="px-5 py-4 flex items-center gap-x-6 gap-y-1.5 flex-wrap">
+        <span className="label" style={{ color: C.accent }}>Onset detected</span>
+        <span className="mono" style={{ fontSize: 14, color: C.ink }}>step {state.onsetStep}</span>
+        {lead != null && lead > 0 && (
+          <span className="mono" style={{ fontSize: 12.5, color: C.muted }}>
+            {lead} steps before the oracle-gap turn
           </span>
         )}
+        {state.onsetExplanation && (
+          <span className="mono" style={{ fontSize: 11.5, color: C.faint }}>{state.onsetExplanation}</span>
+        )}
       </div>
-      {state.onsetExplanation && (
-        <div className="relative font-mono text-[11px] mt-2" style={{ color: C.dim }}>
-          {state.onsetExplanation}
-        </div>
-      )}
     </div>
   );
 }
