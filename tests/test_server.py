@@ -49,6 +49,27 @@ def test_ws_replay_streams_events(tmp_path):
     assert {"frame", "oracle", "detector"} <= kinds and "run_end" in kinds
 
 
+def test_health_endpoint(tmp_path):
+    c = TestClient(create_app(str(tmp_path)))
+    r = c.get("/health")
+    assert r.status_code == 200 and r.json() == {"status": "ok"}
+
+
+def test_static_spa_fallback_without_shadowing_api(tmp_path):
+    runs = tmp_path / "runs"
+    static = tmp_path / "static"
+    static.mkdir()
+    (static / "index.html").write_text("<!doctype html><title>app shell</title>", encoding="utf-8")
+    _make_run(runs)
+    c = TestClient(create_app(str(runs), static_dir=str(static)))
+    # client-side route -> SPA shell
+    assert "app shell" in c.get("/report/r1").text
+    # API still resolves (not shadowed by the catch-all)
+    assert c.get("/api/runs/r1/summary").json()["onset_step"] is not None
+    # health still resolves
+    assert c.get("/health").json() == {"status": "ok"}
+
+
 def test_websocket_sink_publishes_to_broker():
     class FakeBroker:
         def __init__(self): self.sent = []

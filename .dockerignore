@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+**/node_modules
+web/dist
+web/*.tsbuildinfo
+__pycache__
+**/__pycache__
+*.pyc
+.pytest_cache
+.playwright-mcp
+demo-runs
+runs
+*.png
+docs
