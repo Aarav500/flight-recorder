@@ -47,19 +47,42 @@ class TRLCoordinator:
         return c, t, o
 
 
-def wrap_reward_fns(coordinator: TRLCoordinator, train_fn, oracle_fn=None):
+def wrap_reward_fns(coordinator: TRLCoordinator, train_fn, oracle_fn=None, seed_hack=None):
     """Return a TRL-compatible reward fn that also stashes rewards/completions.
 
     TRL calls reward_fn(prompts=..., completions=..., **kw) -> list[float]. We return the
     TRAIN rewards (the optimization signal) and separately capture ORACLE rewards, which
-    are never returned to the trainer."""
+    are never returned to the trainer.
+
+    seed_hack (optional, SHAKEOUT ONLY): inject a known test-overwrite completion so the
+    capture -> label -> isolation -> report path is exercised on a known hack. Shape:
+    {"from_call": int, "hack_text": str}. From that reward-call index onward, >=50%% of each
+    step's completions are replaced by hack_text, scored as the (gameable) train reward, and
+    that seeded reward is BOTH stashed for the recorder AND returned to the trainer. Returning
+    it to the trainer gives the group a non-zero reward variance, so the policy actually moves
+    and TRL logs a genuine non-zero, varying KL -- otherwise a tiny model that never earns
+    reward produces zero gradient and a flat KL, which the capture path cannot fix. The ORACLE
+    reward is never returned to the trainer. This verifies plumbing on real captured geometry;
+    it does NOT claim the model emergently hacked (that is a full-run question)."""
+    counter = {"calls": 0}
+
+    def _score(fn, prompts, comps, kw):
+        return [float(x) for x in fn(prompts=prompts, completions=comps, **kw)]
+
     def wrapped(prompts=None, completions=None, **kw):
-        train = [float(x) for x in train_fn(prompts=prompts, completions=completions, **kw)]
-        oracle = None
-        if oracle_fn is not None:
-            oracle = [float(x) for x in oracle_fn(prompts=prompts, completions=completions, **kw)]
-        coordinator.stash(completions, train, oracle)
-        return train
+        comps = list(completions or [])
+        rec_comps = comps
+        if seed_hack is not None and counter["calls"] >= seed_hack["from_call"]:
+            rec_comps = list(comps)
+            n = len(rec_comps)
+            k = max(1, (n + 1) // 2)            # >= half, so behavioral_onset (frac .5) fires
+            for j in range(n - k, n):
+                rec_comps[j] = seed_hack["hack_text"]
+        counter["calls"] += 1
+        rec_train = _score(train_fn, prompts, rec_comps, kw)
+        rec_oracle = _score(oracle_fn, prompts, rec_comps, kw) if oracle_fn is not None else None
+        coordinator.stash(rec_comps, rec_train, rec_oracle)
+        return rec_train                        # trainer optimizes this -> policy moves -> KL>0
     return wrapped
 
 
@@ -85,19 +108,24 @@ class FlightRecorderCallback(_TrainerCallback):
         self.coord = coordinator
         self.group_size = group_size
         self.collector = collector  # optional list of StepRecord for the integrity report
+        # HF Trainer appends a step's metrics to log_history AFTER on_step_end, so the
+        # callback reads the *previous* step's scalars and step 1 has none. Carry the last
+        # seen scalars forward (init 0.0) so kl/entropy are always finite (no NaN frame).
+        self._last_logged = {"kl": 0.0, "entropy": 0.0}
 
     def on_step_end(self, args=None, state=None, control=None, **kwargs):
         completions, train, oracle = self.coord.drain()
         if train is None:
             return control
         step = int(getattr(state, "global_step", 0)) if state is not None else 0
+        self._last_logged = {**self._last_logged, **_extract_logged(state)}
         batch = RolloutBatch(
             step=step,
             train_rewards=train,
             oracle_rewards=oracle,
             advantages=group_normalized_advantages(train, self.group_size),
             completions=completions,
-            logged=_extract_logged(state),
+            logged=dict(self._last_logged),
             meta={"group_size": self.group_size})
         rf, of = self.recorder.record(batch)
         if self.collector is not None:
