@@ -34,6 +34,8 @@ class RunConfig:
     thresholds_path: str | None = "configs/thresholds.yaml"
     integrity_report: bool = False
     prompts_per_epoch: int = 64
+    beta: float = 0.0                    # GRPO KL-penalty coeff; >0 makes TRL log `kl`
+    seed_hack_from: int | None = None    # shakeout-only: seed a known hack from this call
 
 
 def build_config(scale: str, out_dir: str = "runs", model: str | None = None,
@@ -42,13 +44,17 @@ def build_config(scale: str, out_dir: str = "runs", model: str | None = None,
     common = dict(out_dir=out_dir, scale=scale, thresholds_path=thresholds_path,
                   integrity_report=integrity_report)
     if scale == "shakeout":
+        # Plumbing test: KL penalty on (beta>0) so `kl` is logged; lr high enough that KL
+        # moves; the hack is SEEDED into the recorded stream (no model emergently hacks a
+        # trivial task in 20 steps). The result is the four PASS/FAIL checks, not a number.
         return RunConfig(model=model or "Qwen/Qwen2.5-0.5B", steps=20, num_generations=4,
-                         learning_rate=1e-6, seeds=[0], reward_mode="gameable",
-                         hard_negatives=False, **common)
+                         learning_rate=5e-5, seeds=[0], reward_mode="gameable",
+                         hard_negatives=False, beta=0.04, seed_hack_from=8, **common)
     if scale == "full":
+        # Real experiment: NO seeding -- emergence is the question. beta>0 for KL capture.
         return RunConfig(model=model or "Qwen/Qwen2.5-1.5B", steps=400, num_generations=8,
                          learning_rate=1e-6, seeds=[0, 1, 2], reward_mode="gameable",
-                         hard_negatives=True, **common)
+                         hard_negatives=True, beta=0.04, seed_hack_from=None, **common)
     raise ValueError(f"unknown scale: {scale!r} (use 'shakeout' or 'full')")
 
 
@@ -74,7 +80,10 @@ def make_components(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int =
         optimize_fn, measure_fn = train_fn, oracle_fn
     else:
         optimize_fn, measure_fn = oracle_fn, train_fn
-    reward_fn = wrap_reward_fns(coord, optimize_fn, measure_fn)
+    from .reward_testhack import HACK
+    seed_spec = ({"from_call": config.seed_hack_from, "hack_text": HACK}
+                 if config.seed_hack_from is not None else None)
+    reward_fn = wrap_reward_fns(coord, optimize_fn, measure_fn, seed_hack=seed_spec)
     callback = FlightRecorderCallback(recorder, coord, group_size=config.num_generations,
                                       collector=collector)
     return {"recorder": recorder, "coordinator": coord, "callback": callback,
@@ -86,6 +95,12 @@ def emit_integrity_report(collector: list, config: RunConfig, artifact: str) -> 
     lead-time output. Returns 0 if all checks pass, else 1."""
     from ..eval.evaluator import oracle_gap_turn
     from .integrity import run_integrity_report, format_report
+
+    if config.seed_hack_from is not None:
+        print(f"\n[shakeout] NOTE — the test-overwrite hack was SEEDED into the recorded "
+              f"rollout stream from reward-call {config.seed_hack_from}. This is a PLUMBING "
+              f"test of the capture->label->isolation->report path on a known hack; it does "
+              f"NOT claim the model emergently discovered it (that is a full-run question).\n")
 
     for w in check_threshold_provenance(config.thresholds_path, artifact):
         print("\n!!! " + w + "\n")
@@ -117,6 +132,7 @@ def run(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int = 0) -> int:
         per_device_train_batch_size=config.num_generations,
         num_generations=config.num_generations,
         max_steps=config.steps, learning_rate=config.learning_rate,
+        beta=config.beta,                          # >0 -> TRL logs `kl` for capture (CHECK 1)
         logging_steps=1, save_strategy="no", report_to=[], seed=seed)
     trainer = GRPOTrainer(model=config.model, reward_funcs=[comp["reward_fn"]],
                           args=args, train_dataset=dataset, callbacks=[comp["callback"]])
