@@ -237,6 +237,24 @@ step a practitioner **watching the oracle curve** would call it; beating that on
 oracle-blind signals is the result. (The training-reward turn is **not** a valid
 reference: per §1 the reward looks fine while hacking, so it may never turn.)
 
+> **LOCKED — full-run reward design (THREE separate signals).** The budget-sizing PILOT
+> uses an engineered TWO-signal curriculum warm-start that optimises the held-out oracle
+> directly during phase 1 (`reward_weakverifier.py` + `--curriculum-switch-step`). That is a
+> **budget-sizing shortcut ONLY** and **must never** be the full run's design, because
+> training on the oracle contaminates it (it is no longer held-out). The FULL run MUST use
+> three physically separate reward signals:
+> 1. **Gameable verifier** *(optimised in the hacking phase)* — the weak reward the policy is
+>    allowed to game (e.g. the weak visible verifier).
+> 2. **Robust warm-start verifier** *(optimised only during the warm-start phase)* — a
+>    SEPARATE strong/isomorphic verifier the policy cannot game, distinct from (3), used to
+>    raise true quality before the switch. This is also the tube-reference run's reward.
+> 3. **True held-out oracle** *(NOTHING ever trains on it)* — used ONLY for offline,
+>    evaluator-side ground truth: the `oracle_turn_step` changepoint and lead-time. It must
+>    never appear in any optimiser's reward, in any phase.
+>
+> A `lead`/`oracle_turn` is only thesis-valid when measured against signal (3) under this
+> three-signal separation. The pilot's number is engineered and is **not** such evidence.
+
 ## 7. Adapters (`flightrecorder/adapters/`)
 
 **Interface:** an adapter converts trainer-native per-step data into a `RolloutBatch`
