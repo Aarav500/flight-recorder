@@ -10,6 +10,7 @@ __pycache__
 .pytest_cache
 .playwright-mcp
 demo-runs
-runs
+runs/*
+!runs/gentle_seed0.jsonl
 *.png
 docs

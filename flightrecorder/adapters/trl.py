@@ -27,6 +27,19 @@ _KL_KEYS = ("kl", "objective/kl", "train/kl")
 _ENTROPY_KEYS = ("entropy", "train/entropy", "objective/entropy")
 
 
+def _completion_text(c) -> str:
+    """Normalize a TRL completion to plain text. Conversational GRPO yields a list of
+    role/content messages (or a single dict); standard GRPO yields a string."""
+    if isinstance(c, str):
+        return c
+    if isinstance(c, dict):
+        return str(c.get("content", ""))
+    if isinstance(c, (list, tuple)) and c:
+        last = c[-1]
+        return str(last.get("content", "")) if isinstance(last, dict) else str(last)
+    return str(c)
+
+
 class TRLCoordinator:
     """Buffer shared between the reward wrappers and the callback (one step's worth)."""
 
@@ -47,7 +60,8 @@ class TRLCoordinator:
         return c, t, o
 
 
-def wrap_reward_fns(coordinator: TRLCoordinator, train_fn, oracle_fn=None, seed_hack=None):
+def wrap_reward_fns(coordinator: TRLCoordinator, train_fn, oracle_fn=None, seed_hack=None,
+                    curriculum_switch=None):
     """Return a TRL-compatible reward fn that also stashes rewards/completions.
 
     TRL calls reward_fn(prompts=..., completions=..., **kw) -> list[float]. We return the
@@ -63,25 +77,39 @@ def wrap_reward_fns(coordinator: TRLCoordinator, train_fn, oracle_fn=None, seed_
     and TRL logs a genuine non-zero, varying KL -- otherwise a tiny model that never earns
     reward produces zero gradient and a flat KL, which the capture path cannot fix. The ORACLE
     reward is never returned to the trainer. This verifies plumbing on real captured geometry;
-    it does NOT claim the model emergently hacked (that is a full-run question)."""
+    it does NOT claim the model emergently hacked (that is a full-run question).
+
+    curriculum_switch (optional, PILOT ONLY): an ENGINEERED warm-start to guarantee a healthy
+    solving phase before gaming. For the first `curriculum_switch` reward-calls the OPTIMISED
+    (returned) reward is the measure/oracle signal (oracle_fn), pushing genuine solving so the
+    held-out oracle rises; from then on it is the train signal (the weak verifier), so the
+    policy can drift onto gaming and the oracle drops. The STASHED rollout (train=weak,
+    oracle=strong) is unchanged, so the recorded oracle trajectory shows the high->low turn.
+    The resulting oracle_turn_step is a BUDGET-SIZING artefact of the switch -- NOT evidence
+    that hacking emerges on its own."""
     counter = {"calls": 0}
 
     def _score(fn, prompts, comps, kw):
         return [float(x) for x in fn(prompts=prompts, completions=comps, **kw)]
 
     def wrapped(prompts=None, completions=None, **kw):
-        comps = list(completions or [])
+        i = counter["calls"]
+        counter["calls"] += 1
+        comps = [_completion_text(c) for c in (completions or [])]   # message-format -> text
         rec_comps = comps
-        if seed_hack is not None and counter["calls"] >= seed_hack["from_call"]:
+        if seed_hack is not None and i >= seed_hack["from_call"]:
             rec_comps = list(comps)
             n = len(rec_comps)
             k = max(1, (n + 1) // 2)            # >= half, so behavioral_onset (frac .5) fires
             for j in range(n - k, n):
                 rec_comps[j] = seed_hack["hack_text"]
-        counter["calls"] += 1
         rec_train = _score(train_fn, prompts, rec_comps, kw)
         rec_oracle = _score(oracle_fn, prompts, rec_comps, kw) if oracle_fn is not None else None
         coordinator.stash(rec_comps, rec_train, rec_oracle)
+        # ENGINEERED curriculum: optimise the strong/measure reward during warm-start so the
+        # oracle rises, then the (weak) train reward so gaming drifts in and the oracle drops.
+        if curriculum_switch is not None and i < curriculum_switch and rec_oracle is not None:
+            return rec_oracle
         return rec_train                        # trainer optimizes this -> policy moves -> KL>0
     return wrapped
 
@@ -112,6 +140,7 @@ class FlightRecorderCallback(_TrainerCallback):
         # callback reads the *previous* step's scalars and step 1 has none. Carry the last
         # seen scalars forward (init 0.0) so kl/entropy are always finite (no NaN frame).
         self._last_logged = {"kl": 0.0, "entropy": 0.0}
+        self._rstd: list[float] = []   # reward-variance history for the frozen-policy backstop
 
     def on_step_end(self, args=None, state=None, control=None, **kwargs):
         completions, train, oracle = self.coord.drain()
@@ -133,6 +162,20 @@ class FlightRecorderCallback(_TrainerCallback):
             self.collector.append(StepRecord(
                 step=step, rollout=rf, oracle=of, completions=completions or [],
                 train_rewards=train, oracle_rewards=oracle))
+            # Live per-step trajectory so the oracle trend is visible in the job logs at the
+            # monitoring check points (stuck-at-zero ~step 10; flat-high drift ~step 55).
+            vis = float(np.mean(train))
+            orc = float(of.oracle_reward) if of is not None else float("nan")
+            print(f"[fr] step={step} visible={vis:.3f} oracle={orc:.3f}", flush=True)
+        # Frozen-policy BACKSTOP: if reward variance is zero for the first several steps, GRPO
+        # has no gradient and the run will never converge — request an early stop so it does not
+        # burn the budget. (Calibration is the primary check; this is the safety net.)
+        self._rstd.append(float(np.std(train)))
+        if (len(self._rstd) >= 6 and step >= 6 and all(s == 0.0 for s in self._rstd[:6])
+                and control is not None and hasattr(control, "should_training_stop")):
+            control.should_training_stop = True
+            print("[fr] FROZEN-POLICY BACKSTOP: reward_std=0 for the first 6 steps (no gradient) "
+                  "-> early stop.", flush=True)
         return control
 
     def on_train_end(self, args=None, state=None, control=None, **kwargs):
