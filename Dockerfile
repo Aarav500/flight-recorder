@@ -22,6 +22,9 @@ RUN pip install --no-cache-dir ".[server]"
 
 COPY --from=web /web/dist ./web/dist
 RUN mkdir -p /opt/flight-recorder/runs
+# Bake the real persisted benign run so the honest demo (the false-positive replay) ships in the
+# image. Source: HF dataset Aarav500/fr-gentle-artifact, gentle_seed0.jsonl (onset 94, S~37.5).
+COPY runs/gentle_seed0.jsonl /opt/flight-recorder/runs/gentle_seed0.jsonl
 
 EXPOSE 8000
 # --factory: call create_app(), which reads FLIGHTRECORDER_RUNS / FLIGHTRECORDER_STATIC.

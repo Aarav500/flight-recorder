@@ -38,7 +38,7 @@ export default function LiveDashboard() {
 
   return (
     <Frame right={<SpeedCtl speed={speed} setSpeed={setSpeed} />}>
-      <Cockpit runId={id} mode="LIVE" state={state} speed={speed} />
+      <Cockpit runId={id} mode="LIVE" state={state} speed={speed} demo />
     </Frame>
   );
 }

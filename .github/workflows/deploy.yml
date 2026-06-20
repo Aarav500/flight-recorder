@@ -1,22 +1,30 @@
 name: deploy
 
-# Build the React app, bake a single container, push to ECR, and roll it on EC2.
+# Builds the web UI, ships the app bundle to the EC2 host via SSM (no SSH, no ECR,
+# no inbound port beyond Cloudflare->80), and restarts the systemd service. Mirrors
+# the manual SSM-direct deploy: tarball -> S3 -> presigned URL -> AWS-RunShellScript.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   AWS_ACCESS_KEY_ID      IAM user key with ECR push permission
-#   AWS_SECRET_ACCESS_KEY  matching secret
-#   AWS_REGION             e.g. us-east-1
-#   ECR_REGISTRY           <account-id>.dkr.ecr.<region>.amazonaws.com
-#   EC2_HOST               public DNS or IP of the EC2 instance
-#   EC2_SSH_KEY            private key (PEM contents) for the ec2-user
-# None of these are hardcoded here — add them manually in the repo settings.
+# Required GitHub secrets (Settings -> Secrets and variables -> Actions):
+#   AWS_ACCESS_KEY_ID      access key for IAM user flightrecorder-gha-deployer
+#   AWS_SECRET_ACCESS_KEY  its secret
+# That IAM user is scoped to ssm:SendCommand on this one instance + S3 on the deploy
+# bucket only. Region / instance / bucket below are config, not secret.
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  INSTANCE_ID: i-0d699e12e83b93346
+  DEPLOY_BUCKET: fr-deploy-325527186655
+
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +35,7 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Build React app (fail fast before the expensive steps)
+      - name: Build web UI
         working-directory: web
         run: |
           npm ci
@@ -38,47 +46,75 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, and push image
-        env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-          IMAGE: flight-recorder
+      - name: Package and upload bundle to S3
+        id: pkg
         run: |
-          docker build -t "$ECR_REGISTRY/$IMAGE:${{ github.sha }}" -t "$ECR_REGISTRY/$IMAGE:latest" .
-          docker push "$ECR_REGISTRY/$IMAGE:${{ github.sha }}"
-          docker push "$ECR_REGISTRY/$IMAGE:latest"
+          set -euo pipefail
+          KEY="fr-deploy-${GITHUB_SHA}.tgz"
+          tar czf /tmp/fr-deploy.tgz --exclude='__pycache__' \
+            flightrecorder web/dist runs/gentle_seed0.jsonl \
+            configs/thresholds.yaml pyproject.toml README.md
+          aws s3 cp /tmp/fr-deploy.tgz "s3://${DEPLOY_BUCKET}/${KEY}"
+          URL=$(aws s3 presign "s3://${DEPLOY_BUCKET}/${KEY}" --expires-in 1800)
+          echo "url=${URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy on EC2 over SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -e
-            ECR_REGISTRY="${{ secrets.ECR_REGISTRY }}"
-            AWS_REGION="${{ secrets.AWS_REGION }}"
-            aws ecr get-login-password --region "$AWS_REGION" \
-              | docker login --username AWS --password-stdin "$ECR_REGISTRY"
-            docker pull "$ECR_REGISTRY/flight-recorder:latest"
-            docker stop flight-recorder 2>/dev/null || true
-            docker rm flight-recorder 2>/dev/null || true
-            docker run -d --name flight-recorder --restart unless-stopped \
-              -p 8000:8000 \
-              -v /opt/flight-recorder/runs:/opt/flight-recorder/runs \
-              "$ECR_REGISTRY/flight-recorder:latest"
-            docker image prune -f || true
-
-      - name: Verify /health
+      - name: Build SSM deploy script
         run: |
-          for i in $(seq 1 30); do
-            if curl -fsS "http://${{ secrets.EC2_HOST }}:8000/health"; then
-              echo " — container is up"; exit 0
-            fi
-            sleep 3
-          done
-          echo "health check failed after 90s"; exit 1
+          set -euo pipefail
+          cat > /tmp/script.sh <<EOF
+          set -e
+          rm -rf /opt/flight-recorder && mkdir -p /opt/flight-recorder
+          curl -fsSL "${{ steps.pkg.outputs.url }}" -o /tmp/fr-deploy.tgz
+          tar xzf /tmp/fr-deploy.tgz -C /opt/flight-recorder
+          apt-get update -y
+          apt-get install -y python3-venv python3-pip
+          python3 -m venv /opt/flight-recorder/venv
+          /opt/flight-recorder/venv/bin/pip install --upgrade pip wheel
+          cd /opt/flight-recorder && /opt/flight-recorder/venv/bin/pip install ".[server]"
+          printf '%s\n' \
+            '[Unit]' \
+            'Description=Flight Recorder honest demo' \
+            'After=network.target' \
+            '[Service]' \
+            'Environment=FLIGHTRECORDER_RUNS=/opt/flight-recorder/runs' \
+            'Environment=FLIGHTRECORDER_STATIC=/opt/flight-recorder/web/dist' \
+            'ExecStart=/opt/flight-recorder/venv/bin/uvicorn flightrecorder.server.app:create_app --factory --host 0.0.0.0 --port 80' \
+            'Restart=always' \
+            '[Install]' \
+            'WantedBy=multi-user.target' \
+            > /etc/systemd/system/flightrecorder.service
+          systemctl daemon-reload
+          systemctl enable flightrecorder.service
+          systemctl restart flightrecorder.service
+          sleep 10
+          curl -fsS http://localhost:80/health && echo FR_HEALTH_OK
+          EOF
+          jq -n --rawfile s /tmp/script.sh \
+            '{commands: ($s | rtrimstr("\n") | split("\n"))}' > /tmp/params.json
+
+      - name: Send SSM command and wait
+        run: |
+          set -euo pipefail
+          CID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment "GitHub Actions deploy ${GITHUB_SHA}" \
+            --timeout-seconds 600 \
+            --parameters file:///tmp/params.json \
+            --query Command.CommandId --output text)
+          echo "Command: $CID"
+          aws ssm wait command-executed --command-id "$CID" --instance-id "$INSTANCE_ID" || true
+          STATUS=$(aws ssm get-command-invocation --command-id "$CID" --instance-id "$INSTANCE_ID" --query Status --output text)
+          echo "----- stdout (tail) -----"
+          aws ssm get-command-invocation --command-id "$CID" --instance-id "$INSTANCE_ID" --query StandardOutputContent --output text | tail -30
+          echo "----- status: $STATUS -----"
+          test "$STATUS" = "Success"
+
+      - name: Verify public health
+        run: |
+          set -euo pipefail
+          code=$(curl -s -m 20 -o /dev/null -w '%{http_code}' https://flightrecorder.aarav-shah.com/health)
+          echo "https health: $code"
+          test "$code" = "200"
