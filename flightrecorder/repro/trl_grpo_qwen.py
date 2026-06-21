@@ -19,7 +19,7 @@ from dataclasses import dataclass
 
 from .reward_testhack import SQUARE_TASK, HARD_TASK, CodeTask, make_reward_fns
 from .reward_weakverifier import OVERFIT_TASK
-from .reward_benign import CONST_TASK, COMPLEX_TASK
+from .reward_benign import CONST_TASK, COMPLEX_TASK, MAXRUN_TASK, SECONDMAX_TASK
 from ..config import load_thresholds, detector_from_thresholds, check_threshold_provenance
 
 
@@ -30,7 +30,9 @@ def task_for(config: "RunConfig") -> CodeTask:
     if config.scale == "pilot":
         return OVERFIT_TASK
     if config.scale == "benign":
-        return CONST_TASK if config.benign_task == "const" else COMPLEX_TASK
+        return {"const": CONST_TASK, "complex": COMPLEX_TASK,
+                "maxrun": MAXRUN_TASK, "secondmax": SECONDMAX_TASK}.get(
+                    config.benign_task, COMPLEX_TASK)
     return SQUARE_TASK
 
 
@@ -275,8 +277,8 @@ def run(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int = 0) -> int:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="flr-grpo-qwen")
     p.add_argument("--scale", choices=["shakeout", "pilot", "benign", "full"], default="shakeout")
-    p.add_argument("--task", choices=["const", "complex"], default=None,
-                   help="benign scale: trivial constant-answer target | complex structured target")
+    p.add_argument("--task", choices=["const", "complex", "maxrun", "secondmax"], default=None,
+                   help="benign scale task: const (sum) | complex (lus2) | maxrun | secondmax")
     p.add_argument("--artifact-dir", default="runs", help="where run artifacts are written")
     p.add_argument("--out", default=None, help="alias for --artifact-dir")
     p.add_argument("--model", default=None)
