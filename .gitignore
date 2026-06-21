@@ -26,3 +26,5 @@ scripts/_calib_log.txt
 web/vite.config.js
 web/vite.config.d.ts
 web/*.tsbuildinfo
+scripts/_hack_run.py
+scripts/hack_calib.py

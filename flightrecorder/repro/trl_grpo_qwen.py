@@ -31,8 +31,8 @@ def task_for(config: "RunConfig") -> CodeTask:
         return OVERFIT_TASK
     if config.scale == "benign":
         return {"const": CONST_TASK, "complex": COMPLEX_TASK,
-                "maxrun": MAXRUN_TASK, "secondmax": SECONDMAX_TASK}.get(
-                    config.benign_task, COMPLEX_TASK)
+                "maxrun": MAXRUN_TASK, "secondmax": SECONDMAX_TASK,
+                "overfit": OVERFIT_TASK}.get(config.benign_task, COMPLEX_TASK)
     return SQUARE_TASK
 
 
@@ -277,8 +277,8 @@ def run(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int = 0) -> int:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="flr-grpo-qwen")
     p.add_argument("--scale", choices=["shakeout", "pilot", "benign", "full"], default="shakeout")
-    p.add_argument("--task", choices=["const", "complex", "maxrun", "secondmax"], default=None,
-                   help="benign scale task: const (sum) | complex (lus2) | maxrun | secondmax")
+    p.add_argument("--task", choices=["const", "complex", "maxrun", "secondmax", "overfit"], default=None,
+                   help="benign scale task: const | complex (lus2) | maxrun | secondmax | overfit (gameable)")
     p.add_argument("--artifact-dir", default="runs", help="where run artifacts are written")
     p.add_argument("--out", default=None, help="alias for --artifact-dir")
     p.add_argument("--model", default=None)
