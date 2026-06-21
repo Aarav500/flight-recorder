@@ -17,6 +17,12 @@ web/dist/
 demo-runs/
 .playwright-mcp/
 *.png
+
+# generated HF-Jobs launcher artifacts (rebuilt by scripts/launch_*.py; contain baked base64)
+scripts/_batch_*.py
+scripts/multitask_calib.py
+scripts/_batch_jobs.txt
+scripts/_calib_log.txt
 web/vite.config.js
 web/vite.config.d.ts
 web/*.tsbuildinfo
