@@ -28,3 +28,4 @@ web/vite.config.d.ts
 web/*.tsbuildinfo
 scripts/_hack_run.py
 scripts/hack_calib.py
+scripts/_benign_calib.py
