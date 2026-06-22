@@ -56,6 +56,7 @@ class RunConfig:
     curriculum_switch: int | None = None  # pilot: ENGINEERED warm-start length (calls)
     benign_task: str = "complex"         # benign scale default: "complex" (lus2) is the
     #                                      calibration-confirmed boundary task; "const" saturates
+    algo: str = "grpo"                   # "grpo" | "rloo" (RLOOTrainer, TRL >=0.22 same interface)
 
 
 def build_config(scale: str, out_dir: str = "runs", model: str | None = None,
@@ -240,7 +241,10 @@ def run(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int = 0) -> int:
     try:
         import torch  # noqa: F401
         from datasets import Dataset
-        from trl import GRPOConfig, GRPOTrainer
+        if config.algo == "rloo":
+            from trl import RLOOConfig as _Config, RLOOTrainer as _Trainer
+        else:
+            from trl import GRPOConfig as _Config, GRPOTrainer as _Trainer
     except Exception as e:  # pragma: no cover - only without the [train] extra / GPU
         print(f"[flightrecorder] real run needs extras: pip install 'flightrecorder[train]' "
               f"and a GPU. Import failed: {e}")
@@ -254,7 +258,7 @@ def run(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int = 0) -> int:
     else:
         prompt = task.prompt
     dataset = Dataset.from_dict({"prompt": [prompt] * config.prompts_per_epoch})
-    args = GRPOConfig(
+    args = _Config(
         output_dir=os.path.join(config.out_dir, "trainer"),
         per_device_train_batch_size=config.num_generations,
         num_generations=config.num_generations,
@@ -262,8 +266,8 @@ def run(config: RunConfig, task: CodeTask = SQUARE_TASK, seed: int = 0) -> int:
         max_completion_length=256,                 # bound generation cost
         beta=config.beta,                          # >0 -> TRL logs `kl` for capture (CHECK 1)
         logging_steps=1, save_strategy="no", report_to=[], seed=seed)
-    trainer = GRPOTrainer(model=config.model, reward_funcs=[comp["reward_fn"]],
-                          args=args, train_dataset=dataset, callbacks=[comp["callback"]])
+    trainer = _Trainer(model=config.model, reward_funcs=[comp["reward_fn"]],
+                       args=args, train_dataset=dataset, callbacks=[comp["callback"]])
     trainer.train()
     comp["recorder"].close()
     print(f"[flightrecorder] wrote {comp['artifact']}")
@@ -287,6 +291,8 @@ def main(argv=None) -> int:
                    help="override learning rate — the benign-pair SHARPNESS lever (high=sharp)")
     p.add_argument("--reward-mode", choices=["gameable", "robust"], default=None,
                    help="controlled pair: gameable (weak verifier) | robust (strong reference)")
+    p.add_argument("--algo", choices=["grpo", "rloo"], default=None,
+                   help="RL algorithm: grpo (default) | rloo (RLOOTrainer, same interface in TRL>=0.22)")
     p.add_argument("--curriculum-switch-step", type=int, default=None,
                    help="pilot: ENGINEERED warm-start length (optimise strong verifier first)")
     p.add_argument("--seed", type=int, default=0)
@@ -306,6 +312,8 @@ def main(argv=None) -> int:
         config.learning_rate = a.lr
     if a.reward_mode is not None:
         config.reward_mode = a.reward_mode
+    if a.algo is not None:
+        config.algo = a.algo
     if a.curriculum_switch_step is not None:
         config.curriculum_switch = a.curriculum_switch_step
     if a.task is not None:

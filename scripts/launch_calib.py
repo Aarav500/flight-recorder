@@ -49,7 +49,7 @@ import numpy as np  # noqa: E402
 import torch  # noqa: E402
 from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: E402
 
-MODEL = "Qwen/Qwen2.5-1.5B"
+MODEL = "__MODEL__"
 GROUPS = 6
 G = 8
 TEMP = 1.0
@@ -125,10 +125,12 @@ for name, prompt, cases in TASKS:
           f"(gradient={grad:.2f}, mean in (0.05,0.95)={0.05 < a.mean() < 0.95})", flush=True)
 '''
 
-UV = UV.replace("__PKG_B64__", B64)
+import sys
+MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen2.5-1.5B"
+UV = UV.replace("__PKG_B64__", B64).replace("__MODEL__", MODEL)
 out_path = ROOT / "scripts" / "multitask_calib.py"
 out_path.write_text(UV, encoding="utf-8")
-print(f"wrote {out_path} ({len(UV)} chars)")
+print(f"wrote {out_path} ({len(UV)} chars)  model={MODEL}")
 
 job = run_uv_job(str(out_path), flavor="l4x1", timeout="30m",
                  secrets={"HF_TOKEN": get_token()})
