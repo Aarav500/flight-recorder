@@ -46,6 +46,33 @@ trainer (TRL/verl/OpenRLHF)
                                └► OracleFrame  ─► Evaluator (lead time, ground-truth onset)
 ```
 
+## Gym reward-audit wrapper (opt-in, separate from the detector above)
+
+`flightrecorder.wrappers.RewardAuditWrapper` is a small, separate tool: an opt-in
+Gymnasium environment wrapper that records episode-level reward statistics for
+cross-run audit. It grew out of a discussion on
+[Farama-Foundation/Gymnasium#1619](https://github.com/Farama-Foundation/Gymnasium/issues/1619)
+about whether a general-purpose "reward-hacking audit wrapper" belonged in Gymnasium
+core — the conclusion was **no**, and this module exists here instead, scoped narrowly:
+
+**What it records**: episode-level reward mean/std (computed only from the scalar
+`env.step()` rewards actually returned), a caller-supplied reward-function
+version/digest (so records from different reward-function revisions are never
+conflated), and a rolling reward-drift signal with an explicit `state` field so a
+cold-start "not enough episodes yet" period is never reported as a filler zero.
+
+**What it deliberately does NOT do**: it does not, and structurally cannot, infer *why*
+a reward changed or decompose a reward into components — a wrapper only ever sees the
+scalar an environment returns. It also carries no ground-truth/oracle field of any
+kind; if you want to compare an audited run against a held-out oracle signal, that
+comparison has to happen in code you own, using data you supply out-of-band.
+
+Install: `pip install -e ".[gym]"`. Runnable example:
+`python examples/gym_reward_audit_example.py`. Tests: `pytest tests/test_gym_audit.py`.
+
+This is a concrete, runnable case first — not yet proposed to Gymnasium's external-tools
+list. See the issue thread above for why that ordering matters.
+
 ## Status
 
 Core complete, harness-validated, real run launch-ready; **thesis: pending real run.**
