@@ -4,10 +4,14 @@
 
 This wrapper records ONLY what the environment or caller explicitly exposes:
 
-- episode-level reward statistics (mean, std, min, max) computed from the rewards
+- episode-level reward statistics (mean, std) computed from the rewards
   ``env.step()`` actually returned -- nothing inferred from inside the environment;
-- a caller-supplied reward-function version/digest, carried in ``ProducerRef.version``
-  so records from different reward-function revisions are never silently conflated;
+- a caller-supplied reward-function version/digest, carried in
+  ``ProducerRef.config["reward_fn_version"]``. ``ProducerRef.version`` itself is the
+  wrapper's own version (``_WRAPPER_VERSION``), not the reward function's -- the two
+  are deliberately separate so a wrapper upgrade is never confused with a
+  reward-function revision, and records from different reward-function revisions are
+  never silently conflated;
 - readiness/derivation metadata for the one rolling signal this wrapper computes
   (reward drift vs. a reference window), so a cold-start "not enough episodes yet"
   state is never confused with a genuine zero-drift reading.
@@ -49,9 +53,10 @@ class RewardAuditWrapper(gym.Wrapper):
         env: the Gymnasium environment to wrap.
         reward_fn_version: a caller-supplied string identifying the reward function's
             revision (e.g. a git SHA, a semantic version, or a hash of its config) --
-            REQUIRED, not optional, because the whole point of ``ProducerRef.version``
-            is to make cross-run audits possible; a wrapper that silently defaulted
-            this to something meaningless would defeat that purpose.
+            REQUIRED, not optional, because the whole point of carrying it in
+            ``ProducerRef.config["reward_fn_version"]`` is to make cross-run audits
+            possible; a wrapper that silently defaulted this to something meaningless
+            would defeat that purpose.
         run_id: an identifier grouping records from one run (e.g. a training run ID).
             Defaults to a fresh UUID if not supplied.
         window_size: number of most-recent episodes' reward means used as the rolling
@@ -76,8 +81,8 @@ class RewardAuditWrapper(gym.Wrapper):
         if not reward_fn_version:
             raise ValueError(
                 "reward_fn_version is required -- this wrapper's entire purpose is "
-                "cross-run audit via ProducerRef.version, which is meaningless if "
-                "every run reports the same placeholder version."
+                "cross-run audit via ProducerRef.config['reward_fn_version'], which is "
+                "meaningless if every run reports the same placeholder version."
             )
         self._reward_fn_version = reward_fn_version
         self._run_id = run_id or str(uuid.uuid4())

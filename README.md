@@ -56,10 +56,13 @@ about whether a general-purpose "reward-hacking audit wrapper" belonged in Gymna
 core — the conclusion was **no**, and this module exists here instead, scoped narrowly:
 
 **What it records**: episode-level reward mean/std (computed only from the scalar
-`env.step()` rewards actually returned), a caller-supplied reward-function
-version/digest (so records from different reward-function revisions are never
-conflated), and a rolling reward-drift signal with an explicit `state` field so a
-cold-start "not enough episodes yet" period is never reported as a filler zero.
+`env.step()` rewards actually returned), a rolling reward-drift signal with an
+explicit `state` field so a cold-start "not enough episodes yet" period is never
+reported as a filler zero, and a caller-supplied reward-function version/digest
+carried in `ProducerRef.config["reward_fn_version"]` (so records from different
+reward-function revisions are never conflated). `ProducerRef.version` itself is the
+wrapper's own version, not the reward function's — the two are kept separate on
+purpose.
 
 **What it deliberately does NOT do**: it does not, and structurally cannot, infer *why*
 a reward changed or decompose a reward into components — a wrapper only ever sees the
