@@ -70,8 +70,14 @@ scalar an environment returns. It also carries no ground-truth/oracle field of a
 kind; if you want to compare an audited run against a held-out oracle signal, that
 comparison has to happen in code you own, using data you supply out-of-band.
 
-Install: `pip install -e ".[gym]"`. Runnable example:
-`python examples/gym_reward_audit_example.py`. Tests: `pytest tests/test_gym_audit.py`.
+Install: `pip install -e ".[gym]"`. Runnable examples:
+`python examples/gym_reward_audit_example.py` (synthetic CartPole reward-scaling case)
+and `python examples/mujoco_reward_hacking_audit_example.py` (a real-use-case demo:
+a genuine `HalfCheetah-v5` run switching from an honest bounding gait to the
+documented "flip-and-slide" MuJoCo locomotion exploit, with a constant reward
+function throughout — showing what the wrapper actually catches when *behavior*,
+not the reward function, is what changes). Requires `gymnasium[mujoco]`.
+Tests: `pytest tests/test_gym_audit.py`.
 
 This is a concrete, runnable case first — not yet proposed to Gymnasium's external-tools
 list. See the issue thread above for why that ordering matters.
