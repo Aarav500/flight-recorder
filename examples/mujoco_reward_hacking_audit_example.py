@@ -72,7 +72,13 @@ def _flip_and_slide_action(t: int) -> np.ndarray:
     return np.full(6, _SLIDE_AMPLITUDE)
 
 
-def _run_episodes(env: RewardAuditWrapper, action_fn, n_episodes: int, seed_offset: int) -> None:
+def _run_episodes(env: RewardAuditWrapper, action_fn, n_episodes: int, seed_offset: int) -> float:
+    """Runs the given policy for ``n_episodes`` and returns the max |pitch| observed
+    across all of them -- pitch telemetry only, kept local to this demo script and
+    never fed into the wrapper or ``EpisodeRecord`` (the oracle/ground-truth boundary
+    stays intact; this is behavior verification for the example's own claims, not a
+    signal the audited pipeline sees)."""
+    max_abs_pitch = 0.0
     for ep in range(n_episodes):
         env.reset(seed=seed_offset + ep)
         t = 0
@@ -80,7 +86,10 @@ def _run_episodes(env: RewardAuditWrapper, action_fn, n_episodes: int, seed_offs
         while not (terminated or truncated):
             action = np.clip(action_fn(t), env.action_space.low, env.action_space.high)
             _obs, _reward, terminated, truncated, _info = env.step(action)
+            pitch = float(env.unwrapped.data.qpos[2])
+            max_abs_pitch = max(max_abs_pitch, abs(pitch))
             t += 1
+    return max_abs_pitch
 
 
 def main() -> None:
@@ -96,12 +105,21 @@ def main() -> None:
     )
 
     print("Phase 1: genuine bounding gait (upright locomotion, no exploit)")
-    _run_episodes(audited_env, _bounding_gait_action, _LEGIT_EPISODES, seed_offset=0)
+    legit_max_pitch = _run_episodes(audited_env, _bounding_gait_action, _LEGIT_EPISODES, seed_offset=0)
+    print(f"  max |pitch| over phase 1: {legit_max_pitch:.4f} rad (flip threshold: {_FLIP_PITCH_THRESHOLD} rad)")
 
     print("Phase 2: flip-and-slide exploit (same reward function, hacking behavior)")
-    _run_episodes(audited_env, _flip_and_slide_action, _HACKING_EPISODES, seed_offset=1000)
+    hacking_max_pitch = _run_episodes(audited_env, _flip_and_slide_action, _HACKING_EPISODES, seed_offset=1000)
+    print(f"  max |pitch| over phase 2: {hacking_max_pitch:.4f} rad (flip threshold: {_FLIP_PITCH_THRESHOLD} rad)")
 
     audited_env.close()
+
+    # Auditable behavior check: the exploit phase must actually cross the flip
+    # threshold, or this example's "genuine flip-and-slide" claim would be false.
+    assert hacking_max_pitch > _FLIP_PITCH_THRESHOLD, (
+        f"Phase 2 never flipped (max |pitch|={hacking_max_pitch:.4f} <= "
+        f"{_FLIP_PITCH_THRESHOLD}) -- the exploit action sequence needs tuning."
+    )
 
     print(f"\nRecorded {len(audited_env.records)} episodes.\n")
     legit_means = [r.signals["reward_mean"].value for r in audited_env.records[:_LEGIT_EPISODES]]
