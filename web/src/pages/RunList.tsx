@@ -4,6 +4,8 @@ import Frame from "../components/Frame";
 import { listRuns, type RunSummary } from "../api";
 import { C } from "../theme";
 
+const COLS = "minmax(0,1.4fr) 90px 70px 80px 110px 90px 120px";
+
 export default function RunList() {
   const [runs, setRuns] = useState<RunSummary[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -14,84 +16,84 @@ export default function RunList() {
 
   return (
     <Frame>
-      <div className="label mb-3" style={{ color: C.dim }}>
-        recorded runs · black-box archive
-      </div>
+      <p className="prose max-w-[800px] mb-7">
+        Flight Recorder records the geometry of GRPO training runs and flags the onset of
+        reward hacking from rollout statistics alone — before a held-out oracle reveals it.
+        Each row below is a recorded run. Open one to read the detector's finding.
+      </p>
+
       {err && (
-        <div className="panel p-4 mb-4 font-mono text-[12px]" style={{ color: C.amber }}>
-          backend unreachable — start it with{" "}
-          <span style={{ color: C.phos }}>flr serve --runs runs</span>
+        <div className="section p-4 mb-5" style={{ fontSize: 13, color: C.ink2 }}>
+          Backend unreachable. Start it with{" "}
+          <span className="mono" style={{ color: C.accent }}>flr serve --runs runs</span>.
         </div>
       )}
-      {runs && runs.length === 0 && <EmptyState />}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {runs?.map((r) => (
-          <RunCard key={r.id} r={r} />
-        ))}
-      </div>
+
+      {runs && runs.length === 0 && <Empty />}
+
+      {runs && runs.length > 0 && (
+        <div className="section">
+          <div
+            className="grid items-center px-5 py-2.5 rule-b"
+            style={{ gridTemplateColumns: COLS, columnGap: 16 }}
+          >
+            {["Run", "Status", "Steps", "Onset", "Oracle turn", "Lead", ""].map((h) => (
+              <span key={h} className="label">{h}</span>
+            ))}
+          </div>
+          {runs.map((r, i) => (
+            <Row key={r.id} r={r} first={i === 0} />
+          ))}
+        </div>
+      )}
     </Frame>
   );
 }
 
-function RunCard({ r }: { r: RunSummary }) {
+function Row({ r, first }: { r: RunSummary; first: boolean }) {
   const onset = r.status === "onset";
+  const led = r.lead != null && r.lead > 0;
   return (
-    <div className="panel p-4 rise flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-sm" style={{ color: C.text }}>
-          {r.id}
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="lamp" style={{ color: onset ? C.alarm : C.phos }} />
-          <span className="label" style={{ color: onset ? C.alarm : C.phos }}>
-            {onset ? "ONSET" : "CLEAN"}
-          </span>
-        </span>
-      </div>
-      <div className="grid grid-cols-3 gap-2 font-mono text-[12px]">
-        <KV k="steps" v={String(r.steps)} />
-        <KV k="onset" v={r.onset_step != null ? String(r.onset_step) : "—"}
-            color={onset ? C.alarm : undefined} />
-        <KV k="lead" v={r.lead != null ? `${r.lead >= 0 ? "+" : ""}${r.lead}` : "—"}
-            color={r.lead != null && r.lead > 0 ? C.phos : undefined} />
-      </div>
-      <div className="flex gap-2 mt-1">
-        <Link to={`/live/${r.id}`}
-          className="flex-1 text-center py-1.5 rounded font-display tracking-[0.16em] text-[12px]"
-          style={{ color: C.phos, border: `1px solid ${C.line}` }}>
-          ▶ LIVE
-        </Link>
-        <Link to={`/report/${r.id}`}
-          className="flex-1 text-center py-1.5 rounded font-display tracking-[0.16em] text-[12px]"
-          style={{ color: C.cyan, border: `1px solid ${C.line}` }}>
-          ◷ REPORT
-        </Link>
-      </div>
+    <div
+      className={`grid items-center px-5 py-3.5 ${first ? "" : "rule-t"}`}
+      style={{ gridTemplateColumns: COLS, columnGap: 16 }}
+    >
+      <Link to={`/report/${r.id}`} className="mono truncate" style={{ fontSize: 13, color: C.ink }}>
+        {r.id}
+      </Link>
+      <span className="label" style={{ color: onset ? C.accent : C.muted, fontWeight: 600 }}>
+        {onset ? "Onset" : "Clean"}
+      </span>
+      <span className="mono" style={{ fontSize: 12.5, color: C.ink2 }}>{r.steps}</span>
+      <span className="mono" style={{ fontSize: 12.5, color: onset ? C.accent : C.faint }}>
+        {r.onset_step != null ? r.onset_step : "—"}
+      </span>
+      <span className="mono" style={{ fontSize: 12.5, color: C.ink2 }}>
+        {r.oracle_turn != null ? r.oracle_turn : "—"}
+      </span>
+      <span className="mono" style={{ fontSize: 12.5, color: led ? C.accent : C.ink2 }}>
+        {r.lead != null ? `${r.lead > 0 ? "+" : ""}${r.lead}` : "—"}
+      </span>
+      <span className="flex gap-4 justify-end">
+        <Link to={`/report/${r.id}`} className="label" style={{ color: C.ink }}>Report</Link>
+        <Link to={`/live/${r.id}`} className="label" style={{ color: C.muted }}>Live</Link>
+      </span>
     </div>
   );
 }
 
-function KV({ k, v, color }: { k: string; v: string; color?: string }) {
+function Empty() {
   return (
-    <div className="flex flex-col">
-      <span className="label">{k}</span>
-      <span style={{ color: color || C.text }}>{v}</span>
-    </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="panel p-6 rise font-mono text-[12px] leading-relaxed" style={{ color: C.dim }}>
-      <div className="font-display tracking-[0.18em] text-base mb-3" style={{ color: C.text }}>
-        NO RUNS ON RECORD
-      </div>
-      generate one, then point the server at it:
-      <pre className="mt-3 p-3 rounded overflow-auto"
-        style={{ background: "#0a0f10", border: `1px solid ${C.line}`, color: C.phos }}>
-{`flr synth --seed 1 --steps 200 --tstar 100 --out runs/demo.jsonl
-flr serve --runs runs`}
-      </pre>
+    <div className="section p-6">
+      <h2 style={{ fontSize: 15, fontWeight: 600, color: C.ink }}>No runs on record</h2>
+      <p className="mt-2 mb-3" style={{ fontSize: 13, color: C.muted, maxWidth: 620 }}>
+        Generate a synthetic run, then point the server at its directory:
+      </p>
+      <pre
+        className="mono p-4"
+        style={{ fontSize: 12, background: "#f4f2ec", border: `1px solid ${C.rule}`, color: C.ink2, overflow: "auto" }}
+      >{`flr synth --seed 1 --steps 200 --tstar 100 --out runs/demo.jsonl
+flr serve --runs runs`}</pre>
     </div>
   );
 }
