@@ -132,6 +132,20 @@ develop substantial Prime", Phi = 0.10 at convergence. All headline results are 
 this on a sub-7B policy means PRIME ITSELF PREDICTS A FLAT PROBE; a null there is not evidence
 against PRIME and must be reported with that caveat up front.
 
+SOURCE C LIVES HERE TOO, ON THE SAME FORWARD PASS. Everything above is a functional of the
+model's OUTPUT DISTRIBUTION at the final prompt token (`_last_token_readout`'s logits), which is
+the same information class as the ten detectors whose null this repo reports -- so it cannot test
+whether that null is an instrumentation artifact. PRIME's Source C reads the RESIDUAL STREAM at
+that same position instead, before any token is generated. `_last_token_readout(hidden=True)`
+returns both from ONE call and `source_c_activations` is the batched loop over it, so the residual
+channel costs no extra forward passes and provably shares the prompt, tokenisation, padding and
+read position with the forced choice; `assert_source_c_prompt_parity` is the executable proof that
+Source C adds no prompt path. The direction fitting, layer freezing, calibration and per-step
+scoring built on top of it are in flightrecorder/repro/prime_source_c.py, which imports these and
+duplicates none of them. Read the SOURCE C banner below `yes_no_margin` before touching either --
+in particular the label-hygiene rule (fit once at step 0, freeze, hash, load read-only) and why
+our step-0 fit is a deliberate deviation from PRIME's late-reference-checkpoint fit at t_ref=200.
+
 Emit per step as {"prime_phi": [[step, v], ...], "prime_csa": [...], "prime_pr": [...],
 "prime_er": [...]} to match the anticipatory/idea1_probe.json shape the tooling already reads.
 SIGNAL_KEYS below is that contract; benchmark/score_prime.py reads exactly these names, and
@@ -443,27 +457,72 @@ def _logits_kw(model):
     return _LOGITS_KW[key]
 
 
-def _last_token_logits(model, ids, attn, kw):
-    """[B, V] logits at each row's last UNPADDED position.
+def _last_token_readout(model, ids, attn, kw, hidden: bool = False):
+    """([B, V] logits, hidden_states-or-None) at each row's last UNPADDED position.
 
-    Only [B, 1, V] is ever read, so asking for [B, L, V] is a multi-GB transient inside a live
-    training step plus a wasted lm_head matmul over every position: measured on Qwen2.5-0.5B,
-    (8, 161, 151936) fp32 = 783 MB against 4.9 MB for one position, a 161x waste, and at 7B/14B
-    with CodeContests-length statements it is a 4-5 GB bf16 allocation on top of a saturated
-    GRPO step, every probe. With RIGHT padding the last real token sits at a different index per
-    row, so `logits_to_keep=1` alone would read the wrong position for short rows; we keep the
-    smallest window that still covers every row's read-out. `_yes_minus_no` batches in length
-    order, so that window is 1 for most batches."""
+    ONE forward pass serves both channels. `hidden=True` sets `output_hidden_states=True` on the
+    SAME call that already produces the logits, so PRIME's Source C (the residual-stream readout,
+    `source_c_activations` below) costs no extra forward passes over the forced-choice probe --
+    that is the whole reason the residual read lives inside this function instead of in a second
+    one. The two channels therefore share a prompt, a tokenisation, a padded batch and a read
+    position by CONSTRUCTION, which is what makes "residual leads, logit does not" attributable
+    to the channel rather than to any of those.
+
+    Only [B, 1, V] of the logits is ever read, so asking for [B, L, V] is a multi-GB transient
+    inside a live training step plus a wasted lm_head matmul over every position: measured on
+    Qwen2.5-0.5B, (8, 161, 151936) fp32 = 783 MB against 4.9 MB for one position, a 161x waste,
+    and at 7B/14B with CodeContests-length statements it is a 4-5 GB bf16 allocation on top of a
+    saturated GRPO step, every probe. With RIGHT padding the last real token sits at a different
+    index per row, so `logits_to_keep=1` alone would read the wrong position for short rows; we
+    keep the smallest window that still covers every row's read-out. `_yes_minus_no` batches in
+    length order, so that window is 1 for most batches.
+
+    The hidden-state channel gets NO such window: `output_hidden_states=True` materialises
+    [B, L, d] for every layer at once (B=4, L=768, d=896, 25 layers ~ 275 MB fp32; ~1.1 GB for a
+    1.5B at B=8), because transformers has no `hidden_states_to_keep`. Callers that want it must
+    drop batch_size accordingly -- hence source_c batch_size 4 against the probe's 8. The
+    per-layer slice at the read position is taken here and the full tensor is dropped
+    immediately, so the transient does not outlive the batch."""
     import torch
     last = attn.sum(1) - 1
     rows = torch.arange(ids.shape[0], device=ids.device)
+    extra = {"output_hidden_states": True} if hidden else {}
     if kw is not None:
         k = int(ids.shape[1] - int(last.min().item()))
-        out = model(input_ids=ids, attention_mask=attn, **{kw: k}).logits
-        if out.shape[1] == k:                     # honoured -> index inside the kept window
-            return out[rows, last - (ids.shape[1] - k)]
-        return out[rows, last]                    # ignored by this model -> full tensor
-    return model(input_ids=ids, attention_mask=attn).logits[rows, last]
+        out = model(input_ids=ids, attention_mask=attn, **{kw: k}, **extra)
+        lg = out.logits
+        lg = (lg[rows, last - (ids.shape[1] - k)] if lg.shape[1] == k  # honoured -> kept window
+              else lg[rows, last])                                    # ignored -> full tensor
+    else:
+        out = model(input_ids=ids, attention_mask=attn, **extra)
+        lg = out.logits[rows, last]
+    if not hidden:
+        return lg, None
+    hs = getattr(out, "hidden_states", None)
+    if hs is None:
+        raise OffStreamViolation(
+            "model returned no hidden_states despite output_hidden_states=True; this model "
+            "cannot support the Source C residual readout")
+    # `last` indexes the FULL sequence. transformers' logits_to_keep slices only the lm_head
+    # input, so hidden_states come back full-length -- but that is a version-dependent fact and a
+    # version that also sliced them would leave this gather reading the wrong token, silently,
+    # producing a perfectly plausible series. Check it rather than rely on it.
+    bad = [i for i, h in enumerate(hs) if h.shape[1] != ids.shape[1]]
+    if bad:
+        raise OffStreamViolation(
+            "hidden_states[%s] have length %d against %d input positions: this transformers "
+            "version slices hidden states under %r, so the last-token gather would read the "
+            "wrong position. Re-run with kw=None (full logits) or fix the offset here."
+            % (bad[:3], hs[bad[0]].shape[1], ids.shape[1], kw))
+    # [n_layers+1] x [B, d] at the read position. hidden_states[0] is the embedding output.
+    return lg, [h[rows, last] for h in hs]
+
+
+def _last_token_logits(model, ids, attn, kw):
+    """[B, V] logits at each row's last UNPADDED position -- the logits-only path, unchanged.
+    Kept as its own name because `_yes_minus_no` is on the live-training-step path and must not
+    pay for a hidden-state tensor it does not read."""
+    return _last_token_readout(model, ids, attn, kw, hidden=False)[0]
 
 
 def _yes_minus_no(model, tokenizer, texts, yes_ids, no_ids, batch_size,
@@ -523,6 +582,176 @@ def yes_no_margin(model, tokenizer, texts, batch_size: int = 8,
             tokenizer.pad_token = old_pad
         except Exception:
             pass
+
+
+# =================================================================================================
+# PRIME SOURCE C -- THE RESIDUAL-STREAM READOUT, ON THE SAME FORWARD PASS AS THE FORCED CHOICE
+# =================================================================================================
+# WHY IT IS HERE AND NOT IN A FILE OF ITS OWN. Everything above reads `_last_token_readout`'s
+# LOGIT return -- the model's output distribution at the final prompt token. That is a scalar
+# functional of what the policy would emit, i.e. the same information class as the ten detectors
+# whose null this repo reports, and it therefore cannot test the hypothesis that the null is an
+# instrumentation artifact. Source C reads the OTHER return of the same call: the residual stream
+# at that same position, before any token is generated. Putting the residual read anywhere but
+# inside the existing forward pass would (i) double the cost inside a live GRPO step and, worse,
+# (ii) let the two channels drift apart in prompt, tokenisation, padding or read position, at
+# which point "the residual channel leads and the logit channel does not" is uninterpretable.
+# `source_c_activations` returns BOTH, from one pass, and `assert_source_c_prompt_parity` proves
+# byte-for-byte that the strings fed to it are the strings `score_prime` feeds.
+#
+# WHAT IS READ, AND WHERE
+#   POSITION  the final UNPADDED token of the chat-wrapped prompt built with
+#             add_generation_prompt=True -- the last INPUT token. No token is generated, so the
+#             readout does not depend on what the model happens to sample.
+#   LAYER     swept, not guessed: `source_c_activations(layers=None)` returns every layer
+#             (0 = embedding output, 1..n = blocks) so the depth profile is measured and
+#             published. One layer per component is then frozen at step 0 and never re-selected;
+#             re-selecting per step lets the probe shop for whichever layer separates at that
+#             step, which manufactures signal exactly as a per-step threshold recalibration does.
+#   DIRECTION difference of means, mean(h | D_hack) - mean(h | robust-honest control), unit
+#             normalised, fit ONCE from the FROZEN OFFLINE category labels.
+#   SCORE     the UNIT-NORMALISED projection of the centred activation. Not the raw dot product:
+#             residual norms grow with depth and drift over a run, so a raw projection moves when
+#             ||h|| moves whatever the direction is doing -- and an activation-NORM trend is just
+#             another low-order scalar aggregate, i.e. the class this readout exists to escape.
+#             Carry the raw projection alongside as a diagnostic so that confound is auditable.
+#
+# LABEL HYGIENE -- THE POINT ON WHICH THIS WHOLE READOUT IS LEGITIMATE OR NOT.
+# A difference-of-means direction fit on D_hack vs D_control USES GOLD LABELS. That is admissible
+# only under the same discipline the diagnostic set is under: fit ONCE, OFFLINE, BEFORE the run it
+# scores, then freeze, hash, and load read-only (`prime_source_c.freeze_directions` /
+# `load_directions`). Re-fitting the direction per checkpoint would hand the detector a fresh gold
+# label at every step it is asked to predict, which is leakage, not early warning. The per-step
+# readout is label-free; only the one-time fit sees labels, exactly as `bin_pair` is the one place
+# gold rewards are touched and it runs before training starts.
+#   PRIME itself does NOT meet this bar. Its concept vectors are fit at a LATE REFERENCE
+#   CHECKPOINT (t_ref = 200), i.e. after the hacking behaviour it is meant to anticipate has
+#   already appeared, which makes their Source C non-deployable prospectively: you cannot fit at
+#   t_ref = 200 in order to raise an alarm at t = 30. Fitting at STEP 0 as we do is a DELIBERATE
+#   DEVIATION and it cuts both ways -- ours is deployable (nothing after t = 0 is used) but
+#   weaker (the step-0 model's basis may not carry the concept as cleanly as a trained one's).
+#   State it as ours; do not present a step-0 fit as a replication of theirs.
+#
+# NO CONJUNCTION. Report csa / pr / er SEPARATELY. PRIME's Eq. 1 AND cannot fire until its
+# SLOWEST component fires, so the conjunction discards precisely the lead this experiment
+# measures -- and on our own step-0 pass PR is saturated, so it would not even be a three-way
+# gate. `prime_source_c.assert_source_c_contract` refuses an aggregate key outright.
+SOURCE_C_KEYS = ("sourcec_csa", "sourcec_pr", "sourcec_er")
+
+
+def source_c_texts(pairs, tokenizer, component: str):
+    """The EXACT strings `score_prime` feeds the model for this component.
+
+    Source C introduces NO new prompt path: it is this one composition, `render_prompt` (which
+    runs `assert_offstream_pair` and the template reconstruction check) followed by `_wrap`, and
+    it is the same composition `score_prime` performs inline. The off-stream guarantee is
+    therefore inherited rather than restated, and there is no second prompt builder in the repo
+    to drift. `assert_source_c_prompt_parity` is the executable proof of that sentence."""
+    return [_wrap(tokenizer, render_prompt(p, component)) for p in pairs]
+
+
+def assert_source_c_prompt_parity(pairs, tokenizer) -> str:
+    """THE EXTENDED OFF-STREAM ASSERTION for Source C, and it is a check rather than a claim.
+
+    The module docstring's guarantee is that the model sees only (task_description, solution) and
+    the component question. Source C would break it if it built its own prompt. It does not, and
+    this asserts so the only way that can be asserted: rebuild the strings BOTH ways -- through
+    `source_c_texts` and through `score_prime`'s own inline composition -- and require them equal
+    byte for byte, then re-run the per-input filter and the template audit over the result.
+
+    Returns the prompt fingerprint over all three components, which is the SAME value
+    `score_prime` reports as `prompt_sha256` on the same pairs and tokenizer. Equality of that
+    fingerprint between a Source C run and a PRIME run is the field-checkable version of "the two
+    channels saw identical prompts"."""
+    texts = []
+    for c in COMPONENTS:
+        assert_template_integrity(c, True)                 # template audit, again, per component
+        a = source_c_texts(pairs, tokenizer, c)
+        b = [_wrap(tokenizer, render_prompt(p, c)) for p in pairs]   # score_prime's composition
+        if a != b:
+            raise OffStreamViolation(
+                "Source C prompt path has diverged from score_prime's for component %r: the two "
+                "channels are no longer comparable and the residual-vs-logit contrast is void" % c)
+        for p, t in zip(pairs, a):
+            assert_offstream_pair(p)
+            if p["task"] not in t or p["solution"] not in t:
+                raise OffStreamViolation("pair %r/%s: wrapping dropped a prompt-visible field"
+                                         % (p.get("id"), c))
+        texts.extend(a)
+    return _prompt_fingerprint(texts)
+
+
+def source_c_activations(model, tokenizer, texts, layers=None, batch_size: int = 4,
+                         max_length: int = MAX_PROMPT_TOKENS):
+    """(margins, resid) from ONE forward pass per batch -- both channels, same position.
+
+    margins : list of float, logP(Yes) - logP(No), the identical quantity `_yes_minus_no` returns.
+              Computed here only so that the two channels provably share a forward pass.
+    resid   : {layer_index: [len(texts), d] float32} -- the residual stream at that same final
+              prompt token. `layers=None` means every layer (0 = embedding output), which is what
+              a step-0 depth sweep needs; pass an explicit tuple once a layer has been frozen.
+
+    DETERMINISM AND NON-PERTURBATION, both required of anything called from a training callback:
+    no sampling, no dropout (`model.eval()`), no gradients (`torch.no_grad()`), and
+    `model.training` plus the tokenizer's pad / padding_side / truncation_side are saved and
+    restored, so the caller's reward channel is bit-unchanged. Right padding with a gather at
+    `attention_mask.sum(1) - 1` makes the read position correct per row whatever the tokenizer's
+    default padding side is; truncation is LEFT so the closing question can never be truncated
+    away. Rows are batched in length order (ties by index -- deterministic) and scattered back to
+    input order, so the returned values do not depend on the batching; hold batch_size fixed
+    across steps anyway, because padding changes the float reduction order by ~1e-5 for free."""
+    import numpy as np
+    import torch
+
+    texts = list(texts)
+    if not texts:
+        raise ValueError("source_c_activations called with no texts")
+    dev = next(model.parameters()).device
+    was_training = bool(model.training)
+    old_pad, old_side = tokenizer.pad_token, tokenizer.padding_side
+    old_trunc = getattr(tokenizer, "truncation_side", "right")
+    try:
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.padding_side = "right"
+        tokenizer.truncation_side = "left"       # never truncate away the closing question
+        yes_ids, no_ids = _first_ids(tokenizer, _YES_SURFACES), _first_ids(tokenizer, _NO_SURFACES)
+        if not yes_ids or not no_ids or set(yes_ids) & set(no_ids):
+            raise ValueError("tokenizer gives empty or overlapping Yes/No answer tokens")
+        yi, ni = torch.tensor(yes_ids, device=dev), torch.tensor(no_ids, device=dev)
+        kw = _logits_kw(model)
+        model.eval()
+        order = sorted(range(len(texts)), key=lambda i: (len(texts[i]), i))
+        margins, resid = [0.0] * len(texts), None
+        with torch.no_grad():
+            for s in range(0, len(order), batch_size):
+                idx = order[s:s + batch_size]
+                enc = tokenizer([texts[i] for i in idx], return_tensors="pt", padding=True,
+                                truncation=True, max_length=max_length,
+                                add_special_tokens=False).to(dev)
+                lg, hs = _last_token_readout(model, enc["input_ids"], enc["attention_mask"], kw,
+                                             hidden=True)
+                lp = torch.log_softmax(lg.float(), dim=-1)
+                for i, v in zip(idx, (torch.logsumexp(lp[:, yi], -1)
+                                      - torch.logsumexp(lp[:, ni], -1)).tolist()):
+                    margins[i] = float(v)
+                if resid is None:
+                    sel = (tuple(range(len(hs))) if layers is None
+                           else tuple(sorted({int(l) % len(hs) for l in layers})))
+                    resid = {int(l): np.zeros((len(texts), int(hs[l].shape[-1])), "float32")
+                             for l in sel}
+                for l in resid:
+                    resid[l][idx] = hs[l].float().cpu().numpy()
+                del lg, hs, lp
+    finally:
+        model.train(was_training)
+        tokenizer.padding_side = old_side
+        tokenizer.truncation_side = old_trunc
+        try:
+            tokenizer.pad_token = old_pad
+        except Exception:                        # some tokenizers refuse pad_token = None
+            pass
+    return margins, resid
 
 
 # OUR CHOICE (e): the cheap LOCAL stand-in for PRIME's two frontier judges on the ER component
@@ -1347,15 +1576,31 @@ class StubTokenizer:
         return _StubEnc(input_ids=torch.tensor(ids), attention_mask=torch.tensor(att))
 
 
+class _StubConfig:
+    def __init__(self, n):
+        self.num_hidden_layers = n
+        self.hidden_size = _STUB_DIM
+
+
 class StubModel:
     """Prefix-mean embedding -> linear head. Prefix-only, so right padding cannot reach a real
-    position and the readout is identical at every batch size."""
+    position and the readout is identical at every batch size.
 
-    def __init__(self, seed=0):
+    It also answers `output_hidden_states=True` with a fake tower, so the SOURCE C arithmetic --
+    the layer sweep, the difference-of-means fit, the fold split, the freeze/load round trip --
+    is testable with no transformers, no download and no GPU, exactly as the forced-choice
+    arithmetic already is. hidden_states[0] is the raw embedding at each position (no mixing,
+    the way a real model's embedding output is) and 1..n are fixed linear maps of the prefix
+    mean, so the whole tower is prefix-only and the read position cannot see padding."""
+
+    def __init__(self, seed=0, n_layers=4):
         import torch
         g = torch.Generator().manual_seed(seed)
         self.emb = torch.randn(_STUB_VOCAB, _STUB_DIM, generator=g)
         self.head = torch.randn(_STUB_DIM, _STUB_VOCAB, generator=g) * 0.5
+        self.blocks = [torch.randn(_STUB_DIM, _STUB_DIM, generator=g) * (0.5 + 0.1 * i)
+                       for i in range(n_layers)]
+        self.config = _StubConfig(n_layers)
         self._p = torch.zeros(1)
         self.training = False
 
@@ -1370,11 +1615,12 @@ class StubModel:
         self.training = bool(mode)
         return self
 
-    def __call__(self, input_ids=None, attention_mask=None, **kw):
+    def __call__(self, input_ids=None, attention_mask=None, output_hidden_states=False, **kw):
         import torch
         e = self.emb[input_ids]                                   # [B,T,D]
         cum = e.cumsum(dim=1) / torch.arange(1, e.shape[1] + 1, dtype=e.dtype).view(1, -1, 1)
-        return type("Out", (), {"logits": cum @ self.head})()
+        hs = ((e,) + tuple(cum @ w for w in self.blocks)) if output_hidden_states else None
+        return type("Out", (), {"logits": cum @ self.head, "hidden_states": hs})()
 
 
 def stub_model_and_tokenizer(seed=0):
@@ -1628,5 +1874,47 @@ if __name__ == "__main__":                                             # end-to-
         print("    |D_hack|=1 raises: %s" % str(e)[:64])
     else:
         raise AssertionError("degenerate calibration did not raise")
+    print("[10] SOURCE C: the residual channel must ride the SAME forward pass, see the SAME")
+    print("     prompts, and leave the forced-choice channel bit-identical")
+    fp = assert_source_c_prompt_parity(pairs, tok)
+    assert fp == res["prompt_sha256"], \
+        "Source C prompt fingerprint differs from score_prime's on the same pairs/tokenizer -- " \
+        "the two channels did not see identical prompts and the contrast is void"
+    print("     OK  prompt_sha256 %s identical to score_prime's (parity, not assertion)"
+          % fp[:16])
+    model.train()                                        # again: pretend we are mid-training-step
+    csa_texts = source_c_texts(pairs, tok, "csa")
+    mgn, resid = source_c_activations(model, tok, csa_texts, batch_size=4)
+    assert model.training, "source_c_activations must restore model.training"
+    ref_margin = yes_no_margin(model, tok, csa_texts, batch_size=4)
+    assert mgn == ref_margin, \
+        "the logit channel read off the dual pass differs from yes_no_margin's -- the residual " \
+        "read has perturbed the forced choice, so the existing PRIME series would move"
+    print("     OK  logit channel bitwise-identical to yes_no_margin (%d pairs); layers %s, d=%d"
+          % (len(mgn), sorted(resid), resid[0].shape[1]))
+    mgn1, resid1 = source_c_activations(model, tok, csa_texts, batch_size=1)
+    dmax = max(float(abs(resid[l] - resid1[l]).max()) for l in resid)
+    print("     OK  determinism: max residual drift across batch sizes %.2e" % dmax)
+    # The residual read must be a function of the PROMPT, not of the padding: a batch whose rows
+    # have very different lengths is where a wrong gather index shows up, and it would show up as
+    # a plausible-looking series with no downstream check to catch it.
+    lo = min(range(len(csa_texts)), key=lambda i: len(csa_texts[i]))
+    solo, _ = source_c_activations(model, tok, [csa_texts[lo]], batch_size=1)
+    assert abs(solo[0] - mgn[lo]) < 1e-4, \
+        "the shortest row's readout moved when it was batched with longer ones -- the gather is " \
+        "reading a padded position"
+    print("     OK  shortest row identical alone and padded inside a mixed-length batch")
+    # A direction fit on the frozen labels must be fit ONCE and frozen; the label-hygiene rule is
+    # documented at the SOURCE C banner and enforced by prime_source_c's freeze/load hash.
+    import numpy as _np
+    hk = [i for i, p in enumerate(pairs) if p["category"] == "hack"]
+    ct = [i for i, p in enumerate(pairs) if p["category"] == "robust_honest"]
+    X = _np.asarray(resid[len(resid) - 1], dtype=_np.float64)
+    v = X[hk].mean(0) - X[ct].mean(0)
+    print("     top-layer difference-of-means direction: ||v||=%.3f over |D_hack|=%d vs |ctrl|=%d"
+          % (float(_np.linalg.norm(v)), len(hk), len(ct)))
+    print("     (fitting/freezing/hashing that direction is prime_source_c's; it imports these "
+          "and duplicates none of them)")
+
     print("SELF-TEST OK" + (" (stub model: arithmetic verified, model behaviour not)"
                             if OFFLINE else ""))

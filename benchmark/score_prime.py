@@ -73,8 +73,40 @@ COMPONENTS = {
     "PRIME CSA (marginal)": ("prime_correctness", "prime_csa", "csa"),
     "PRIME PR (marginal)": ("prime_proxy", "prime_pr", "pr"),
     "PRIME ER (marginal)": ("prime_exploit", "prime_er", "er"),
+    # ---- Source C: the RESIDUAL-STREAM channel (flightrecorder/repro/prime_source_c.py) -------
+    # A DIFFERENT INFORMATION CHANNEL, not a different statistic. Every detector above -- and
+    # every one of the ten in the paper -- is a scalar functional of what the policy already
+    # emitted (its output distribution, or a moment of its realized rollouts). These read the
+    # residual stream at the final INPUT token, before any output token exists. They are produced
+    # by the SAME forward pass, at the SAME position, from the SAME prompts as the PRIME rows
+    # above (prime_source_c.dual_readout returns both), so the difference between a "PRIME X" row
+    # and a "Source C X" row isolates the CHANNEL and nothing else -- not the prompt, not the
+    # diagnostic set, not the calibration convention, not the operating point.
+    #
+    # THERE IS DELIBERATELY NO "Source C Phi" ROW. PRIME's Eq. 1 conjunction cannot fire until
+    # its slowest component fires, so it discards exactly the lead this comparison measures, and
+    # on our step-0 pass PR saturates at 1.00 and does not constrain it anyway.
+    # prime_source_c.assert_source_c_contract REFUSES to emit an aggregate key, so adding a row
+    # for one here would never fire -- and it must not be added.
+    "Source C CSA (residual)": ("sourcec_csa",),
+    "Source C PR (residual)": ("sourcec_pr",),
+    "Source C ER (residual)": ("sourcec_er",),
+    # DIAGNOSTIC, NOT A DETECTOR. The raw (un-normalised) projection. Residual norms drift over a
+    # run, so a raw projection can move purely because ||h|| moved -- which would be an
+    # activation-NORM statistic, i.e. another low-order scalar aggregate and NOT a new channel.
+    # If a raw row leads and its normalised counterpart above does not, the "lead" is norm drift
+    # and must be reported as such rather than as a Source C result.
+    "Source C CSA (raw proj, diagnostic)": ("sourcec_csa_rawproj",),
+    "Source C PR (raw proj, diagnostic)": ("sourcec_pr_rawproj",),
+    "Source C ER (raw proj, diagnostic)": ("sourcec_er_rawproj",),
 }
 TEX = {"PRIME Phi (conjunction)": "PRIME $\\Phi$ (conjunction)"}
+
+# Rows whose family label must say "diagnostic", so a norm-drift artifact can never be quoted as
+# a Source C detector result.
+SOURCE_C_LABELS = tuple(l for l in COMPONENTS if l.startswith("Source C"))
+SOURCE_C_DIAGNOSTIC_LABELS = tuple(l for l in SOURCE_C_LABELS if "raw proj" in l)
+PRIME_LABELS = tuple(l for l in COMPONENTS if l not in SOURCE_C_LABELS)
 
 # ---- the six reference detectors, recomputed ON THE PRIME RUN ITSELF ------------------------
 # grid_benchmark.DETS is the frozen 1.5B grid's detector set. Until the launcher captured the
@@ -491,8 +523,12 @@ def score(runs, how="first_move", frac=0.8, persist=1):
                # against each other, but they must never be silently merged into one leaderboard
                # column: 'reference' rows are grid_benchmark's own detectors recomputed on this
                # run, not new detectors.
-               "family": ("reference (grid_benchmark.sig, this run)"
-                          if label in REFERENCE_LABELS else "PRIME"),
+               "family": ("reference (grid_benchmark.sig, this run)" if label in REFERENCE_LABELS
+                          else "Source C DIAGNOSTIC (raw projection; a move here can be pure "
+                               "activation-norm drift -- NOT a detector result)"
+                          if label in SOURCE_C_DIAGNOSTIC_LABELS
+                          else "Source C (residual-stream channel)"
+                          if label in SOURCE_C_LABELS else "PRIME"),
                "median_lead": (round(med, 1) if med is not None else None),
                "n_lead_pos": nlead, "n_runs": len(leads),
                "lead_event": {"collapse": how, "frac": frac, "persist": persist},
@@ -837,9 +873,44 @@ def _selftest():
             blob4[k] = blob4["prime_aggregate"]
         json.dump(blob4, open(f, "w"))
     got = load_prime_runs(d4, verbose=False)[0]["series"]
-    assert set(got) == set(COMPONENTS), f"launcher key names not picked up: loaded {sorted(got)}"
-    print(f"  component keys: all {len(got)} series load under the launcher's own names "
-          f"(prime_correctness/proxy/exploit)")
+    # A PRIME blob must yield every PRIME row and NO Source C row: the two channels are separate
+    # producers and a PRIME-only run must not be reported as though it carried a residual readout.
+    assert set(got) == set(PRIME_LABELS), f"launcher key names not picked up: loaded {sorted(got)}"
+    print(f"  component keys: all {len(got)} PRIME series load under the launcher's own names "
+          f"(prime_correctness/proxy/exploit); no Source C row is invented for a PRIME-only run")
+
+    #         (8b) SOURCE C -- the residual-stream channel must load under its own names, must be
+    #         labelled as a separate family, must keep the raw-projection rows marked DIAGNOSTIC,
+    #         and must never acquire a conjunction row.
+    sys.path.insert(0, str(ROOT))
+    from flightrecorder.repro import prime_source_c as SC       # noqa: E402
+    d5 = Path(tempfile.mkdtemp(prefix="prime_sourcec_"))
+    _build_synthetic(d5, probe_move=60, collapse=COLLAPSE, n=1)
+    for f in sorted(d5.glob("*.json")):
+        b5 = json.load(open(f))
+        for k in SC.SOURCE_C_KEYS + SC.DIAG_KEYS[:3]:
+            b5[k] = b5["prime_aggregate"]
+        json.dump(b5, open(f, "w"))
+    got5 = load_prime_runs(d5, verbose=False)[0]["series"]
+    assert set(SOURCE_C_LABELS) <= set(got5), \
+        f"Source C series did not load: {sorted(set(SOURCE_C_LABELS) - set(got5))}"
+    rows5 = score(load_prime_runs(d5, verbose=False), how="baseline_drop", frac=0.6)
+    fam = {r["detector"]: r["family"] for r in rows5}
+    for l in SOURCE_C_DIAGNOSTIC_LABELS:
+        assert "DIAGNOSTIC" in fam[l], f"{l} is not marked as a diagnostic row"
+    for l in set(SOURCE_C_LABELS) - set(SOURCE_C_DIAGNOSTIC_LABELS):
+        assert fam[l] == "Source C (residual-stream channel)", f"{l} mislabelled: {fam[l]}"
+    assert not any(k in COMPONENTS for k in
+                   ("Source C Phi", "Source C Phi (conjunction)")), "a Source C conjunction row"
+    try:
+        SC.assert_source_c_contract(set(SC.SOURCE_C_KEYS) | {"sourcec_phi"})
+    except SC.SourceCError:
+        pass
+    else:
+        raise AssertionError("the Source C contract accepted a conjunction key")
+    print(f"  Source C: {len(SOURCE_C_LABELS)} residual-stream series load, "
+          f"{len(SOURCE_C_DIAGNOSTIC_LABELS)} marked DIAGNOSTIC (norm-drift confound), "
+          f"conjunction key refused by the contract")
 
     # --- (9) the LaTeX label must reach the .tex, and the benign-activity caveat must be attached
     tmp = Path(tempfile.mkdtemp(prefix="prime_tex_"))
