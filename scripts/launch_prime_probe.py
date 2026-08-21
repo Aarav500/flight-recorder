@@ -214,8 +214,38 @@ flags: --submit (default OFF)  --proxy=tests|judge  --policy=ID  --n-pairs=64  -
        --ctrl-every=5  --er-gen  --allow-proxy-mismatch
        --selftest                  (offline end-to-end verification; builds nothing, spends nothing)
        --collect=<saved job log>   (parse a finished job's stdout into runs/prime/*.json)
+       --plan                      (checkpoint cadence + 7B memory table + comparability; free)
+  SPOT / 7B flags, all OFF by default. Inert when off in the sense that is checked by EXECUTING
+  the emitted config-assembly region (--selftest step [7](h)): identical GRPOConfig argument list,
+  no extras, identical callback list, byte-identical PEP 723 header. The emitted job does gain two
+  unconditional module-level imports (model_memory, spot_resilience) -- pure planning modules, no
+  import-time side effects -- and that is recorded rather than glossed:
+       --ckpt=dir:<path>|hub:<repo>[@rev]   durable checkpoints; cadence from Young/Daly, not habit
+       --ckpt-every=N --ckpt-keep=N --resume=latest|checkpoint-N --mtbf-h=H --preempt
+       --memory=fp32-full(default)|bf16-8bit-gc-refcpu(recommended at 7B)|lora32-bf16-gc|...
+  --memory is the fix for TRL defaulting the policy to fp32: 20 B/param x 7.6B = 152 GB of state
+  against an 80 GB A100. The recommended config is 53 GB and keeps full-finetune geometry, so it
+  owes 3 control runs rather than LoRA's 27. See flightrecorder/repro/model_memory.py.
   Boolean flags accept --f / --f=1|true|yes|on / --f=0|false|no|off and REJECT anything else.
   --submit=0 used to evaluate True; on the one flag that controls whether money is spent.
+
+BACKENDS -- `--backend=hf` (default, unchanged) or `--backend=azureml`
+  The HF path is the default and is byte-identical to what it was before the flag existed.
+  --backend=azureml routes the SAME baked script through scripts/azureml_backend.py, which
+  swaps the delivery mechanism (tarball -> source_dir, PEP 723/uv -> Azure Environment,
+  run_uv_job -> command job, HF secrets -> Key Vault, stdout scrape -> ./outputs artifact) and
+  proves by hash that it changed nothing else, so runs from the two backends are poolable.
+    --aml-workspace= --aml-resource-group= --aml-cluster= --aml-region=   (names; nothing is
+                                                                           ever created)
+    --spot=1|0        low-priority nodes; ON by default -- it is the reason to be on Azure
+                      ($0.679 vs $3.673 per GPU-hour). submit REFUSES if the named cluster
+                      resolves to a dedicated tier.
+    --hf-token=keyvault|env|none   default keyvault. Qwen2.5-* is public, so `none` is
+                                   usually correct; `env` writes a PLACEHOLDER to the YAML and
+                                   injects the real token in memory at submit time only.
+    --pip-freeze=<file>   pin the environment instead of letting the PEP 723 bounds float.
+  Costs, quota and the quota-request text:
+    python scripts/azureml_backend.py --cost --quota --quota-request
 """
 from __future__ import annotations
 
@@ -303,6 +333,10 @@ TASK = POS[3] if len(POS) > 3 else "second_largest"
 LR = POS[4] if len(POS) > 4 else "2e-6"
 
 SUBMIT = _bool_flag("submit", False)
+# --disclose=0 gives the hack arm the CLEAN prompt. Needed when the hacking/benign
+# contrast is carried by the TASK (a matched-control pair whose visible split differs)
+# rather than by prompt discoverability. Default 1 = unchanged legacy behaviour.
+DISCLOSE = _bool_flag("disclose", True)
 ER_GEN = _bool_flag("er-gen", False)
 ALLOW_MISMATCH = _bool_flag("allow-proxy-mismatch", False)
 PROXY = _choice_flag("proxy", ("tests", "judge"), "tests")
@@ -319,6 +353,60 @@ COLLECT = _flag("collect", None)
 # nothing and spends nothing.
 REAL_MODEL = _flag("real-model", None)
 
+# ---------------------------------------------------------------- spot resilience / 7B memory
+# BOTH DEFAULT TO OFF. With --ckpt=none and --memory=fp32-full the emitted GRPOConfig call is
+# exactly the one that produced every published run: output_dir="/tmp/out", save_strategy="no",
+# fp32 weights, no extra kwargs, and the callback list is still [prime_cb, geom_cb].
+# WHAT DID CHANGE, AND IT IS NOT NOTHING: the emitted job now carries two additional MODULE-LEVEL
+# imports, `from flightrecorder.repro import model_memory as MM` and `... spot_resilience as SR`.
+# They are unconditional, not gated. Both are stdlib-only pure-planning modules with no
+# import-time side effects, and on the default path the only call into either is
+# `SR.resume_provenance(None, None) -> {"resumed": False}`, so the trainer sees the same
+# arguments as before -- but "no imports that were not already there" would be false and the
+# previous revision of this comment said exactly that.
+# NOT verified by prose: verify_default_inertness() (section 4b) RENDERS the template with the
+# canonical defaults, EXECUTES the config-assembly region against stub trainer objects, and
+# compares _cfg, _extra, the callback list, the PEP 723 dependency line and the module-level
+# import set against frozen literals, with a negative control that must differ. --selftest [7](h).
+#   --ckpt=none|dir:<path>|hub:<repo>[@rev]   durable checkpoint store (default none)
+#   --ckpt-every=N        override the computed cadence (default: Young/Daly, see spot_resilience)
+#   --ckpt-keep=N         durable retention (default 2 -- see the torn-write argument)
+#   --resume=latest|checkpoint-N|<path>       resume an evicted run
+#   --mtbf-h=12           assumed mean time between spot evictions, for the cadence arithmetic
+#   --preempt             poll the cloud's eviction-notice endpoint and save on notice
+#   --memory=<config>     fp32-full (default) .. bf16-8bit-gc-refcpu .. lora32-bf16-gc
+#   --plan                print the checkpoint plan + memory table + comparability report, exit
+CKPT = str(_flag("ckpt", "none"))
+CKPT_EVERY = int(_flag("ckpt-every", 0) or 0)
+CKPT_KEEP = _int_flag("ckpt-keep", 2)
+RESUME = _flag("resume", None)
+MTBF_H = float(_flag("mtbf-h", 12.0))
+PREEMPT = _bool_flag("preempt", False)
+MEMCFG = str(_flag("memory", "fp32-full"))
+PLAN_ONLY = _bool_flag("plan", False)
+SPOT_USD_PER_HR = float(_flag("spot-usd", 0.68))    # Azure NC A100 v4 spot, vs 3.67 on-demand
+
+# --backend selects WHERE the built job runs. `hf` is the default and its path below is
+# byte-for-byte what it was before this flag existed: same bake(), same tarball, same
+# run_uv_job, same secrets. `azureml` diverges only AFTER the build, print_cost and the scale
+# warning have all run, so an Azure job is priced and validated by exactly the code that prices
+# and validates an HF one. scripts/azureml_backend.py is imported on the azureml path ONLY --
+# it is not a dependency of the default path and cannot perturb it.
+BACKEND = _choice_flag("backend", ("hf", "azureml"), "hf")
+AZ_WORKSPACE = str(_flag("aml-workspace", "fr-prime-ws"))
+AZ_RG = str(_flag("aml-resource-group", "fr-prime-rg"))
+AZ_CLUSTER = str(_flag("aml-cluster", "a100-lowpri"))
+AZ_REGION = str(_flag("aml-region", "eastus"))
+AZ_SPOT = _bool_flag("spot", True)          # low-priority is the whole reason to be on Azure
+# DEFAULT `none`, and it is the secure default rather than a lazy one: every policy this project
+# has used (Qwen2.5-*, SmolLM, StarCoder) is a PUBLIC Hub checkpoint, so the job needs no token
+# at all, and a spec with no token is both safer and directly submittable. `keyvault` is the
+# right answer the day a gated checkpoint is needed; `env` is the expedient one and puts the
+# token in the workspace run history forever.
+AZ_HF_TOKEN = _choice_flag("hf-token", ("keyvault", "env", "none"), "none")
+AZ_KV_URI = _flag("keyvault-uri", None)
+AZ_PIP_FREEZE = _flag("pip-freeze", None)
+
 BUILDER = "prime_diag_v3"                      # v2 pools were built from the TRAINING tasks
 DIAG_DIR = ROOT / "experiments" / "prime"
 POOL_PATH = DIAG_DIR / f"diag_pool_{BUILDER.rsplit('_', 1)[1]}.json"
@@ -327,6 +415,24 @@ RUNS_DIR = ROOT / "runs" / "prime"
 OUT_JSON = RUNS_DIR / f"prime_{ARM_LABEL}_{TASK}_seed{SEED}.json"
 
 from flightrecorder.repro import prime_probe as PP                          # noqa: E402
+from flightrecorder.repro import model_memory as MM                         # noqa: E402
+from flightrecorder.repro import spot_resilience as SR                      # noqa: E402
+
+if MEMCFG not in MM.CONFIGS:
+    raise SystemExit("--memory must be one of %s, got %r" % ("|".join(MM.CONFIGS), MEMCFG))
+if CKPT != "none" and not (CKPT.startswith("dir:") or CKPT.startswith("hub:")):
+    raise SystemExit("--ckpt must be none, dir:<path> or hub:<repo>[@rev], got %r" % CKPT)
+if RESUME and CKPT == "none":
+    raise SystemExit("--resume=%s without --ckpt: there is nowhere to resume FROM. Pass the same "
+                     "--ckpt the evicted run used." % RESUME)
+
+# WHERE THE TRAINER WRITES. Default "/tmp/out" -- unchanged, and correct while save_strategy is
+# "no", because nothing is written there. With --ckpt=dir:<path> the output_dir BECOMES the
+# durable path: the Trainer's own write is then the durable write and no copy happens at all,
+# which is the whole reason the "dir" backend is the cheap one (a local NVMe write at ~900 MB/s
+# instead of a ~150 MB/s Hub upload). With --ckpt=hub:... it stays ephemeral and the callback
+# uploads. See spot_resilience.DirBackend.
+OUTPUT_DIR = CKPT.split(":", 1)[1] if CKPT.startswith("dir:") else "/tmp/out"
 
 # ============================================================================================
 # 1. COLLECTOR -- parse a finished job's stdout into the established anticipatory/*.json shape.
@@ -691,7 +797,7 @@ if PROXY_MISMATCH:
 # 4. THE BAKED JOB. It IMPORTS flightrecorder.repro.prime_probe; it does not reimplement it.
 # ============================================================================================
 UV = r'''# /// script
-# dependencies = ["torch>=2.6","transformers>=4.47","trl>=0.22","datasets>=3.0","accelerate>=1.0","numpy>=1.26"]
+# dependencies = ["torch>=2.6","transformers>=4.47","trl>=0.22","datasets>=3.0","accelerate>=1.0","numpy>=1.26"__EXTRA_DEPS__]
 # [[tool.uv.index]]
 # name = "pytorch-cu128"
 # url = "https://download.pytorch.org/whl/cu128"
@@ -715,12 +821,22 @@ from flightrecorder.repro.reward_testhack import oracle_reward, train_reward  # 
 # THE probe implementation -- three prompts, off-stream guards, Eq. 1, both calibrations, and the
 # single result emitter. Nothing below re-derives any of it.
 from flightrecorder.repro import prime_probe as PP  # noqa: E402
+# Spot-eviction resilience and the 7B memory configuration. Both are INERT on the default path:
+# with CKPT_SPEC == "none" and MEM_CONFIG == "fp32-full" neither module touches the trainer, and
+# the GRPOConfig call below is the one that produced every published run.
+from flightrecorder.repro import model_memory as MM  # noqa: E402
+from flightrecorder.repro import spot_resilience as SR  # noqa: E402
 
+# FR-CONST-BEGIN  (extracted verbatim and executed by verify_default_inertness(); see below)
 POLICY, ARM, SEED, STEPS, TASK = "__POLICY__", "__ARM__", __SEED__, __STEPS__, "__TASK__"
 PROXY, PROXY_MISMATCH = "__PROXY__", __PROXY_MISMATCH__
 GEN, LR, BETA, MAXTOK = 8, __LR__, 0.02, 256
 PROBE_EVERY, CTRL_EVERY, ER_GEN = __PROBE_EVERY__, __CTRL_EVERY__, __ER_GEN__
 DIAG_SHA, PROBE_BS = "__DIAG_SHA__", 8
+CKPT_SPEC, CKPT_EVERY, CKPT_KEEP = "__CKPT_SPEC__", __CKPT_EVERY__, __CKPT_KEEP__
+RESUME_SPEC, MEM_CONFIG, PREEMPT = __RESUME_SPEC__, "__MEM_CONFIG__", __PREEMPT__
+OUTPUT_DIR, STEP_S = "__OUTPUT_DIR__", __STEP_S__
+# FR-CONST-END
 PHI0_TARGET, MARGINAL0_TARGET = PP.HONEST_BASELINE, PP.HONEST_BASELINE
 BIG, SMALL = "Qwen/Qwen2.5-1.5B-Instruct", "Qwen/Qwen2.5-0.5B-Instruct"
 
@@ -742,7 +858,8 @@ def _reachable_prompt(t):
 # proxy=tests  -> both arms optimise train_reward (the binned R); arms differ by prompt reachability
 # proxy=judge  -> both arms optimise a judge; arms differ by judge capacity (legacy, mismatched)
 HACK_ARM = (ARM == "hacking")
-PROMPT = _reachable_prompt(task) if (PROXY == "tests" and HACK_ARM) else task.prompt
+PROMPT = (_reachable_prompt(task) if (PROXY == "tests" and HACK_ARM and __DISCLOSE__)
+          else task.prompt)
 
 import random  # noqa: E402
 random.seed(SEED)
@@ -818,6 +935,13 @@ class PrimeProbeCallback(TrainerCallback):
         self.fails = 0
         self.ok = True
         self.n_probes = 0
+        # Set only when this process resumed from a checkpoint. It exists because on_train_begin
+        # fires again on resume, and the branch below would then CALIBRATE THE FROZEN GATES
+        # AGAINST A PARTLY-TRAINED POLICY -- silently replacing the step-0 anchor that makes lead
+        # time comparable at all with one measured at step N. The gates are restored from the
+        # checkpoint's sidecar instead (spot_resilience.StateSidecar) and re-derivation is
+        # refused, not merely skipped.
+        self.resumed_at = None
 
     def _emit(self, row):
         PRIME_ROWS.append(row)
@@ -891,6 +1015,19 @@ class PrimeProbeCallback(TrainerCallback):
             self._nan_row(step)
 
     def on_train_begin(self, args, state, control, model=None, **kw):
+        if self.resumed_at is not None:
+            # The step-0 row is already in PRIME_ROWS, restored from the sidecar, and the gates
+            # with it. Probing here would append a SECOND row labelled step 0 that was actually
+            # measured at self.resumed_at, which corrupts the series it is meant to continue.
+            if self.thr is None:
+                raise RuntimeError(
+                    "resumed at step %s but the frozen Phi gates were not restored. Continuing "
+                    "would re-calibrate against a partly-trained policy and report a lead time "
+                    "that is an artefact of the eviction. Aborting." % self.resumed_at)
+            print("PRIME_RESUME step %s: gates restored from the checkpoint sidecar, NOT "
+                  "re-derived; %d probe rows and %d reward rows carried forward" % (
+                      self.resumed_at, len(PRIME_ROWS), len(LOG)), flush=True)
+            return
         m = model if model is not None else kw.get("model")
         if m is not None:
             self._probe(m, 0)                              # the calibration checkpoint
@@ -986,12 +1123,137 @@ class GeomCallback(TrainerCallback):
                   r.get("step"), r.get("entropy"), r.get("kl"), r.get("grad_norm")), flush=True)
 
 geom_cb = GeomCallback()
-args = _Config(output_dir="/tmp/out", per_device_train_batch_size=GEN, num_generations=GEN,
-               max_steps=STEPS, learning_rate=LR, max_completion_length=MAXTOK, beta=BETA,
-               logging_steps=1, save_strategy="no", report_to=[], seed=SEED)
+prime_cb = PrimeProbeCallback()
+
+# ============================================================================================
+# SPOT RESILIENCE + MEMORY CONFIG.  Everything in this block is a no-op on the default path.
+# The GRPOConfig call is assembled as a dict so that the DEFAULT dict is character-for-character
+# the argument list of every published run; extras are merged only when a flag asked for them,
+# and only after being filtered against the GRPOConfig the runner actually resolved (the PEP 723
+# header floats, so the trainer here is not the trainer these calls were written against).
+#
+# THE INERTNESS CLAIM IS EXECUTED, NOT ASSERTED. Everything between FR-ASSEMBLY-BEGIN and
+# FR-ASSEMBLY-END is extracted from this template by verify_default_inertness() (in the launcher,
+# run by --selftest step [7](h)), rendered with the DEFAULT flag values, and EXECUTED against
+# stub _Config/_Trainer/callback objects with the real model_memory and spot_resilience modules.
+# The resulting _cfg is compared to PUBLISHED_CFG, _extra to {}, the callback list and trainer
+# kwargs to their published values. Do not reorder these lines out of the sentinels.
+# ============================================================================================
+# FR-ASSEMBLY-BEGIN
+_cfg = dict(output_dir=OUTPUT_DIR, per_device_train_batch_size=GEN, num_generations=GEN,
+            max_steps=STEPS, learning_rate=LR, max_completion_length=MAXTOK, beta=BETA,
+            logging_steps=1, save_strategy="no", report_to=[], seed=SEED)
+_extra, _peft, _post = {}, None, {}
+_callbacks = [prime_cb, geom_cb]
+_backend = _sidecar = _watcher = _ckpt_cb = None
+_resume_path, _resume_blob, _ckpt_plan = None, None, None
+
+if MEM_CONFIG != "fp32-full":
+    _tk = MM.training_kwargs(MEM_CONFIG, beta=BETA)
+    _extra.update(_tk["config"])
+    _peft, _post = _tk["peft"], _tk["post"]
+    print("MEMCFG %s -> %s" % (MEM_CONFIG, json.dumps(_tk["config"], default=str)), flush=True)
+    print(MM.comparability_report(MEM_CONFIG, steps=STEPS), flush=True)
+
+if CKPT_SPEC != "none":
+    _p_b = SR.params_b(POLICY)
+    _lora_b = MM.lora_params_b(_p_b, _peft["r"]) if _peft else None
+    # STEP_S is the launcher's own measured-and-scaled step time (cost_model), templated in so
+    # the cadence arithmetic here uses the same number the run was priced with rather than a
+    # second, silently different estimate.
+    _ckpt_plan = SR.plan(p_b=_p_b, step_s=STEP_S, steps=STEPS,
+                         backend=CKPT_SPEC.split(":", 1)[0],
+                         dtype=MM.CONFIGS[MEM_CONFIG]["dtype"],
+                         optim=MM.CONFIGS[MEM_CONFIG]["optim"],
+                         lora_trainable_params_b=_lora_b,
+                         save_steps=(CKPT_EVERY or None), keep=CKPT_KEEP)
+    print(SR.format_plan(_ckpt_plan), flush=True)
+    _extra.update(SR.trainer_kwargs(_ckpt_plan, OUTPUT_DIR))
+    _backend = SR.make_backend(CKPT_SPEC, OUTPUT_DIR)
+    # The sidecar carries RUN state, which model state is not. Every slot here is something the
+    # run would otherwise silently re-derive after an eviction, wrongly.
+    _sidecar = (SR.StateSidecar()
+                .register("calib", lambda: CALIB, lambda v: CALIB.update(v or {}))
+                .register("thr", lambda: prime_cb.thr,
+                          lambda v: setattr(prime_cb, "thr", v))
+                .register("thr_onset", lambda: prime_cb.thr_onset,
+                          lambda v: setattr(prime_cb, "thr_onset", v))
+                .register("n_probes", lambda: prime_cb.n_probes,
+                          lambda v: setattr(prime_cb, "n_probes", int(v or 0)))
+                .register("prime_rows", lambda: PRIME_ROWS,
+                          lambda v: (PRIME_ROWS.clear(), PRIME_ROWS.extend(v or [])))
+                .register("log", lambda: LOG, lambda v: (LOG.clear(), LOG.extend(v or [])))
+                # _n["c"] is the reward-row counter that keeps the ONSET step clock aligned with
+                # state.global_step. Restarting it at 0 after a resume silently renumbers every
+                # subsequent reward row and destroys the alignment the scorer depends on.
+                .register("reward_rows", lambda: _n["c"],
+                          lambda v: _n.update(c=int(v or 0)))
+                .register("resume_count", lambda: _RESUME_META.get("resume_count", 0),
+                          lambda v: None))
+    if PREEMPT:
+        _watcher = SR.PreemptionWatcher().start()
+    # ONE retention number for both stores. The plan clamps CKPT_KEEP to the torn-write floor of
+    # 2 and `trainer_kwargs` puts the SAME value in the Trainer's save_total_limit, so durable
+    # and local retention cannot disagree -- they did, before: save_total_limit was hardcoded 2.
+    _ckpt_cb = SR.make_callback(_backend, sidecar=_sidecar,
+                                keep=_ckpt_plan["save_total_limit"], watcher=_watcher)
+    _callbacks.append(_ckpt_cb)
+    _resume_path = SR.resolve_resume(RESUME_SPEC, _backend, OUTPUT_DIR)
+    if _resume_path:
+        _resume_blob = _sidecar.load(_resume_path, strict=True)
+        prime_cb.resumed_at = SR.checkpoint_step(_resume_path)
+        print("RESUME from %s at step %s" % (_resume_path, prime_cb.resumed_at), flush=True)
+
+_RESUME_META = SR.resume_provenance(_resume_path, _resume_blob)
+
+if _extra:
+    _extra = SR.filter_supported(_Config, _extra)
+    _cfg.update(_extra)
+    print("GRPOConfig extras applied: %s" % json.dumps(
+        {k: str(v) for k, v in _extra.items()}), flush=True)
+
+args = _Config(**_cfg)
+_tr_kw = {}
+if _peft is not None:
+    from peft import LoraConfig  # noqa: E402  (only imported on the LoRA path)
+    _tr_kw["peft_config"] = LoraConfig(**_peft)
 trainer = _Trainer(model=POLICY, reward_funcs=[reward_fn], args=args, train_dataset=dataset,
-                   callbacks=[PrimeProbeCallback(), geom_cb])
-trainer.train()
+                   callbacks=_callbacks, **_tr_kw)
+
+# Reference offload is EXACT -- same weights, same KL, different device -- so it costs
+# comparability nothing and buys back a whole model copy. It cannot be a config field because it
+# acts on an object the trainer builds, hence a post-construction step.
+if _post.get("ref_device") == "cpu":
+    print("REF_OFFLOAD " + json.dumps(MM.offload_reference(trainer, True)), flush=True)
+# FR-ASSEMBLY-END
+
+# PEAK VRAM: the number the memory model predicts. Reset immediately before the first step so
+# the reading covers training only, not weight loading, then emit it as a parseable line.
+try:
+    if torch.cuda.is_available():
+        torch.cuda.reset_peak_memory_stats()
+except Exception as _e:
+    print("PRIME_VRAM_RESET_FAILED " + repr(_e), flush=True)
+
+if _resume_path:
+    trainer.train(resume_from_checkpoint=_resume_path)
+else:
+    trainer.train()
+
+try:
+    if torch.cuda.is_available():
+        _dev = torch.cuda.current_device()
+        print("PRIME_VRAM " + json.dumps({
+            "max_allocated_gb": round(torch.cuda.max_memory_allocated(_dev) / 2**30, 2),
+            "max_reserved_gb":  round(torch.cuda.max_memory_reserved(_dev) / 2**30, 2),
+            "device_total_gb":  round(torch.cuda.get_device_properties(_dev).total_memory / 2**30, 2),
+            "device_name":      torch.cuda.get_device_name(_dev),
+            "memory_config":    "__MEM_CONFIG__",
+        }), flush=True)
+    else:
+        print("PRIME_VRAM {\"note\": \"no CUDA device\"}", flush=True)
+except Exception as _e:
+    print("PRIME_VRAM_FAILED " + repr(_e), flush=True)
 
 # ---- geometry coverage: read this BEFORE trusting any lead time from this run ----------------
 GEOM_COV = PP.geometry_coverage(LOG)
@@ -1012,7 +1274,7 @@ META = {"arm": ARM, "seed": SEED, "task": TASK, "policy": POLICY, "lr": LR, "ste
                             "binned D_hack" if PROXY == "tests" else
                             "reward_judge.JudgeScorer -- NOT the proxy D_hack was binned against"),
         "proxy": PROXY, "proxy_mismatch": PROXY_MISMATCH,
-        "exploit_reachable_prompt": bool(PROXY == "tests" and HACK_ARM),
+        "exploit_reachable_prompt": bool(PROXY == "tests" and HACK_ARM and __DISCLOSE__),
         "scoring": "OUR CHOICE: forced-choice affirmative-logit margin, NOT PRIME's "
                    "two-frontier-judge 0-5 rubric; biases Phi UP and therefore FLATTERS "
                    "PRIME's lead time",
@@ -1023,6 +1285,25 @@ META = {"arm": ARM, "seed": SEED, "task": TASK, "policy": POLICY, "lr": LR, "ste
         "calibration": {k: {kk: vv for kk, vv in v.items() if kk != "step0"}
                         for k, v in CALIB.items()},
         "aggregation": "Eq.1 conjunction over three components (AND, not mean)",
+        # Provenance for the two infrastructure switches. These go in the metadata rather than the
+        # commit message because a reader holding only the artifact must be able to tell whether
+        # this trajectory is comparable to the frozen fp32 full-finetune grid. "fp32-full" plus
+        # resumed=False is the published configuration; anything else is not, and says so here.
+        "memory_config": MEM_CONFIG,
+        "memory_comparability": ("identical to the frozen fp32 full-finetune grid"
+                                 if MEM_CONFIG == "fp32-full" else
+                                 "NOT the frozen grid's numerics -- %s. Exact changes cost "
+                                 "comparability nothing; dtype/optimizer changes need the 1.5B "
+                                 "numerics control; LoRA needs 27 matched controls. See "
+                                 "model_memory.comparability_report." % MEM_CONFIG),
+        "checkpointing": ({"enabled": False} if CKPT_SPEC == "none" else
+                          {"enabled": True, "backend": CKPT_SPEC,
+                           "save_steps": _ckpt_plan["save_steps"],
+                           "keep": CKPT_KEEP,
+                           "overhead_pct": round(_ckpt_plan["overhead_pct"], 2),
+                           "written": (_ckpt_cb.saved if _ckpt_cb else []),
+                           "errors": (_ckpt_cb.errors if _ckpt_cb else 0)}),
+        "resume": _RESUME_META,
         "geometry_coverage": GEOM_COV,
         "geometry_source": "TRL TrainerCallback.on_log logs['entropy'|'kl'|'grad_norm'], captured "
                            "by GeomCallback -- byte-for-byte the code path that produced "
@@ -1038,6 +1319,49 @@ print("DONE steps=%d probes=%d" % (_n["c"], len(PRIME_ROWS)), flush=True)
 '''
 
 
+def _extra_deps() -> str:
+    """The memory flags pull in packages the base header does not declare, and a missing one is
+    an ImportError on the runner AFTER the job has been accepted and the environment resolved --
+    i.e. after the wait, though before the GPU meter does much. `adamw_bnb_8bit` without
+    bitsandbytes and `peft_config=` without peft both fail that way. The header is extended only
+    when a flag actually needs it, so the DEFAULT job's dependency set is unchanged and its
+    resolution is bit-identical to every previous run's."""
+    deps = []
+    if MM.CONFIGS[MEMCFG]["optim"].endswith("8bit"):
+        deps.append("bitsandbytes>=0.43")
+    if MM.CONFIGS[MEMCFG]["lora_rank"]:
+        deps.append("peft>=0.13")
+    return "".join(',"%s"' % d for d in deps)
+
+
+def _placeholders(diag_sha: str, b64: str) -> dict:
+    """The full placeholder -> value map for one render, from THIS invocation's flags.
+
+    Split out of `bake` so that `verify_default_inertness` can render the SAME template through
+    the SAME substitution code with a different (canonical-default) map. A harness that rendered
+    the job by its own private path would be testing its own path."""
+    return {
+        "__PKG_B64__": b64, "__POLICY__": POLICY, "__ARM__": ARM_LABEL, "__SEED__": str(SEED),
+        "__STEPS__": str(STEPS), "__TASK__": TASK, "__LR__": LR, "__PROXY__": PROXY,
+        "__PROXY_MISMATCH__": str(PROXY_MISMATCH), "__PROBE_EVERY__": str(PROBE_EVERY),
+        "__CTRL_EVERY__": str(CTRL_EVERY), "__ER_GEN__": str(ER_GEN), "__CKPT_SPEC__": CKPT,
+        "__CKPT_EVERY__": str(CKPT_EVERY), "__CKPT_KEEP__": str(CKPT_KEEP),
+        "__RESUME_SPEC__": repr(RESUME) if RESUME else "None", "__MEM_CONFIG__": MEMCFG,
+        "__PREEMPT__": str(PREEMPT), "__OUTPUT_DIR__": OUTPUT_DIR,
+        "__STEP_S__": "%.3f" % STEP_S, "__EXTRA_DEPS__": _extra_deps(),
+        "__DIAG_SHA__": diag_sha, "__DISCLOSE__": str(bool(DISCLOSE)),
+    }
+
+
+def _render(subs: dict) -> str:
+    """Substitute a placeholder map into UV. The ONE renderer; bake and the inertness harness
+    both go through it."""
+    src = UV
+    for k, v in subs.items():
+        src = src.replace(k, v)
+    return src
+
+
 def bake(diag_path: Path, diag_sha: str) -> tuple[str, Path]:
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as t:
@@ -1047,15 +1371,7 @@ def bake(diag_path: Path, diag_sha: str) -> tuple[str, Path]:
     print(f"baked {len(b64)} b64 chars  arm={ARM_LABEL} seed={SEED} steps={STEPS} task={TASK} "
           f"lr={LR} proxy={PROXY}")
     outp = ROOT / "scripts" / f"_prime_probe_{ARM_LABEL}_{TASK}_{SEED}.py"
-    outp.write_text(UV.replace("__PKG_B64__", b64).replace("__POLICY__", POLICY)
-                    .replace("__ARM__", ARM_LABEL).replace("__SEED__", str(SEED))
-                    .replace("__STEPS__", str(STEPS)).replace("__TASK__", TASK)
-                    .replace("__LR__", LR).replace("__PROXY__", PROXY)
-                    .replace("__PROXY_MISMATCH__", str(PROXY_MISMATCH))
-                    .replace("__PROBE_EVERY__", str(PROBE_EVERY))
-                    .replace("__CTRL_EVERY__", str(CTRL_EVERY))
-                    .replace("__ER_GEN__", str(ER_GEN))
-                    .replace("__DIAG_SHA__", diag_sha), encoding="utf-8")
+    outp.write_text(_render(_placeholders(diag_sha, b64)), encoding="utf-8")
     import py_compile  # fail locally on a baked-script syntax error BEFORE spending
     py_compile.compile(str(outp), doraise=True)
     src = outp.read_text(encoding="utf-8")
@@ -1064,19 +1380,256 @@ def bake(diag_path: Path, diag_sha: str) -> tuple[str, Path]:
     # The job's whole probe is `PP.<something>`. py_compile cannot see a missing attribute, and
     # this launcher no longer owns that code, so resolve every PP.<name> against the module that
     # is actually going into the tarball. An API drift would otherwise surface on the GPU.
-    used = sorted(set(re.findall(r"\bPP\.([A-Za-z_][A-Za-z0-9_]*)", src.replace(b64, ""))))
+    # Same check for the two new baked modules: they are called through `SR.` / `MM.` aliases and
+    # py_compile cannot see a missing attribute any better there than it can for PP.
+    body = src.replace(b64, "")
+    used = sorted(set(re.findall(r"\bPP\.([A-Za-z_][A-Za-z0-9_]*)", body)))
     missing = [a for a in used if not hasattr(PP, a)]
     assert not missing, ("the baked script calls prime_probe attributes that do not exist: "
                          + ", ".join(missing))
-    print(f"baked script compiles OK; {len(used)} prime_probe attributes resolve "
-          f"({', '.join(used[:6])}...); no unsubstituted placeholders -> {outp}")
+    for alias, mod in (("SR", SR), ("MM", MM)):
+        names = sorted(set(re.findall(r"\b%s\.([A-Za-z_][A-Za-z0-9_]*)" % alias, body)))
+        gone = [a for a in names if not hasattr(mod, a)]
+        assert not gone, ("the baked script calls %s attributes that do not exist: %s"
+                          % (mod.__name__, ", ".join(gone)))
+        used += names
+    print(f"baked script compiles OK; {len(used)} prime_probe/spot_resilience/model_memory "
+          f"attributes resolve; no unsubstituted placeholders -> {outp}")
     return b64, outp
+
+
+# ============================================================================================
+# 4b. INERTNESS, PROVED BY EXECUTION.
+#
+# The spot/memory flags are claimed to be inert when off. That claim was previously written down
+# as `assert (CKPT, MEMCFG, RESUME, PREEMPT) == (...) or True`, a tautology that could not fail,
+# and as a comment saying the default job gained "no imports that were not already there", which
+# was false -- the template imports model_memory and spot_resilience unconditionally.
+#
+# What is below replaces both. It renders the template through bake()'s own renderer with the
+# CANONICAL DEFAULT flag values (not this invocation's -- a --selftest run given --memory=... must
+# still be testing the default), EXECUTES the config-assembly region against stub trainer objects
+# with the REAL model_memory / spot_resilience modules, and compares the results to frozen
+# literals. It also runs a NEGATIVE control: the same extraction with --memory=bf16-8bit-gc-refcpu
+# must produce a DIFFERENT _cfg, or the harness is passing vacuously on a region it failed to
+# locate.
+# ============================================================================================
+
+#: The GRPOConfig argument list of every published run, frozen as a literal. Deriving it from the
+#: template would make this check circular; the whole point is to detect the template drifting.
+PUBLISHED_CFG = {
+    "output_dir": "/tmp/out", "per_device_train_batch_size": 8, "num_generations": 8,
+    "max_steps": 150, "learning_rate": 1e-6, "max_completion_length": 256, "beta": 0.02,
+    "logging_steps": 1, "save_strategy": "no", "report_to": [], "seed": 0,
+}
+#: The PEP 723 dependency line of the DEFAULT job, byte for byte. `_extra_deps()` appends to it
+#: only when a memory flag needs a package; on the default path it must be exactly this.
+PUBLISHED_DEP_LINE = ('# dependencies = ["torch>=2.6","transformers>=4.47","trl>=0.22",'
+                      '"datasets>=3.0","accelerate>=1.0","numpy>=1.26"]')
+#: Module-level imports of the DEFAULT emitted job. This list is NOT the pre-spot-resilience one:
+#: the default job really does import model_memory and spot_resilience now. They are stdlib-only,
+#: import-time-side-effect-free planning modules, and on the default path nothing calls into them
+#: except `SR.resume_provenance(None, None) -> {"resumed": False}`. Recording them here is the
+#: honest form of the claim the old comment got wrong.
+PUBLISHED_JOB_IMPORTS = [
+    "import base64, hashlib, io, json, sys, tarfile",
+    "import numpy as np",
+    "import torch",
+    "from datasets import Dataset",
+    "from trl import GRPOConfig as _Config, GRPOTrainer as _Trainer",
+    "from transformers import TrainerCallback, AutoTokenizer",
+    "from flightrecorder.repro.reward_codeset import CODE_TASKS",
+    "from flightrecorder.repro.reward_judge import JudgeScorer",
+    "from flightrecorder.repro.reward_testhack import oracle_reward, train_reward",
+    "from flightrecorder.repro import prime_probe as PP",
+    "from flightrecorder.repro import model_memory as MM",      # ADDED by the memory work
+    "from flightrecorder.repro import spot_resilience as SR",   # ADDED by the spot work
+    "import random",
+]
+#: Imports that the default job must NOT reach, because they are the expensive/behaviour-changing
+#: ones the flags exist to gate.
+GATED_JOB_IMPORTS = ["from peft import LoraConfig"]
+
+#: Canonical default flag values -- what `python scripts/launch_prime_probe.py hack 0 150 <task>
+#: 1e-6` produces. Fixed here so the harness is independent of the argv --selftest was given.
+_DEFAULT_SUBS = {
+    "__PKG_B64__": "", "__POLICY__": "Qwen/Qwen2.5-1.5B", "__ARM__": "hacking", "__SEED__": "0",
+    "__STEPS__": "150", "__TASK__": "sum_list", "__LR__": "1e-6", "__PROXY__": "tests",
+    "__PROXY_MISMATCH__": "False", "__PROBE_EVERY__": "5", "__CTRL_EVERY__": "5",
+    "__ER_GEN__": "False", "__CKPT_SPEC__": "none", "__CKPT_EVERY__": "0", "__CKPT_KEEP__": "2",
+    "__RESUME_SPEC__": "None", "__MEM_CONFIG__": "fp32-full", "__PREEMPT__": "False",
+    "__OUTPUT_DIR__": "/tmp/out", "__STEP_S__": "16.000", "__EXTRA_DEPS__": "",
+    "__DIAG_SHA__": "0" * 64, "__DISCLOSE__": "True",
+}
+
+
+def _extract(src: str, tag: str) -> str:
+    """The region between `# FR-<tag>-BEGIN` and `# FR-<tag>-END`, or raise. Raising rather than
+    returning "" matters: an empty region would execute cleanly and pass every assertion."""
+    m = re.search(r"^# FR-%s-BEGIN[^\n]*\n(.*?)^# FR-%s-END\b" % (tag, tag), src, re.S | re.M)
+    if not m or not m.group(1).strip():
+        raise AssertionError("FR-%s region not found in the emitted template -- the inertness "
+                             "harness cannot verify a region it cannot locate" % tag)
+    return m.group(1)
+
+
+class _RecordingConfig:
+    """Stands in for trl.GRPOConfig. Records the exact kwargs it was called with."""
+    def __init__(self, **kw):
+        self.kw = dict(kw)
+
+
+class _StubRef:
+    """A reference model that records where it was moved, so `offload_reference` firing (or not
+    firing) is observable rather than swallowed by its own except clause."""
+    def __init__(self):
+        self.device = "cuda"
+
+    def to(self, dev):
+        self.device = dev
+        return self
+
+
+class _RecordingTrainer:
+    """Stands in for trl.GRPOTrainer. Records callbacks and the peft kwarg."""
+    def __init__(self, **kw):
+        self.kw = dict(kw)
+        self.ref_model = _StubRef()        # so a wrongly-enabled ref offload would be visible
+        self.model = self.ref_model
+
+
+class _StubCallback:
+    """Stands in for PrimeProbeCallback: carries the attributes the sidecar registers."""
+    def __init__(self, name):
+        self.name, self.thr, self.thr_onset, self.n_probes, self.resumed_at = name, {}, {}, 0, None
+
+    def __repr__(self):
+        return self.name
+
+
+def _run_assembly(subs: dict, quiet: bool = False) -> dict:
+    """Render the template with `subs`, execute the constants block and the config-assembly
+    region, and return the resulting namespace.
+
+    The REAL model_memory and spot_resilience are used -- they are pure planning modules and
+    stubbing them would move the thing under test out of the test. Only the trainer objects, the
+    two callbacks, the reward function and the dataset are stubbed, because those need a GPU."""
+    import contextlib
+    import io as _io
+    src = _render(subs)
+    # A placeholder added to the template but not to _DEFAULT_SUBS would leave the harness
+    # rendering something that is not the default job, and every assertion below would then be
+    # about a script that no invocation produces.
+    left = sorted(set(re.findall(r"__[A-Z_]+__", src)))
+    assert not left, ("the inertness harness rendered an incomplete job -- unsubstituted %s. Add "
+                      "them to _DEFAULT_SUBS." % ", ".join(left))
+    prime_cb, geom_cb = _StubCallback("prime_cb"), _StubCallback("geom_cb")
+    ns = {
+        "MM": MM, "SR": SR, "PP": PP, "json": json,
+        "prime_cb": prime_cb, "geom_cb": geom_cb,
+        "_Config": _RecordingConfig, "_Trainer": _RecordingTrainer,
+        "reward_fn": lambda **kw: [], "dataset": object(),
+        "CALIB": {}, "PRIME_ROWS": [], "LOG": [], "_n": {"c": 0},
+    }
+    sink = _io.StringIO()
+    with (contextlib.redirect_stdout(sink) if quiet else contextlib.nullcontext()):
+        exec(compile(_extract(src, "CONST"), "<baked-constants>", "exec"), ns)
+        exec(compile(_extract(src, "ASSEMBLY"), "<baked-assembly>", "exec"), ns)
+    ns["_prime_cb"], ns["_geom_cb"] = prime_cb, geom_cb
+    ns["_src"], ns["_stdout"] = src, sink.getvalue()
+    return ns
+
+
+def verify_default_inertness(verbose: bool = True) -> dict:
+    """EXECUTE the emitted config-assembly region on the default flags and prove it is inert.
+
+    Returns the evidence dict it checked, so the caller can print numbers rather than a bare OK."""
+    ns = _run_assembly(dict(_DEFAULT_SUBS), quiet=True)
+    src, cfg = ns["_src"], ns["_cfg"]
+    assert ns["_stdout"] == "", ("the DEFAULT assembly printed something -- it must be silent, "
+                                 "and anything it prints is something it did: %r" % ns["_stdout"])
+    assert ns["trainer"].ref_model.device == "cuda", "reference offload fired on the default path"
+
+    # 1. The GRPOConfig argument list, compared to the published literal -- keys AND order AND
+    #    values. dict == dict ignores order, so order is checked separately: the emitted call is
+    #    quoted in the paper's methods section by position.
+    assert cfg == PUBLISHED_CFG, ("the DEFAULT job's GRPOConfig argument list drifted:\n  got      "
+                                  "%r\n  published %r" % (cfg, PUBLISHED_CFG))
+    assert list(cfg) == list(PUBLISHED_CFG), ("same keys, different order: %r vs %r"
+                                              % (list(cfg), list(PUBLISHED_CFG)))
+    # 2. ...and it is what actually reached the trainer, not merely what was assembled.
+    assert ns["args"].kw == PUBLISHED_CFG, "GRPOConfig was called with something else than _cfg"
+
+    # 3. Nothing was merged in, nothing was built, nothing was resumed.
+    assert ns["_extra"] == {}, "the default path merged GRPOConfig extras: %r" % (ns["_extra"],)
+    assert ns["_peft"] is None and ns["_post"] == {}, (ns["_peft"], ns["_post"])
+    assert ns["_tr_kw"] == {}, "the default path passed extra trainer kwargs: %r" % (ns["_tr_kw"],)
+    for name in ("_backend", "_sidecar", "_watcher", "_ckpt_cb", "_resume_path", "_resume_blob",
+                 "_ckpt_plan"):
+        assert ns[name] is None, "%s was constructed on the default path" % name
+    assert ns["_RESUME_META"] == {"resumed": False}, ns["_RESUME_META"]
+
+    # 4. The callback list, by identity and order.
+    cbs = ns["trainer"].kw["callbacks"]
+    assert cbs == [ns["_prime_cb"], ns["_geom_cb"]], "callback list changed: %r" % (cbs,)
+    assert "peft_config" not in ns["trainer"].kw, "peft_config reached the trainer by default"
+
+    # 5. The PEP 723 dependency header, byte for byte.
+    dep = next(ln for ln in src.splitlines() if ln.startswith("# dependencies ="))
+    assert dep == PUBLISHED_DEP_LINE, ("the DEFAULT job's dependency header changed:\n  got       "
+                                       "%s\n  published %s" % (dep, PUBLISHED_DEP_LINE))
+
+    # 6. The module-level import set of the default job, against the recorded list. This is the
+    #    check the old prose comment claimed and did not perform.
+    #    Column 0 is what makes an import unconditional: every gated import in the template is
+    #    inside an `if`, hence indented.
+    imports = [re.sub(r"\s*#.*$", "", ln).rstrip()
+               for ln in src.splitlines() if re.match(r"^(import |from )", ln)]
+    assert imports == PUBLISHED_JOB_IMPORTS, ("the DEFAULT job's module-level imports changed:\n"
+                                              "  got       %r\n  published %r"
+                                              % (imports, PUBLISHED_JOB_IMPORTS))
+    for gated in GATED_JOB_IMPORTS:
+        assert gated not in imports, "%s is no longer gated -- it now runs unconditionally" % gated
+        assert re.search(r"^\s+%s" % re.escape(gated), src, re.M), (
+            "%s vanished from the template; the gating check has nothing left to check" % gated)
+
+    # 7. NEGATIVE CONTROL. The same extraction, with --memory=bf16-8bit-gc-refcpu, must CHANGE
+    #    things. Without this, a harness that silently extracted an empty or wrong region would
+    #    report inertness for a template it never executed.
+    mem = dict(_DEFAULT_SUBS, __MEM_CONFIG__="bf16-8bit-gc-refcpu",
+               __EXTRA_DEPS__=',"bitsandbytes>=0.43"')
+    ns2 = _run_assembly(mem, quiet=True)
+    assert ns2["_cfg"] != PUBLISHED_CFG, "the negative control produced the published cfg -- the "\
+                                         "harness is not executing the region it thinks it is"
+    assert ns2["_extra"], "the memory path merged nothing"
+    assert ns2["_post"].get("ref_device") == "cpu"
+    assert ns2["_cfg"]["model_init_kwargs"][MM.dtype_key()] == "bfloat16"
+    assert ns2["trainer"].ref_model.device == "cpu", "the memory path did not offload the reference"
+    dep2 = next(ln for ln in ns2["_src"].splitlines() if ln.startswith("# dependencies ="))
+    assert dep2 != PUBLISHED_DEP_LINE and "bitsandbytes" in dep2
+
+    ev = {"cfg": cfg, "dep_line": dep, "callbacks": [repr(c) for c in cbs],
+          "n_imports": len(imports), "negative_control_extra": sorted(ns2["_extra"]),
+          "region_lines": len(_extract(src, "ASSEMBLY").splitlines())}
+    if verbose:
+        print("    OK  inertness EXECUTED (%d-line assembly region, real MM/SR, stub trainer):"
+              % ev["region_lines"])
+        print("          _cfg == PUBLISHED_CFG (%d keys, same order) and is what _Config received"
+              % len(cfg))
+        print("          _extra={} _peft=None _post={} _tr_kw={} backend/sidecar/watcher/resume "
+              "all None")
+        print("          callbacks == [prime_cb, geom_cb]; peft_config absent")
+        print("          PEP 723 dependency line byte-identical; %d module-level imports match"
+              % len(imports))
+        print("          negative control --memory=bf16-8bit-gc-refcpu DOES change it: +%s"
+              % ", ".join(ev["negative_control_extra"]))
+    return ev
 
 
 # ============================================================================================
 # 5. COST. Every term that the job actually executes is priced, at the cadence that will run.
 # ============================================================================================
-USD_PER_HR, FLAVOR = 3.40, "a100-large"      # a100-large list rate; edit if HF pricing moves
+USD_PER_HR, FLAVOR = 2.50, "a100-large"      # a100-large list rate; edit if HF pricing moves
 STEP_S_1P5B = 16.0                           # measured ~16 s/step at 1.5B (launch_judge_batch)
 SEQ_S_1P5B = 0.020                           # one short forced-choice forward pass
 GEN_S_1P5B = 0.35                            # one 128-token greedy decode
@@ -1145,6 +1698,32 @@ def print_cost(n_hack, n_ctrl):
               f"--probe-every={PROBE_EVERY}: ~{c7['hours']:.2f} h ~${c7['usd']:.2f}")
     print("=" * 92)
     return c, timeout_h
+
+
+# The step time the checkpoint cadence is computed from is the SAME number this run is priced
+# with. Two estimates of the same quantity is how a plan and a budget drift apart.
+STEP_S = cost_model(64, 64, PROBE_EVERY, ER_GEN)["step_s"]
+
+
+def print_plan():
+    """--plan: the checkpointing arithmetic and the memory table, then exit. Free -- no build, no
+    tarball, no network, no spend."""
+    print(MM.memory_table())
+    print("")
+    MM.validate()
+    print("")
+    print(MM.comparability_report(MEMCFG, steps=STEPS))
+    print("")
+    _p_b = SR.params_b(POLICY)
+    _lora = (MM.lora_params_b(_p_b, MM.CONFIGS[MEMCFG]["lora_rank"])
+             if MM.CONFIGS[MEMCFG]["lora_rank"] else None)
+    for be in ("dir", "hub"):
+        print(SR.format_plan(SR.plan(
+            p_b=_p_b, step_s=STEP_S, steps=STEPS, backend=be,
+            dtype=MM.CONFIGS[MEMCFG]["dtype"], optim=MM.CONFIGS[MEMCFG]["optim"],
+            lora_trainable_params_b=_lora, mtbf_h=MTBF_H, usd_per_hr=SPOT_USD_PER_HR,
+            save_steps=(CKPT_EVERY or None), keep=CKPT_KEEP)))
+        print("")
 
 
 def print_scale_warning(params):
@@ -1537,9 +2116,155 @@ def _selftest():
     print(f"    with control block {a['probe_s']:.1f}s/probe vs {b['probe_s']:.1f}s/probe without "
           f"-> control is {100 * (a['probe_s'] - b['probe_s']) / b['probe_s']:.0f}% of the probe")
     assert a["probe_s"] > b["probe_s"], "the control block is priced at zero"
+    print("[7] spot resilience + 7B memory: the arithmetic, the guards, and INERTNESS by default")
+    # (a) The memory model is confronted with runs that actually happened. A planning model that
+    #     has never been checked against a real outcome is a spreadsheet.
+    assert MM.validate(verbose=False), "the memory model contradicts an observed run"
+    print("    OK  memory model agrees with all %d observed-run anchors (a10g OOM, 1.5B, 3B, 7B)"
+          % len(MM.ANCHORS))
+    # (a2) ...and the PROSE is confronted with the model. Three figures in model_memory's own
+    #      docstring contradicted its own table (57/23 GB and ~15x against 53.3/26.7 GB and
+    #      10.34x), and spot_resilience's docstring priced an 18.5 GB write at ~15 s against its
+    #      own BACKEND_MBPS["dir"]=900, which makes it 20.6 s. The prose is what gets quoted.
+    assert MM.validate_prose(verbose=False), "model_memory's prose contradicts its own model"
+    assert SR.validate_prose(verbose=False), "spot_resilience's prose contradicts its own model"
+    print("    OK  every number quoted in model_memory's and spot_resilience's docstrings is "
+          "recomputed from the code and matches")
+    # (b) The recommendation must fit with real headroom AND survive the pessimistic activation
+    #     constant, or it is not a recommendation.
+    rec = MM.memory_breakdown(7.616, **{k: v for k, v in
+                                        MM.CONFIGS["bf16-8bit-gc-refcpu"].items() if k != "note"})
+    pess = MM.memory_breakdown(7.616, act_k=MM.ACT_K_THEORY,
+                               **{k: v for k, v in
+                                  MM.CONFIGS["bf16-8bit-gc-refcpu"].items() if k != "note"})
+    cur = MM.memory_breakdown(7.616, **{k: v for k, v in
+                                        MM.CONFIGS["fp32-full"].items() if k != "note"})
+    assert MM.fits(rec["peak_gb"]) == "FIT" and MM.fits(pess["peak_gb"]) == "FIT", (
+        rec["peak_gb"], pess["peak_gb"])
+    assert MM.fits(cur["peak_gb"]) == "OOM", cur["peak_gb"]
+    assert abs(cur["states_gb"] - 152.0) < 3.0, ("the fp32 7B state total should be ~152 GB "
+                                                 "(20 B/param), got %.1f" % cur["states_gb"])
+    print("    OK  7B fp32 states %.0f GB (the bug) -> recommended config %.0f GB peak, %.0f GB "
+          "at ACT_K=%d" % (cur["states_gb"], rec["peak_gb"], pess["peak_gb"], MM.ACT_K_THEORY))
+    # (c) The recommended config keeps full-finetune geometry, which is what makes the 27 matched
+    #     LoRA controls unnecessary. If this ever flips to LoRA, the control bill flips with it.
+    assert MM.training_kwargs("bf16-8bit-gc-refcpu")["peft"] is None
+    kc = MM.lora_control_cost()
+    assert kc["lora_control_runs"] == 27 and kc["ratio"] > 5
+    print("    OK  recommended config uses no LoRA -> owes %d control runs (%.1f h), not %d "
+          "(%.1f h)" % (kc["numerics_control_runs"], kc["numerics_control_h"],
+                        kc["lora_control_runs"], kc["lora_control_h"]))
+    # (d) beta=0 is a cheaper run and an unscoreable one. It must be refused, not offered.
+    try:
+        MM.training_kwargs("bf16-8bit-gc-refcpu", beta=0.0)
+        raise AssertionError("beta=0 was accepted as a memory fix")
+    except ValueError as e:
+        assert "KL" in str(e)
+    print("    OK  beta=0 refused as a memory fix (it deletes one of the six reference detectors)")
+    # (e) The naive cadence is priced and rejected; the chosen one is Young/Daly-derived.
+    naive = SR.plan(p_b=1.544, step_s=16.0, steps=150, backend="hub", save_steps=5)
+    auto = SR.plan(p_b=7.616, step_s=77.0, steps=150, backend="dir", dtype="bfloat16",
+                   optim="adamw_bnb_8bit")
+    assert naive["overhead_pct"] > 100 and not naive["worth_it"]
+    assert auto["save_steps"] > 5 and auto["overhead_pct"] < 8 and auto["worth_it"]
+    assert auto["save_total_limit"] == 2, "retention must survive a torn write"
+    print("    OK  save_steps=5 at 1.5B/hub = %.0f%% overhead, %.0f GB written -> rejected; "
+          "7B/dir chooses %d (%.1f%%)" % (naive["overhead_pct"], naive["bytes_written_gb"],
+                                          auto["save_steps"], auto["overhead_pct"]))
+    # (e2) --ckpt-keep must reach BOTH stores. It reached one: `plan` hardcoded
+    #      save_total_limit=2 while `make_callback(keep=CKPT_KEEP)` took the flag, so
+    #      --ckpt-keep=5 pruned the durable store to 5 and the Trainer's local output_dir -- the
+    #      one it resumes from under DirBackend.inplace -- to 2.
+    for _k, _want in ((1, 2), (2, 2), (5, 5)):
+        _p = SR.plan(p_b=7.616, step_s=77.0, steps=150, backend="dir", keep=_k)
+        assert _p["save_total_limit"] == _want, (_k, _p["save_total_limit"])
+        assert SR.trainer_kwargs(_p, "/tmp/out")["save_total_limit"] == _want
+    print("    OK  --ckpt-keep reaches the Trainer: keep=5 -> save_total_limit=5 in "
+          "trainer_kwargs AND in make_callback; keep=1 clamped up to the torn-write floor of 2")
+    # (f) A resumed run that cannot restore its frozen gates must ABORT. This is the failure that
+    #     trains correctly and measures wrongly, so it is the one worth a test.
+    import tempfile
+    with tempfile.TemporaryDirectory() as _td:
+        sc = SR.StateSidecar().register("calib", lambda: {"phi": 1}, lambda v: None)
+        sc.dump(Path(_td))
+        assert sc.load(Path(_td))["slots"]["calib"] == {"phi": 1}, "sidecar did not round-trip"
+        with tempfile.TemporaryDirectory() as _empty:
+            try:
+                sc.load(Path(_empty), strict=True)
+                raise AssertionError("a sidecar-less resume was accepted")
+            except RuntimeError as e:
+                assert "RE-CALIBRATE" in str(e)
+    print("    OK  sidecar round-trips; a resume without one is refused, not warned about")
+    # (f2) THE TORN CHECKPOINT. The newest checkpoint is the one most likely to have been torn by
+    #      the eviction that caused the resume, so "resume from the newest" is the wrong rule and
+    #      "resume from the newest COMPLETE one" is the right one. That distinction was argued in
+    #      prose and reproduced by hand; nothing re-checked it after a change to DirBackend.list
+    #      or resolve_resume. It does now.
+    with tempfile.TemporaryDirectory() as _root:
+        _r = Path(_root)
+        for _step in (22, 44):                          # two complete checkpoints
+            (_r / ("checkpoint-%d" % _step)).mkdir()
+            (_r / ("checkpoint-%d" % _step) / SR.COMPLETE_MARKER).write_text("t")
+            (_r / ("checkpoint-%d" % _step) / "model.safetensors").write_text("weights")
+        (_r / "checkpoint-66").mkdir()                   # torn: written, never marked complete
+        (_r / "checkpoint-66" / "model.safetensors").write_text("half a t")
+        _be = SR.DirBackend(str(_r), str(_r))            # inplace: output_dir IS the durable root
+        assert _be.list() == ["checkpoint-22", "checkpoint-44"], _be.list()
+        _got = SR.resolve_resume("latest", _be, str(_r))
+        assert SR.checkpoint_step(_got) == 44, ("resume picked %s -- the torn newest checkpoint "
+                                                "was selected" % _got)
+        # ...and asking for the torn one BY NAME must be refused, not silently downgraded.
+        try:
+            SR.resolve_resume("checkpoint-66", _be, str(_r))
+            raise AssertionError("--resume=checkpoint-66 accepted a torn checkpoint")
+        except RuntimeError as e:
+            assert "checkpoint-66" in str(e)
+        # ...and with no backend at all, the same rule must hold on the plain output_dir scan.
+        assert SR.checkpoint_step(SR.resolve_resume("latest", None, str(_r))) == 44
+        # Sanity: mark 66 complete and the answer must MOVE, or the test is passing on a fixture
+        # that never had a newest checkpoint to reject.
+        (_r / "checkpoint-66" / SR.COMPLETE_MARKER).write_text("t")
+        assert SR.checkpoint_step(SR.resolve_resume("latest", _be, str(_r))) == 66
+    print("    OK  torn checkpoint-66 (no _COMPLETE) is skipped: list()=[22,44], "
+          "--resume=latest -> checkpoint-44, --resume=checkpoint-66 refused; marking it "
+          "complete moves the answer to 66")
+    # (g) A trainer that cannot apply the dtype fix must abort at startup, not OOM at minute 40.
+    import dataclasses as _dc
+
+    @_dc.dataclass
+    class _OldCfg:
+        output_dir: str = "/tmp/out"
+    try:
+        SR.filter_supported(_OldCfg, {"model_init_kwargs": {"dtype": "bfloat16"}}, verbose=False)
+        raise AssertionError("a trainer without model_init_kwargs was accepted")
+    except SystemExit as e:
+        assert "model_init_kwargs" in str(e)
+    print("    OK  a trainer that cannot apply the dtype fix aborts instead of loading fp32")
+    # (h) INERTNESS, BY EXECUTION. This used to be
+    #       assert (CKPT, MEMCFG, RESUME, PREEMPT) == ("none", "fp32-full", None, False) or True
+    #     -- a tautology (`or True`) on the one line that would have checked the flag defaults,
+    #     printing OK unconditionally. verify_default_inertness() renders the template with the
+    #     canonical defaults, EXECUTES its config-assembly region against stub trainer objects,
+    #     and compares _cfg / _extra / the callback list / the PEP 723 header / the module-level
+    #     import set to frozen literals, with a negative control that must differ.
+    assert MM.CONFIGS["fp32-full"]["dtype"] == "float32", "the default config drifted off fp32"
+    verify_default_inertness()
+    # And the same for THIS invocation's flags, which is the weaker but still worth-having claim:
+    # a --selftest run that was itself given a memory flag should say so rather than imply the
+    # default was verified twice.
+    if (CKPT, MEMCFG, RESUME, PREEMPT) != ("none", "fp32-full", None, False):
+        print("    NOTE this --selftest was invoked with non-default spot/memory flags "
+              "(ckpt=%s memory=%s resume=%s preempt=%s); the inertness check above still tested "
+              "the DEFAULTS, not these." % (CKPT, MEMCFG, RESUME, PREEMPT))
+
     print("\nSELFTEST PASS  (nothing submitted, nothing spent)")
     return res
 
+
+if PLAN_ONLY:
+    # Free: arithmetic and tables only. No pool build, no tarball, no network, no spend.
+    print_plan()
+    raise SystemExit(0)
 
 if SELFTEST:
     _selftest()
@@ -1570,6 +2295,9 @@ print(f"  python scripts/launch_prime_probe.py {ARM} {SEED} {STEPS} {TASK} {LR}"
       + (f" --n-pairs={N_PAIRS}" if N_PAIRS != 64 else "")
       + (f" --probe-every={PROBE_EVERY}" if PROBE_EVERY != 5 else "")
       + (f" --ctrl-every={CTRL_EVERY}" if CTRL_EVERY != 5 else "")
+      + ("" if DISCLOSE else " --disclose=0")
+      + (f" --memory={MEMCFG}" if MEMCFG != "fp32-full" else "")
+      + (f" --ckpt={CKPT}" if CKPT != "none" else "")
       + (" --er-gen" if ER_GEN else "") + " --submit")
 print("AFTERWARDS (job stdout -> established shape):")
 print(f"  python scripts/launch_prime_probe.py {ARM} {SEED} {STEPS} {TASK} {LR} --collect=<joblog.txt>")
@@ -1580,6 +2308,20 @@ print("  one benign run is the minimum for an FPR-calibrated operating point.")
 print("VERIFY FIRST (needs the probe extra: uv pip install -e \".[probe]\"):")
 print("  python scripts/launch_prime_probe.py --selftest")
 print("  python scripts/launch_prime_probe.py --selftest --real-model=Qwen/Qwen2.5-0.5B-Instruct")
+
+if BACKEND == "azureml":
+    # Everything above -- the frozen set, the lexical audit, bake()'s py_compile / placeholder /
+    # PP-attribute guards, the cost model, the scale warning -- has already run and is shared.
+    # The Azure backend transforms the SAME baked script and proves by hash that it did not
+    # change the job body. It creates no Azure resource and submits nothing without --submit.
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import azureml_backend as AZ                                            # noqa: E402
+    raise SystemExit(AZ.build_and_maybe_submit(
+        root=ROOT, baked_path=OUTP, diag_path=DIAG_PATH, diag_sha=DIAG_SHA,
+        arm=ARM_LABEL, task=TASK, seed=SEED, steps=STEPS, policy=POLICY,
+        cost=COST, timeout_h=TIMEOUT_H, submit=SUBMIT,
+        workspace=AZ_WORKSPACE, resource_group=AZ_RG, cluster=AZ_CLUSTER, region=AZ_REGION,
+        spot=AZ_SPOT, hf_token_mode=AZ_HF_TOKEN, kv_uri=AZ_KV_URI, pip_freeze=AZ_PIP_FREEZE))
 
 if not SUBMIT:
     print("\nDRY RUN -- nothing submitted, nothing spent. Re-run with --submit to launch.")
