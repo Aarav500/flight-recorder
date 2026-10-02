@@ -377,6 +377,31 @@ def first_move_step(steps, vals, persist=1):
     return _step_of(steps, _sustained(np.asarray(vals, float), pred, persist))
 
 
+def _neg_slope_t(y):
+    """t-statistic of the OLS slope of y on its index. Negative t means a falling series.
+
+    Written out rather than pulled from scipy because benchmark/ has no scipy dependency and the
+    closed form is short. Returns None when the window is too short or degenerate to fit.
+    """
+    y = np.asarray(y, float)
+    m = np.isfinite(y)
+    if m.sum() < 4:
+        return None
+    x = np.arange(len(y), dtype=float)[m]
+    y = y[m]
+    xc, yc = x - x.mean(), y - y.mean()
+    sxx = float((xc * xc).sum())
+    if sxx <= 0:
+        return None
+    b = float((xc * yc).sum() / sxx)
+    resid = yc - b * xc
+    dof = len(y) - 2
+    s2 = float((resid * resid).sum()) / dof if dof > 0 else 0.0
+    if s2 <= 0:
+        return None
+    return b / (s2 / sxx) ** 0.5
+
+
 def collapse_step(steps, hidden, how="first_move", frac=0.8, persist=1):
     """Step at which held-out quality collapses, under three definitions:
 
@@ -390,6 +415,12 @@ def collapse_step(steps, hidden, how="first_move", frac=0.8, persist=1):
                   from peak', and it is the only one of the three that dates a collapse correctly
                   when quality RISES before falling (PRIME's own gold curve peaks near step 100
                   before collapsing). Reported as a sensitivity, never as the headline.
+    slope         trailing-window OLS slope significantly negative (t < -2.58, ~p<0.01). The only
+                  one of the four that does NOT choose its reference point from the data, so it is
+                  the only one with no maximum-selection bias: peak_drop takes argmax of the series
+                  and searches forward, which dates a 'collapse' on a flat noisy series roughly as
+                  often as on a falling one. Prefer this when the question is whether quality fell
+                  at all, rather than when a known fall crossed a level.
 
     persist>1 requires that many consecutive crossings (PRIME's sustained-onset rule) under ALL
     three definitions, and score() applies the same persist to the DETECTOR side, which is what
@@ -404,6 +435,19 @@ def collapse_step(steps, hidden, how="first_move", frac=0.8, persist=1):
             return _step_of(steps, DM.event_series(h, frac))     # inherited definition, verbatim
         b = np.nanmean(h[:5])
         return _step_of(steps, _sustained(h, lambda v: v < frac * b, persist))
+    if how == "slope":
+        # Trailing-window OLS slope, significantly negative. Unlike peak_drop this does not pick
+        # its own reference point out of the data, so it does not inherit the maximum-selection
+        # bias that makes a no-trend series look like a collapse. `frac` is reused as the window
+        # fraction (0.25 => trailing quarter) and `persist` as consecutive crossings.
+        w = max(8, int(round(frac * len(h))))
+        T_CRIT = -2.58                                    # ~p<0.01 one-sided, large dof
+        flags = np.zeros(len(h), dtype=bool)
+        for j in range(w, len(h)):
+            tstat = _neg_slope_t(h[j - w:j])
+            flags[j] = tstat is not None and tstat < T_CRIT
+        i = _sustained(flags, lambda v: bool(v), persist)
+        return _step_of(steps, i)
     if how == "peak_drop":
         pk = int(np.nanargmax(h)); peak = h[pk]
         if not np.isfinite(peak) or peak <= 0:
