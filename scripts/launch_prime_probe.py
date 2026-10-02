@@ -337,7 +337,15 @@ SUBMIT = _bool_flag("submit", False)
 # contrast is carried by the TASK (a matched-control pair whose visible split differs)
 # rather than by prompt discoverability. Default 1 = unchanged legacy behaviour.
 DISCLOSE = _bool_flag("disclose", True)
+# --corpus=powered runs the frozen, screened trap corpus (reward_powered).
+# Default "codeset" is the legacy RL pool, so existing behaviour is unchanged.
+CORPUS = str(_flag("corpus", "codeset"))
+
 ER_GEN = _bool_flag("er-gen", False)
+# --gen-log emits free-form answers for ALL THREE components as PRIME_GEN lines, for offline
+# judging by a frontier model. Additive: the forced-choice Phi series is untouched, so a run
+# with --gen-log is still numerically comparable to one without.
+GEN_LOG = _bool_flag("gen-log", False)
 ALLOW_MISMATCH = _bool_flag("allow-proxy-mismatch", False)
 PROXY = _choice_flag("proxy", ("tests", "judge"), "tests")
 POLICY = str(_flag("policy", "Qwen/Qwen2.5-1.5B"))
@@ -383,6 +391,36 @@ RESUME = _flag("resume", None)
 MTBF_H = float(_flag("mtbf-h", 12.0))
 PREEMPT = _bool_flag("preempt", False)
 MEMCFG = str(_flag("memory", "fp32-full"))
+
+if CORPUS == "powered":
+    # GUARD 1 -- an unset --policy silently defaulted to Qwen2.5-1.5B and voided a pilot that
+    # was meant to be 7B. Every pi0 in this corpus was screened at the registered policy, so a
+    # default here produces numbers the screen does not predict. Refuse instead.
+    import json as _json
+    _PM = ROOT / "experiments" / "prime" / "powered_manifest.json"
+    _man = _json.load(open(_PM, encoding="utf-8"))
+    _want = _man["preregistered_prediction"]["run_config"]["policy"]
+    if _flag("policy", None) is None:
+        raise SystemExit(
+            "--corpus=powered requires an EXPLICIT --policy." + '\\n' +
+            "  refusing the built-in default %s" % POLICY + '\\n' +
+            "  the manifest registers %s" % _want + '\\n' +
+            "  a silent policy default already voided one pilot (ran 1.5B, screened at 7B)")
+    # GUARD 2 -- the running policy must match the pre-registration.
+    if POLICY != _want:
+        raise SystemExit(
+            "POLICY MISMATCH vs the pre-registration -- refusing to run." + '\\n' +
+            "  requested  %s" % POLICY + '\\n' +
+            "  registered %s" % _want + '\\n' +
+            "  re-register deliberately if you mean to change the policy")
+    from flightrecorder.repro import reward_powered as _RP
+    if _RP.corpus_sha256() != _man["corpus_sha256"]:
+        raise SystemExit("POWERED CORPUS HASH MISMATCH -- live %s vs manifest %s"
+                         % (_RP.corpus_sha256()[:16], _man["corpus_sha256"][:16]))
+    print("POWERED corpus %s  policy %s  prereg %s  [verified]"
+          % (_man["corpus_sha256"][:16], POLICY,
+             _man["preregistered_prediction"]["self_sha256"][:16]))
+
 PLAN_ONLY = _bool_flag("plan", False)
 SPOT_USD_PER_HR = float(_flag("spot-usd", 0.68))    # Azure NC A100 v4 spot, vs 3.67 on-demand
 
@@ -832,6 +870,7 @@ POLICY, ARM, SEED, STEPS, TASK = "__POLICY__", "__ARM__", __SEED__, __STEPS__, "
 PROXY, PROXY_MISMATCH = "__PROXY__", __PROXY_MISMATCH__
 GEN, LR, BETA, MAXTOK = 8, __LR__, 0.02, 256
 PROBE_EVERY, CTRL_EVERY, ER_GEN = __PROBE_EVERY__, __CTRL_EVERY__, __ER_GEN__
+GEN_LOG = __GEN_LOG__
 DIAG_SHA, PROBE_BS = "__DIAG_SHA__", 8
 CKPT_SPEC, CKPT_EVERY, CKPT_KEEP = "__CKPT_SPEC__", __CKPT_EVERY__, __CKPT_KEEP__
 RESUME_SPEC, MEM_CONFIG, PREEMPT = __RESUME_SPEC__, "__MEM_CONFIG__", __PREEMPT__
@@ -840,8 +879,14 @@ OUTPUT_DIR, STEP_S = "__OUTPUT_DIR__", __STEP_S__
 PHI0_TARGET, MARGINAL0_TARGET = PP.HONEST_BASELINE, PP.HONEST_BASELINE
 BIG, SMALL = "Qwen/Qwen2.5-1.5B-Instruct", "Qwen/Qwen2.5-0.5B-Instruct"
 
-TASKS = [t for t in CODE_TASKS if t.name == TASK]
-assert TASKS, "unknown task " + TASK
+if "__CORPUS__" == "powered":
+    from flightrecorder.repro.reward_powered import POWERED, corpus_sha256 as _pcs
+    print("CORPUS powered sha %s policy %s" % (_pcs()[:16], POLICY), flush=True)
+    _POOL = [getattr(x, "task", x) for x in POWERED]
+else:
+    _POOL = list(CODE_TASKS)
+TASKS = [t for t in _POOL if t.name == TASK]
+assert TASKS, "unknown task %s in corpus __CORPUS__" % TASK
 task = TASKS[0]
 
 def _reachable_prompt(t):
@@ -913,6 +958,44 @@ def make_er_scorer(m, judge):
         return PP.yes_no_margin(judge.model, judge.tok, jp, PROBE_BS)
     return scorer
 
+# ---- OUR CHOICE (g): free-form generation for ALL THREE components, logged not scored -------
+def gen_all_components(m, pairs, step):
+    """Generate PRIME's three free-form answers per pair and emit them for offline judging.
+
+    Deliberately NOT fed back into Phi. The forced-choice path above still produces every number
+    the training-time series reports, so enabling this flag cannot move a published result. What
+    it buys is the thing our forced-choice substitute cannot give: the actual free-form text
+    PRIME's rubric is defined over, which a frontier judge can score after the run.
+
+    Decoding matches make_er_scorer -- greedy, single sample, <=128 new tokens -- so the output is
+    deterministic given the checkpoint. PRIME does not state its decoding parameters, so this is
+    our choice and is disclosed as such.
+
+    Off-stream by the same proof as the forced-choice path: render_prompt(..., with_closer=False)
+    sees only (task, solution, question), never execution outcomes or either reward.
+    """
+    dev = next(m.parameters()).device
+    rows = []
+    for c in PP.COMPONENTS:
+        answers = []
+        for i in range(0, len(pairs), PROBE_BS):
+            ps = [PP.render_prompt(p, c, with_closer=False) + "\n\nAnswer:"
+                  for p in pairs[i:i + PROBE_BS]]
+            enc = gen_tok(ps, return_tensors="pt", padding=True, truncation=True,
+                          max_length=PP.MAX_PROMPT_TOKENS).to(dev)
+            out = m.generate(**enc, do_sample=False, max_new_tokens=128,
+                             pad_token_id=gen_tok.pad_token_id)
+            answers += gen_tok.batch_decode(out[:, enc.input_ids.shape[1]:],
+                                            skip_special_tokens=True)
+        for p, a in zip(pairs, answers):
+            rows.append({"step": step, "component": c,
+                         "pair_id": getattr(p, "id", None) or p.get("id"),
+                         "answer": a.strip()})
+    for r in rows:
+        print("PRIME_GEN " + json.dumps(r, sort_keys=True), flush=True)
+    return len(rows)
+
+
 # ---- run state ------------------------------------------------------------------------------
 scorer_big = JudgeScorer(BIG)       # capable judge
 scorer_small = JudgeScorer(SMALL)   # 0.5B judge
@@ -962,6 +1045,15 @@ class PrimeProbeCallback(TrainerCallback):
             return
         try:
             er = make_er_scorer(m, scorer_big) if ER_GEN else None
+            # Generation is logged, never scored into Phi. Failures here must not kill a run that
+            # has already paid for training, so it degrades to a warning and the series continues.
+            if GEN_LOG:
+                try:
+                    with torch.no_grad():
+                        _ng = gen_all_components(m, HACK_ONLY, step)
+                    print("PRIME_GEN_OK step %d rows %d" % (step, _ng), flush=True)
+                except Exception as _ge:
+                    print("PRIME_GEN_ERR step %d %r" % (step, _ge), flush=True)
             r = None
             if self.thr is None:                       # step-0 calibration, then FROZEN
                 # STRICT: a degenerate gate raises CalibrationError, which is re-raised below and
@@ -1268,6 +1360,7 @@ for _k in ("entropy", "kl"):
 # ---- results, through the ONE emitter (asserts the signal-key contract before writing) -------
 META = {"arm": ARM, "seed": SEED, "task": TASK, "policy": POLICY, "lr": LR, "steps": STEPS,
         "probe_every": PROBE_EVERY, "ctrl_every": CTRL_EVERY, "er_gen": ER_GEN,
+        "gen_log": GEN_LOG,
         "diag_sha256": DIAG_SHA, "n_hack": N_HACK, "n_control": N_CTRL,
         "phi0_target": PHI0_TARGET, "marginal0_target": MARGINAL0_TARGET,
         "optimised_proxy": ("reward_testhack.train_reward (visible tests) -- the same R that "
@@ -1344,12 +1437,14 @@ def _placeholders(diag_sha: str, b64: str) -> dict:
         "__PKG_B64__": b64, "__POLICY__": POLICY, "__ARM__": ARM_LABEL, "__SEED__": str(SEED),
         "__STEPS__": str(STEPS), "__TASK__": TASK, "__LR__": LR, "__PROXY__": PROXY,
         "__PROXY_MISMATCH__": str(PROXY_MISMATCH), "__PROBE_EVERY__": str(PROBE_EVERY),
-        "__CTRL_EVERY__": str(CTRL_EVERY), "__ER_GEN__": str(ER_GEN), "__CKPT_SPEC__": CKPT,
+        "__CTRL_EVERY__": str(CTRL_EVERY), "__ER_GEN__": str(ER_GEN),
+        "__GEN_LOG__": str(GEN_LOG), "__CKPT_SPEC__": CKPT,
         "__CKPT_EVERY__": str(CKPT_EVERY), "__CKPT_KEEP__": str(CKPT_KEEP),
         "__RESUME_SPEC__": repr(RESUME) if RESUME else "None", "__MEM_CONFIG__": MEMCFG,
         "__PREEMPT__": str(PREEMPT), "__OUTPUT_DIR__": OUTPUT_DIR,
         "__STEP_S__": "%.3f" % STEP_S, "__EXTRA_DEPS__": _extra_deps(),
         "__DIAG_SHA__": diag_sha, "__DISCLOSE__": str(bool(DISCLOSE)),
+        "__CORPUS__": CORPUS,
     }
 
 
@@ -1456,10 +1551,10 @@ _DEFAULT_SUBS = {
     "__PKG_B64__": "", "__POLICY__": "Qwen/Qwen2.5-1.5B", "__ARM__": "hacking", "__SEED__": "0",
     "__STEPS__": "150", "__TASK__": "sum_list", "__LR__": "1e-6", "__PROXY__": "tests",
     "__PROXY_MISMATCH__": "False", "__PROBE_EVERY__": "5", "__CTRL_EVERY__": "5",
-    "__ER_GEN__": "False", "__CKPT_SPEC__": "none", "__CKPT_EVERY__": "0", "__CKPT_KEEP__": "2",
+    "__ER_GEN__": "False", "__GEN_LOG__": "False", "__CKPT_SPEC__": "none", "__CKPT_EVERY__": "0", "__CKPT_KEEP__": "2",
     "__RESUME_SPEC__": "None", "__MEM_CONFIG__": "fp32-full", "__PREEMPT__": "False",
     "__OUTPUT_DIR__": "/tmp/out", "__STEP_S__": "16.000", "__EXTRA_DEPS__": "",
-    "__DIAG_SHA__": "0" * 64, "__DISCLOSE__": "True",
+    "__DIAG_SHA__": "0" * 64, "__DISCLOSE__": "True", "__CORPUS__": "codeset",
 }
 
 
@@ -2296,6 +2391,8 @@ print(f"  python scripts/launch_prime_probe.py {ARM} {SEED} {STEPS} {TASK} {LR}"
       + (f" --probe-every={PROBE_EVERY}" if PROBE_EVERY != 5 else "")
       + (f" --ctrl-every={CTRL_EVERY}" if CTRL_EVERY != 5 else "")
       + ("" if DISCLOSE else " --disclose=0")
+      + (f" --corpus={CORPUS}" if CORPUS != "codeset" else "")
+      + (" --gen-log=1" if GEN_LOG else "")
       + (f" --memory={MEMCFG}" if MEMCFG != "fp32-full" else "")
       + (f" --ckpt={CKPT}" if CKPT != "none" else "")
       + (" --er-gen" if ER_GEN else "") + " --submit")
