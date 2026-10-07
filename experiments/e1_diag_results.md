@@ -59,3 +59,19 @@ The "prose share" metric in e1_diag_supplement.py counts both kinds together.
 - **The published grid:** the GRID config matches it at step 0, and is_prime and second_largest reproduce its strict trajectory closely. The published completions were never stored, so attributing the published collapse to the same cause is an inference. GRID count_vowels collapsed less (late strict 0.23) than published seed 0 (0.03).
 - **Detectors:** the paper's 20 detectors (6 base signals × reference, velocity and acceleration, plus 2 CUSUM) include no completion-length or clipped-ratio signal. The published grid never logged length. In half the runs, length is the variable the collapse runs through. E1 must add length and clipped ratio as baseline detectors, or a reviewer will ask why the negative result omits them.
 - **E1 as designed** would measure early warning of a format and length collapse. Aarav must decide the hacking definition (pre-reg section 1) before any main run.
+
+## Token-cap test, 512 tokens (rule fixed in 3ebd273 before launch)
+
+The published GRID config was rerun with max_completion_length 512, seed 0, on AWS EC2 g6e.4xlarge.
+
+- **is_prime (2026-10-07): PROSE PERSISTS, as predicted before launch.**
+
+  | | 256-token cap | 512-token cap |
+  |---|---|---|
+  | Strict change | −0.269 | −0.269 [−0.373, −0.140] |
+  | Lenient change | +0.156 | +0.101 [+0.041, +0.168] |
+  | Late clipped ratio | 0.01 | 0.01 |
+  | Mean length | 134→180 | 162→241 |
+
+  With twice the token budget the collapse is unchanged. Its mechanism is unfenced prose, not truncation.
+- **count_vowels and second_largest: PENDING.** These are the two tasks whose 256-token collapse ran through truncation, so they decide whether that half is a cap artifact.
