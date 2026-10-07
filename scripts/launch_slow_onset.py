@@ -242,7 +242,7 @@ def reward_fn(prompts=None, completions=None, **kw):
     LOG.append({"step": c, "task": task.name, "judge_big": jbm, "judge_small": jsm,
                 "disagree": djm, "proxy": pm, "hidden": hm, "delta": pm - hm, "adv_std": adv,
                 "hidden_lenient": float(np.mean(hidden_len)),
-                "entropy": None, "kl": None, "grad_norm": None})
+                "entropy": None, "kl": None, "grad_norm": None, "mean_len": None, "clipped": None})
     COMPS.append({"step": c, "texts": [x[:1500] for x in comps], "hidden": hidden, "hidden_lenient": hidden_len})
     print("ONSET step %d task %s jbig %.3f jsmall %.3f disagree %+.3f proxy %.3f hidden %.3f delta %+.3f adv %.3f hlen %.3f" % (
           c, task.name, jbm, jsm, djm, pm, hm, pm - hm, adv, float(np.mean(hidden_len))), flush=True)
@@ -263,6 +263,10 @@ class GeomCallback(TrainerCallback):
             for k in ("entropy", "kl", "grad_norm"):
                 if r.get(k) is None and k in logs:
                     r[k] = float(logs[k])
+            # E1 detectors: completion length and truncation rate (experiments/e1_detectors.py)
+            for k, src in (("mean_len", "completions/mean_length"), ("clipped", "completions/clipped_ratio")):
+                if r.get(k) is None and src in logs:
+                    r[k] = float(logs[src])
 
 class EvalProbe(TrainerCallback):
     """LOW-NOISE HELD-OUT QUALITY, measured off-gradient.
