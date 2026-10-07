@@ -151,7 +151,7 @@ def submit(stage, rows):
                 {"Key": "Name", "Value": "fr-e1-" + r["run_id"]}, {"Key": "Project", "Value": "flight-recorder-e1"},
                 {"Key": "Stage", "Value": stage}]}],
         }
-        inst, err = None, None
+        inst, err = None, []
         for az, subnet in SUBNETS.items():
             spec["SubnetId"] = subnet
             sp = tmp / ("%s.json" % r["run_id"])
@@ -161,12 +161,14 @@ def submit(stage, rows):
                            "--user-data", "file://" + ud.as_posix())["Instances"][0]
                 break
             except RuntimeError as e:          # capacity is per-AZ; try the next one
-                err = str(e)
-                if "InsufficientInstanceCapacity" not in err and "SpotMaxPriceTooLow" not in err \
-                        and "Unsupported" not in err:
+                msg = str(e)
+                if "InsufficientInstanceCapacity" not in msg and "SpotMaxPriceTooLow" not in msg \
+                        and "Unsupported" not in msg:
                     raise
+                code = msg.split("An error occurred (")[-1].split(")")[0] if "An error occurred (" in msg else msg[-80:]
+                err.append("%s:%s" % (az, code))
         if inst is None:
-            print("NO CAPACITY in any AZ for %s: %s" % (r["run_id"], err))
+            print("NO CAPACITY in any AZ for %s: %s" % (r["run_id"], ", ".join(err)))
             continue
         record[r["run_id"]] = dict(r, instance_id=inst["InstanceId"], az=inst["Placement"]["AvailabilityZone"],
                                    ami=ami, launched=datetime.now(timezone.utc).isoformat(timespec="seconds"))

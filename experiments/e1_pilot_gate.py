@@ -78,7 +78,8 @@ def main():
     by_lr, rows = {lr: [] for lr in RATES}, []
     for f in files:
         d, s, h = load(f)
-        lr = str(d["lr"]) if str(d["lr"]) in RATES else "%g" % float(d["lr"])
+        # the job stores lr as a float (1e-06), so match by value, not by string
+        lr = next((k for k in RATES if abs(float(k) - float(d["lr"])) < 1e-12), str(d["lr"]))
         complete = len(s) >= RATES.get(lr, 0)
         w = event_step(s, h, *EVENT)
         extra = {lab: event_step(s, h, how, fr, pe) for how, fr, pe, lab in RECORD_ONLY}

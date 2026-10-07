@@ -362,6 +362,13 @@ out = {"arm": ARM, "seed": SEED, "policy": POLICY, "judge": JUDGE, "steps": STEP
 with open("/tmp/result.json", "w") as f:
     json.dump(out, f)
 print("LOGLEN " + str(len(LOG)) + " PROBES " + str(len(PROBE_LOG)), flush=True)
+# An HF Job's filesystem is discarded at exit, so the result also goes into the log: gzip, base64,
+# 8000-char lines. scripts/collect_slow_onset_hf.py reassembles it. Output only; training is done.
+import gzip as _gz  # noqa: E402
+_blob = base64.b64encode(_gz.compress(json.dumps(out).encode())).decode()
+_k = (len(_blob) + 7999) // 8000
+for _i in range(_k):
+    print("RESULT_B64 %d/%d %s" % (_i + 1, _k, _blob[_i * 8000:(_i + 1) * 8000]), flush=True)
 '''
 
 
@@ -403,6 +410,8 @@ def main(argv=None):
     p.add_argument("--probe-every", type=int, default=5, help="probe cadence in steps")
     p.add_argument("--pilot", action="store_true",
                    help="minimum informative pilot: first seed only, one run per task")
+    p.add_argument("--record", default=None,
+                   help="JSON file to append {baked script name: HF job id} to, for collection")
     p.add_argument("--submit", action="store_true",
                    help="ACTUALLY SPEND MONEY. Without this the job is only baked and priced.")
     a = p.parse_args(argv)
@@ -435,6 +444,15 @@ def main(argv=None):
         job = run_uv_job(str(outp), flavor=FLAVOR, timeout=f"{timeout_h}h",
                          secrets={"HF_TOKEN": get_token()})
         print("JOB_ID:", getattr(job, "id", job), outp.name)
+        if a.record:
+            import json
+            from datetime import datetime, timezone
+            rp = Path(a.record)
+            rp.parent.mkdir(parents=True, exist_ok=True)
+            rec = json.loads(rp.read_text()) if rp.exists() else {}
+            rec[outp.stem] = {"job_id": str(getattr(job, "id", job)), "flavor": FLAVOR, "timeout_h": timeout_h,
+                              "submitted": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+            rp.write_text(json.dumps(rec, indent=1))
     return 0
 
 
