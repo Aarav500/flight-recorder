@@ -36,6 +36,11 @@ import launch_slow_onset as LSO  # noqa: E402  (has a __main__ guard; importing 
 BUCKET = "fr-deploy-325527186655"
 PROFILE = "fr-e1-runner"
 ITYPE = "g6e.xlarge"
+# Capacity is per type and per AZ. On 2026-10-07 g6e.xlarge had none, spot or on-demand, in any
+# us-east-1 AZ, so each run falls back through these in order: cheapest first, all with >= 48 GB of
+# GPU memory. On-demand USD/h is from the AWS pricing API, 2026-10-07. A10G and L4 (24 GB) are
+# excluded: 1.5B GRPO with fp32 Adam and a reference model OOMs at 24 GB.
+FALLBACK = [("g6e.xlarge", 1.861), ("g6e.2xlarge", 2.242), ("g6e.4xlarge", 3.004), ("g7e.2xlarge", 3.363)]
 AMI_PARAM = "/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id"
 SUBNETS = {"us-east-1a": "subnet-0386677a3484341be", "us-east-1b": "subnet-050b222e93f526cd8",
            "us-east-1c": "subnet-042747a96276b6f96", "us-east-1d": "subnet-028805185f69156e2"}
@@ -156,29 +161,38 @@ def submit(stage, rows, market="spot"):
         if market == "spot":
             spec["InstanceMarketOptions"] = {"MarketType": "spot", "SpotOptions": {
                 "SpotInstanceType": "one-time", "InstanceInterruptionBehavior": "terminate"}}
-        inst, err = None, []
-        for az, subnet in SUBNETS.items():
-            spec["SubnetId"] = subnet
-            sp = tmp / ("%s.json" % r["run_id"])
-            sp.write_text(json.dumps(spec), encoding="ascii")
-            try:
-                inst = aws("ec2", "run-instances", "--cli-input-json", "file://" + sp.as_posix(),
-                           "--user-data", "file://" + ud.as_posix())["Instances"][0]
+        inst, itype_used, usd_used, err = None, None, None, []
+        for itype, usd in FALLBACK:
+            spec["InstanceType"] = itype
+            for az, subnet in SUBNETS.items():
+                spec["SubnetId"] = subnet
+                sp = tmp / ("%s.json" % r["run_id"])
+                sp.write_text(json.dumps(spec), encoding="ascii")
+                try:
+                    inst = aws("ec2", "run-instances", "--cli-input-json", "file://" + sp.as_posix(),
+                               "--user-data", "file://" + ud.as_posix())["Instances"][0]
+                    itype_used, usd_used = itype, usd
+                    break
+                except RuntimeError as e:
+                    msg = str(e)
+                    code = msg.split("An error occurred (")[-1].split(")")[0] if "An error occurred (" in msg else msg[-80:]
+                    if code not in ("InsufficientInstanceCapacity", "SpotMaxPriceTooLow", "Unsupported",
+                                    "VcpuLimitExceeded", "MaxSpotInstanceCountExceeded"):
+                        raise
+                    err.append("%s/%s:%s" % (itype, az, code))
+                    if code == "VcpuLimitExceeded":   # quota, not capacity: no other AZ will help
+                        break
+            if inst is not None:
                 break
-            except RuntimeError as e:          # capacity is per-AZ; try the next one
-                msg = str(e)
-                if "InsufficientInstanceCapacity" not in msg and "SpotMaxPriceTooLow" not in msg \
-                        and "Unsupported" not in msg:
-                    raise
-                code = msg.split("An error occurred (")[-1].split(")")[0] if "An error occurred (" in msg else msg[-80:]
-                err.append("%s:%s" % (az, code))
         if inst is None:
             print("NO CAPACITY in any AZ for %s: %s" % (r["run_id"], ", ".join(err)))
             continue
         record[r["run_id"]] = dict(r, instance_id=inst["InstanceId"], az=inst["Placement"]["AvailabilityZone"],
+                                   instance_type=itype_used, usd_per_h=usd_used, market=market,
                                    ami=ami, launched=datetime.now(timezone.utc).isoformat(timespec="seconds"))
         record_path.write_text(json.dumps(record, indent=1))
-        print("LAUNCHED %-48s %s %s" % (r["run_id"], inst["InstanceId"], inst["Placement"]["AvailabilityZone"]))
+        print("LAUNCHED %-48s %s %s %s $%.2f/h" % (r["run_id"], inst["InstanceId"], inst["Placement"]["AvailabilityZone"],
+                                                  itype_used, usd_used))
     print("launch record: %s" % record_path.relative_to(ROOT))
 
 
