@@ -12,6 +12,7 @@ from __future__ import annotations
 import base64
 import gzip
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -47,7 +48,26 @@ def main(argv):
             (out / (name.replace("_slow_onset_", "") + ".json")).write_text(json.dumps(res))
             print("%-52s %-10s collected (%d steps)" % (name, stage, len(res["log"])))
         else:
-            print("%-52s %-10s NO RESULT in log (%d/%s chunks)" % (name, stage, len(chunks), "?"))
+            # Fallback: the per-step series is also in the ONSET lines. Completions and probes are lost.
+            rows = []
+            for ln in lines:
+                if ln.startswith("ONSET step "):
+                    t = ln.split()
+                    kv = {t[i]: t[i + 1] for i in range(5, len(t) - 1, 2)}   # t[3:5] = 'task <name>'
+                    row = {"step": int(t[2]), "task": t[4] if t[3] == "task" else None,
+                           "judge_big": float(kv.get("jbig", "nan")), "judge_small": float(kv.get("jsmall", "nan")),
+                           "proxy": float(kv.get("proxy", "nan")), "hidden": float(kv.get("hidden", "nan"))}
+                    if "hlen" in kv:
+                        row["hidden_lenient"] = float(kv["hlen"])
+                    rows.append(row)
+            m = re.search(r"_slow_onset_\w+?_(\w+?)_(\d+)_lr([0-9.e-]+)$", name)
+            if rows and m:
+                res = {"task": m.group(1), "seed": int(m.group(2)), "lr": float(m.group(3)), "log": rows,
+                       "from_log_fallback": True}
+                (out / (name.replace("_slow_onset_", "") + ".json")).write_text(json.dumps(res))
+                print("%-52s %-10s FALLBACK from ONSET lines (%d steps, no completions)" % (name, stage, len(rows)))
+            else:
+                print("%-52s %-10s NO RESULT in log (%d chunks, %d ONSET lines)" % (name, stage, len(chunks), len(rows)))
     return 0
 
 
