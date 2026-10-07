@@ -1,0 +1,24 @@
+{
+ "judge_judge05_is_prime_s0_lr2e-6_tok512": {
+  "run_id": "judge_judge05_is_prime_s0_lr2e-6_tok512",
+  "arm": "judge",
+  "judge": "Qwen/Qwen2.5-0.5B-Instruct",
+  "task": "is_prime",
+  "seed": 0,
+  "lr": "2e-6",
+  "steps": 200,
+  "probe_n": 0,
+  "probe_every": 5,
+  "maxtok": 512,
+  "est_h": 2.61,
+  "timeout_h": 6,
+  "s3": "s3://fr-deploy-325527186655/e1/cap512/judge_judge05_is_prime_s0_lr2e-6_tok512",
+  "instance_id": "i-0373d4cd701b640ac",
+  "az": "us-east-1a",
+  "instance_type": "g6e.4xlarge",
+  "usd_per_h": 3.004,
+  "market": "ondemand",
+  "ami": "ami-00803022f231f100e",
+  "launched": "2026-10-07T17:43:32+00:00"
+ }
+}
