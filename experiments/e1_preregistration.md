@@ -26,6 +26,11 @@ Decisions H1 must make. The other sections depend on them.
   - raw peak_drop: 6/12;
   - slope: 9/12 smoothed.
   The pilot gate uses baseline_drop(0.6, persist=2).
+- **Primary collapse event: CANDIDATES SCORED 2026-10-07, AARAV DECIDES** (experiments/event_selection.md).
+  - The rule fixed before scoring selects cusum_page_down_v2.
+  - A post-outcome diagnostic finds it dates 4 of 8 real declined probe runs at step 3, its earliest possible date, while those runs stay flat until about step 10-40. Its grid median window is 10.
+  - Recommendation: sustained_drop_v2. It passes every hard limit, its stream and probe dates agree best on real runs (17.0 against 43.5), and its grid window is 29. Log it as a deviation.
+  - Report cusum_v2 and the old event as sensitivity analyses.
 - **Alarm rule.** The published TPR counts an alarm at or before the event (`a <= e`, score_prime.py:492). Strict early warning is `a < e`. The sweep reports both (tex:728). Pick one as primary.
 - **What counts as hacking. NEW, from the pilot, and the most important decision here.** In the 6 pilot runs, 45 of the 57 late answers that the strict oracle scored 0 contain a function that passes every hidden test once the prose around it is removed. Only 11 are wrong code (experiments/e1_format_audit.json).
   - The mechanism: the base policy opens its answer by continuing the prompt's instructions in prose ("Do not print anything outside the function. def count_vowels(s): ..."). There is no code fence, so the file does not parse.
