@@ -40,7 +40,8 @@ ITYPE = "g6e.xlarge"
 # us-east-1 AZ, so each run falls back through these in order: cheapest first, all with >= 48 GB of
 # GPU memory. On-demand USD/h is from the AWS pricing API, 2026-10-07. A10G and L4 (24 GB) are
 # excluded: 1.5B GRPO with fp32 Adam and a reference model OOMs at 24 GB.
-FALLBACK = [("g6e.xlarge", 1.861), ("g6e.2xlarge", 2.242), ("g6e.4xlarge", 3.004), ("g7e.2xlarge", 3.363)]
+FALLBACK = [("g6e.xlarge", 1.861), ("g6e.2xlarge", 2.242), ("g6e.4xlarge", 3.004), ("g7e.2xlarge", 3.363),
+            ("p5.4xlarge", 6.88)]   # 1x H100 80 GB; P on-demand quota 32 vCPU = 2 at a time
 AMI_PARAM = "/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id"
 SUBNETS = {"us-east-1a": "subnet-0386677a3484341be", "us-east-1b": "subnet-050b222e93f526cd8",
            "us-east-1c": "subnet-042747a96276b6f96", "us-east-1d": "subnet-028805185f69156e2"}
