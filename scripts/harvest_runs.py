@@ -70,21 +70,35 @@ def fetch_log(job_id: str, force: bool = False) -> Path | None:
 
 def collect_one(logpath: Path, arm: str, task: str | None, seed: int, steps: int) -> Path | None:
     """Run the established collector over a fetched log."""
-    sys.path.insert(0, str(ROOT / "scripts"))
-    import launch_prime_probe as L
+    # launch_prime_probe.py is a SCRIPT, not a module: its argv parsing and dry-run printing run
+    # at import time, with no `if __name__ == "__main__"` guard anywhere in the file. Importing it
+    # therefore re-invokes the launcher and parses OUR argv as a run spec. Shell out instead.
+    import subprocess
     if task is None:
         task = _task_from_log(logpath)
         if task is None:
             print("  ERROR  %s  cannot determine task from log; pass --task" % logpath.name)
             return None
-    out = OUTDIR / ("prime_%s_%s_seed%d.json" % (arm, task, seed))
-    try:
-        p = L.collect(str(logpath), out=out, arm=arm, task=task, seed=seed, quiet=True)
-    except Exception as e:
-        print("  ERROR  collect(%s) failed: %r" % (logpath.name, e))
+    # The launcher maps the arm to a LABEL for the filename ("hack" -> "hacking"), so do not
+    # assume arm == label. Glob on (task, seed), which is unambiguous within a run directory.
+    pat = "prime_*_%s_seed%d.json" % (task, seed)
+    cmd = [sys.executable, str(ROOT / "scripts" / "launch_prime_probe.py"),
+           arm, str(seed), str(steps), task, "5e-6", "--collect=%s" % logpath]
+    r = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True)
+    if r.returncode != 0:
+        print("  ERROR  collect failed rc=%d: %s" % (r.returncode, (r.stderr or "")[-300:]))
         return None
-    print("  WROTE  %s" % Path(p).relative_to(ROOT))
-    return Path(p)
+    # Do NOT parse the path out of stdout: the repo path contains a space ("Fligh recorder"), so
+    # splitting the line on whitespace reconstructs a broken path. The collector's output name is
+    # deterministic -- prime_<arm>_<task>_seed<seed>.json under runs/prime -- so build it instead.
+    hits = sorted(OUTDIR.glob(pat), key=lambda p: p.stat().st_mtime, reverse=True)
+    if not hits:
+        print("  ERROR  collector rc=0 but nothing matching %s" % pat)
+        print("         stdout tail: %s" % (r.stdout or "").strip().splitlines()[-1:])
+        return None
+    out = hits[0]
+    print("  WROTE  %s  (%d bytes)" % (out.relative_to(ROOT), out.stat().st_size))
+    return out
 
 
 def _task_from_log(logpath: Path) -> str | None:

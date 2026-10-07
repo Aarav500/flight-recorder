@@ -29,3 +29,22 @@ web/*.tsbuildinfo
 scripts/_hack_run.py
 scripts/hack_calib.py
 scripts/_benign_calib.py
+
+# cached residual-stream tensors (rebuilt by scripts/source_c_v4_*.py from cached weights on
+# CPU). Tens of MB of float32 activations, derived entirely from the committed diagnostic set
+# plus a public checkpoint, and keyed on the set's content_hash so a stale one is refused rather
+# than reused. Outputs, never sources: the committed artefacts are the JSON reports beside them.
+experiments/prime/_*_resid.npz
+experiments/**/_*_resid.npz
+
+# generated Azure ML backend artifacts (rebuilt by launch_prime_probe.py --backend=azureml).
+# The snapshot is a full copy of flightrecorder/ plus the 220 KB frozen diagnostic set, and the
+# job YAML is derived from it -- both are outputs, never sources. The diagnostic set itself is
+# committed at experiments/prime/diag_v3.json and that copy is the one that is authoritative.
+scripts/_azure_snapshot_*/
+scripts/_azure_job_*.yaml
+scripts/_azure_env_*.yaml
+
+# Double-blind manuscript. This repo is PUBLIC under the author's name, so anything here
+# would de-anonymise the paper. Keep it local. See AaravOS/templates/paper_kit/07 Part C.
+paper/

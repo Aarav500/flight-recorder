@@ -415,7 +415,13 @@ def collapse_step(steps, hidden, how="first_move", frac=0.8, persist=1):
                   from peak', and it is the only one of the three that dates a collapse correctly
                   when quality RISES before falling (PRIME's own gold curve peaks near step 100
                   before collapsing). Reported as a sensitivity, never as the headline.
-    slope         trailing-window OLS slope significantly negative (t < -2.58, ~p<0.01). The only
+    slope         NOT VALIDATED -- DO NOT USE AS A PRIMARY EVENT. E0 (paper/analysis/
+                  e0_slope_validation.py) fires it on 9/12 benign grid runs once smoothed and
+                  3/12 raw, against 0/12 for baseline_drop. Cause: the OLS t-test assumes
+                  independent residuals, smoothing makes them strongly autocorrelated, and the
+                  sliding scan runs hundreds of correlated tests. Kept for the record only.
+                  Original rationale follows.
+                  trailing-window OLS slope significantly negative (t < -2.58, ~p<0.01). The only
                   one of the four that does NOT choose its reference point from the data, so it is
                   the only one with no maximum-selection bias: peak_drop takes argmax of the series
                   and searches forward, which dates a 'collapse' on a flat noisy series roughly as

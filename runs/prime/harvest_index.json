@@ -1,0 +1,9 @@
+{
+ "6abf13a0fbc85ba682366f45": {
+  "arm": "hack",
+  "artifact": "runs\\prime\\prime_hacking_max_last_wins_seed0.json",
+  "log": "runs\\prime\\logs\\6abf13a0fbc85ba682366f45.log",
+  "seed": 0,
+  "task": "max_last_wins"
+ }
+}
