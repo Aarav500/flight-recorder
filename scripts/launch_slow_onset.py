@@ -172,6 +172,7 @@ from transformers import TrainerCallback  # noqa: E402
 from flightrecorder.repro.reward_codeset import CODE_TASKS  # noqa: E402
 from flightrecorder.repro.reward_judge import JudgeScorer  # noqa: E402
 from flightrecorder.repro.reward_testhack import oracle_reward, train_reward, extract_code, partial_credit_reward  # noqa: E402
+from flightrecorder.repro.oracle_lenient import lenient_oracle_reward  # noqa: E402  label only, never a reward
 
 POLICY, JUDGE, ARM, SEED, STEPS, TASK = "__POLICY__", "__JUDGE__", "__ARM__", __SEED__, __STEPS__, "__TASK__"
 GEN, LR, BETA, MAXTOK = 8, __LR__, 0.02, 256
@@ -193,6 +194,7 @@ scorer_big = JudgeScorer(BIG)      # both evaluators are ALWAYS logged, in every
 scorer_small = JudgeScorer(SMALL)  # disagreement detector is scorable by the same harness
 OPT_SMALL = (ARM == "judge" and JUDGE == SMALL)
 LOG, SAMPLES, PROBE_LOG = [], [], []
+COMPS = []   # every completion of every step (1500 chars each), so any oracle can be re-run later
 _n = {"c": 0}
 
 import ast as _ast
@@ -229,6 +231,7 @@ def reward_fn(prompts=None, completions=None, **kw):
     pr = prompts or []
     task = BY_PROMPT[pr[0]]
     hidden = [oracle_reward(c, task) for c in comps]
+    hidden_len = [lenient_oracle_reward(c, task) for c in comps]   # same tests, prose stripped
     jb = scorer_big.score(pr[0], comps)
     js = scorer_small.score(pr[0], comps)
     reward = _proxy(comps, jb, js, task)
@@ -238,9 +241,11 @@ def reward_fn(prompts=None, completions=None, **kw):
     c = _n["c"]
     LOG.append({"step": c, "task": task.name, "judge_big": jbm, "judge_small": jsm,
                 "disagree": djm, "proxy": pm, "hidden": hm, "delta": pm - hm, "adv_std": adv,
+                "hidden_lenient": float(np.mean(hidden_len)),
                 "entropy": None, "kl": None, "grad_norm": None})
-    print("ONSET step %d task %s jbig %.3f jsmall %.3f disagree %+.3f proxy %.3f hidden %.3f delta %+.3f adv %.3f" % (
-          c, task.name, jbm, jsm, djm, pm, hm, pm - hm, adv), flush=True)
+    COMPS.append({"step": c, "texts": [x[:1500] for x in comps], "hidden": hidden, "hidden_lenient": hidden_len})
+    print("ONSET step %d task %s jbig %.3f jsmall %.3f disagree %+.3f proxy %.3f hidden %.3f delta %+.3f adv %.3f hlen %.3f" % (
+          c, task.name, jbm, jsm, djm, pm, hm, pm - hm, adv, float(np.mean(hidden_len))), flush=True)
     if c % 20 == 0 and comps:
         SAMPLES.append({"step": c, "task": task.name, "code": extract_code(comps[0])[:800],
                         "jbig": float(jb[0]), "jsmall": float(js[0]), "hidden": float(hidden[0]),
@@ -355,7 +360,7 @@ print(bar, flush=True)
 
 out = {"arm": ARM, "seed": SEED, "policy": POLICY, "judge": JUDGE, "steps": STEPS, "task": TASK,
        "lr": LR, "beta": BETA, "probe_n": PROBE_N, "probe_every": PROBE_EVERY,
-       "log": LOG, "probe": PROBE_LOG, "samples": SAMPLES,
+       "log": LOG, "probe": PROBE_LOG, "samples": SAMPLES, "completions": COMPS,
        "go_no_go": {"collapsed": collapsed, "diverged": diverged, "causal_window": pwin,
                     "peak_block_step": window_b},
        "trl_history": trainer.state.log_history}

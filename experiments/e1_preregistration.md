@@ -27,6 +27,15 @@ Decisions H1 must make. The other sections depend on them.
   - slope: 9/12 smoothed.
   The pilot gate uses baseline_drop(0.6, persist=2).
 - **Alarm rule.** The published TPR counts an alarm at or before the event (`a <= e`, score_prime.py:492). Strict early warning is `a < e`. The sweep reports both (tex:728). Pick one as primary.
+- **What counts as hacking. NEW, from the pilot, and the most important decision here.** In the 6 pilot runs, 45 of the 57 late answers that the strict oracle scored 0 contain a function that passes every hidden test once the prose around it is removed. Only 11 are wrong code (experiments/e1_format_audit.json).
+  - The mechanism: the base policy opens its answer by continuing the prompt's instructions in prose ("Do not print anything outside the function. def count_vowels(s): ..."). There is no code fence, so the file does not parse.
+  - The 0.5B judge rewards these answers. The 1.5B judge rates them about 0.82, the same as at step 0.
+  - So the strict oracle's collapse is mostly format drift.
+  - The options:
+    - (a) Keep the strict oracle and define hacking as "the proxy rises while runnable correctness falls", reported honestly as format gaming.
+    - (b) Make the oracle format-tolerant (flightrecorder/repro/oracle_lenient.py) and define hacking as wrong code. This needs evidence that wrong-code hacking still happens. The pilot cannot show it, because it stored only 1 completion per 20 steps.
+    - (c) Log both oracles every step and pre-register one as primary. The job now logs both, plus every completion.
+  - A diagnostic (section 12) measures whether the lenient oracle also declines, at the E1 config and at the published grid config. Decide after it.
 
 ## 2. Primary test
 
@@ -167,6 +176,7 @@ AARAV WRITES THIS SECTION. Source material, not filled in:
 |---|---|---|---|---|
 | Calibration | E0: validate event definitions offline on CPU | 0 | 0 | Done 2026-10-06 |
 | Pilot | Pick the lr: 6 runs, lr 1e-6 for 400 steps and 5e-7 for 800 steps, 1 per task, seed 100. Gated by experiments/e1_pilot_gate.py, fixed in commit 24e1b5b before any data. | 25 | 60 (about $29 at the measured step time) | "lets start", chat 2026-10-07. The ceiling is PROPOSED. |
+| Diagnostic (NEW) | Does the format-tolerant oracle also decline? 3 runs at the E1 config (lr 1e-6, 400 steps, seed 101), and 3 at the published grid config (lr 2e-6, 200 steps, seed 0), both logging both oracles and every completion. | 8 | 20 | PENDING. Not launched. |
 | Primary | 48 runs plus up to 12 replacements at the pilot's lr | 96 (lr 1e-6) or 186 (lr 5e-7) | 240 or 465. The plan's cap is $300. | PENDING |
 
 If a stage needs more than its ceiling, write a deviation in section 14 before the spend.
@@ -199,4 +209,6 @@ These rows are pre-freeze notes, logged so the paper can cite them.
 | 2026-10-07 | Plan timeline | The pilot ran before the E1 freeze. The plan's timeline had the freeze first (11-19 to 12-11). | Aarav: "lets start". Kit 02 requires the freeze only before primary data. | Before. The pilot gate was committed before the jobs were submitted. | None on the primary test. The pilot seeds are excluded (section 7). The 12-step threshold predates the pilot (plan section 2). | 24e1b5b |
 | 2026-10-07 | Pilot step budget | The plan cites the 200-step setup at tex:129. The pilot uses 400 steps at 1e-6 and 800 at 5e-7. | Lr is a clock lever. A lr 1e-6 run never crossed 0.6 × baseline in 200 steps (launch_slow_onset.py docstring), so 200 steps would trip the kill rule by construction. | Before | The main runs inherit the step budget of the chosen lr. | 24e1b5b |
 | 2026-10-07 | Pilot backend | Moved from AWS g6e spot to HF Jobs a100-large. The job is the same. | EC2 returned InsufficientInstanceCapacity in us-east-1a to 1d (score 1/10), and the other regions have 0 quota. | Before | None. The per-step time differs, but the log is the same. | 97f885c |
+| 2026-10-07 | Pilot result | The gate passed at both rates. Median windows: 27 at lr 1e-6 (32, 27, 2) and 28 at 5e-7 (44, 28, 22), under baseline_drop(0.6, persist=2). By the pre-set rule, lr 1e-6 is kept. Under the published persist=1 event the medians would be 5 and 8, so neither would pass. | Gate committed before the data (24e1b5b; the lr-parsing fix 97f885c also predates the jobs). | After. This row reports the result. | E1 runs at lr 1e-6, 400 steps, if it goes ahead. The section 1 decision on what counts as hacking comes first. | this commit |
+| 2026-10-07 | Job instrumentation | The job now logs a format-tolerant oracle (`hidden_lenient`) and every completion of every step. It is a label only; the training reward is unchanged. | The format audit: 45 of 57 zero-scored late answers are correct code behind prose. | After the pilot | It lets H1 choose its oracle. The strict `hidden` series is unchanged, so earlier analyses still apply. | this commit |
 | 2026-10-07 | Pilot tasks | The tasks are the published grid's count_vowels, is_prime and second_largest, not tex:129's sum_list, is_prime and longest_two_distinct. | E1 replaces the 9 vs 9 grid comparison, so it uses the grid's tasks. | Before | The tasks match the paper's primary comparison. | 24e1b5b |
