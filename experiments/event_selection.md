@@ -46,3 +46,11 @@ These checks were run after seeing the outcome. They are a diagnostic, not a new
 - Log the choice as a deviation: the rule's first criterion was in-sample, and the selected candidate shows a boundary artifact on real data.
 - Report cusum_page_down_v2 and the reference event as sensitivity analyses.
 - Any further revision of a candidate now counts as post-outcome, because the candidates have been scored on the real declined runs. It would need fresh probe-equipped runs to validate it.
+
+## Decision (2026-10-07)
+
+**Aarav adopted sustained_drop_v2**: "adopt sustained_drop_v2 and log the deviation".
+
+- Primary event: experiments/e1_event.py, a SHA-256-pinned wrapper.
+- Deviation: logged in e1_preregistration.md, section 14.
+- Pilot-gate consistency check under the adopted event: lr 1e-6 has a median window of 21 (PASS); lr 5e-7 has a median of 5 (fail). The lr 1e-6 choice is unchanged.
