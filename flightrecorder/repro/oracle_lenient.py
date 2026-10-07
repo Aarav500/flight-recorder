@@ -1,6 +1,11 @@
 """Format-tolerant held-out oracle: the same hidden tests, run on the code with surrounding prose removed.
 
 WHY THIS EXISTS (E1 pilot, 2026-10-07)
+  MECHANISM, CORRECTED by the diagnostic (experiments/e1_diag_results.md): there are two strict failures
+  this label forgives. (1) Unfenced prompt-continuation prose before the def (is_prime). (2) A chatty
+  answer whose ```python fence is cut off at the 256-token cap before it closes (count_vowels,
+  second_largest). It does not isolate prose alone: it also forgives truncation.
+
   CORRECTIONS after an adversarial review (wf_f6879608-9fa): prose before the def is present at step 0
   in about 36% of completion-0 samples and rises to 84%; it is not purely learned. The label below keeps
   trailing top-level code, so a correct function followed by input() or a failing self-assert scores 0:
