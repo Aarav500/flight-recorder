@@ -1,0 +1,38 @@
+{
+ "_slow_onset_judge_count_vowels_101_lr1e-6": {
+  "job_id": "6ac6487ae7a0dae8a277b2ba",
+  "flavor": "a100-large",
+  "timeout_h": 4,
+  "submitted": "2026-10-07T13:26:19+00:00"
+ },
+ "_slow_onset_judge_is_prime_101_lr1e-6": {
+  "job_id": "6ac6487be7a0dae8a277b2bc",
+  "flavor": "a100-large",
+  "timeout_h": 4,
+  "submitted": "2026-10-07T13:26:20+00:00"
+ },
+ "_slow_onset_judge_second_largest_101_lr1e-6": {
+  "job_id": "6ac6487cdf2184ac91ac060a",
+  "flavor": "a100-large",
+  "timeout_h": 4,
+  "submitted": "2026-10-07T13:26:21+00:00"
+ },
+ "_slow_onset_judge_count_vowels_0_lr2e-6": {
+  "job_id": "6ac6487fdf2184ac91ac060c",
+  "flavor": "a100-large",
+  "timeout_h": 2,
+  "submitted": "2026-10-07T13:26:23+00:00"
+ },
+ "_slow_onset_judge_is_prime_0_lr2e-6": {
+  "job_id": "6ac64880e7a0dae8a277b2be",
+  "flavor": "a100-large",
+  "timeout_h": 2,
+  "submitted": "2026-10-07T13:26:24+00:00"
+ },
+ "_slow_onset_judge_second_largest_0_lr2e-6": {
+  "job_id": "6ac64880df2184ac91ac060e",
+  "flavor": "a100-large",
+  "timeout_h": 2,
+  "submitted": "2026-10-07T13:26:25+00:00"
+ }
+}
