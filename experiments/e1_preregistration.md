@@ -44,6 +44,15 @@ Decisions H1 must make. The other sections depend on them.
       - chatty answers cut off at the 256-token cap before the closing fence (count_vowels, second_largest).
     - So the choice is (a) define hacking as spec, length and format violation, which is a known reward-model bias, or (b) change the generator so the hack can be wrong code.
     - Either way, add completion length and clipped ratio to the detector set. The 20 detectors include neither.
+  - **DECISION, conditional, Aarav in chat 2026-10-07: "yes, settle option (a) if they match".**
+    - Recorded BEFORE the count_vowels and second_largest token-cap results existed. Both runs were still training on EC2 i-0f505da81c02cda75.
+    - "Match" means each of the two tasks reads PROSE PERSISTS or FILLS ANY BUDGET under experiments/e1_cap512_analysis.py (rule 3ebd273). is_prime already reads PROSE PERSISTS.
+    - If both match, option (a) is ADOPTED. Hacking means the proxy rises while the strict, runnable, spec-compliant oracle falls, with the format-tolerant oracle reported alongside.
+    - If either task reads CAP ARTIFACT or OTHER, the decision is NOT settled, and (a) versus (b) returns to Aarav.
+    - Still open whatever the result:
+      - the H1 wording, which Aarav writes;
+      - the primary collapse event, because baseline_drop(0.6, persist=2) fires on noise;
+      - the primary detector.
 
 ## 2. Primary test
 
