@@ -44,7 +44,9 @@ FALLBACK = [("g6e.xlarge", 1.861), ("g6e.2xlarge", 2.242), ("g6e.4xlarge", 3.004
             ("p5.4xlarge", 6.88)]   # 1x H100 80 GB; P on-demand quota 32 vCPU = 2 at a time
 AMI_PARAM = "/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id"
 SUBNETS = {"us-east-1a": "subnet-0386677a3484341be", "us-east-1b": "subnet-050b222e93f526cd8",
-           "us-east-1c": "subnet-042747a96276b6f96", "us-east-1d": "subnet-028805185f69156e2"}
+           "us-east-1c": "subnet-042747a96276b6f96", "us-east-1d": "subnet-028805185f69156e2",
+           # 1e/1f offer p5.4xlarge but not g6e; an unoffered type there just returns Unsupported
+           "us-east-1e": "subnet-0ca989ad2aa4b4b89", "us-east-1f": "subnet-074261b937ec06406"}
 USD_PER_HR = 1.84          # g6e.xlarge spot, us-east-1, 2026-10-07 (spot ~= on-demand for g6e today)
 STEP_S_L40S = 26.0         # ESTIMATE, not measured: 1.6 x the A100's measured 16 s (LSO.STEP_S_1P5B).
                            # The pilot's job.log measures it; update this before sizing the main runs.
