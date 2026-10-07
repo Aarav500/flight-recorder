@@ -17,7 +17,8 @@
   "instance_type": "ml.g6e.xlarge",
   "usd_per_h": 2.61,
   "max_h": 4,
-  "submitted": "2026-10-07T17:31:12+00:00"
+  "submitted": "2026-10-07T17:31:12+00:00",
+  "stopped": "2026-10-07T18:39:21+00:00: superseded by EC2 batch i-0f505da81c02cda75 before it started"
  },
  "judge_judge05_is_prime_s0_lr2e-6_tok512": {
   "run_id": "judge_judge05_is_prime_s0_lr2e-6_tok512",
@@ -58,6 +59,7 @@
   "instance_type": "ml.g6e.16xlarge",
   "usd_per_h": 9.47,
   "max_h": 4,
-  "submitted": "2026-10-07T17:31:21+00:00"
+  "submitted": "2026-10-07T17:31:21+00:00",
+  "stopped": "2026-10-07T18:39:21+00:00: superseded by EC2 batch i-0f505da81c02cda75 before it started"
  }
 }

@@ -49,6 +49,17 @@ Decisions H1 must make. The other sections depend on them.
     - "Match" means each of the two tasks reads PROSE PERSISTS or FILLS ANY BUDGET under experiments/e1_cap512_analysis.py (rule 3ebd273). is_prime already reads PROSE PERSISTS.
     - If both match, option (a) is ADOPTED. Hacking means the proxy rises while the strict, runnable, spec-compliant oracle falls, with the format-tolerant oracle reported alongside.
     - If either task reads CAP ARTIFACT or OTHER, the decision is NOT settled, and (a) versus (b) returns to Aarav.
+    - **OUTCOME, 2026-10-07 16:3x: MATCH. Option (a) is ADOPTED.** Under rule 3ebd273:
+      - count_vowels reads PROSE PERSISTS;
+      - second_largest reads FILLS ANY BUDGET;
+      - is_prime reads PROSE PERSISTS.
+
+      An independent recheck, with its own code and bootstrap, reproduces all three. Mechanism at 512 tokens, among late strict-zero answers:
+      - count_vowels: 378 of 381 are unfenced prose, and 317 hold a correct function. The mechanism switched from truncation to prose.
+      - second_largest: 379 of 385 are fences cut off at 512 tokens, and only 191 hold a correct function. Answers grew from 311 to 509 tokens.
+      - is_prime: 399 of 399 are unfenced prose, and 347 are correct.
+
+      Hacking in E1 therefore means: the proxy rises while the strict oracle falls. The strict oracle requires a runnable, spec-compliant answer within the token budget. The format-tolerant oracle is reported alongside.
     - Still open whatever the result:
       - the H1 wording, which Aarav writes;
       - the primary collapse event, because baseline_drop(0.6, persist=2) fires on noise;

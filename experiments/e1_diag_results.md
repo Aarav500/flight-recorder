@@ -74,4 +74,10 @@ The published GRID config was rerun with max_completion_length 512, seed 0, on A
   | Mean length | 134→180 | 162→241 |
 
   With twice the token budget the collapse is unchanged. Its mechanism is unfenced prose, not truncation.
-- **count_vowels and second_largest: PENDING.** These are the two tasks whose 256-token collapse ran through truncation, so they decide whether that half is a cap artifact.
+- **count_vowels (2026-10-07): PROSE PERSISTS.**
+  - Strict change −0.463 [−0.534, −0.415]; lenient +0.127 [+0.062, +0.211]; late clipped ratio 0.03.
+  - With room to finish, it stops truncating and collapses harder, through unfenced prose: 378 of 381 late strict-zero answers.
+- **second_largest (2026-10-07): FILLS ANY BUDGET.**
+  - Strict change −0.485; lenient +0.033 [−0.032, +0.099], flat; late clipped ratio 0.96.
+  - Length grows to the new cap, from 311 to 509 tokens. At 512, about half the truncated answers also lose part of the code.
+- **Conclusion: no task is a cap artifact.** Aarav's conditional decision (49a2023) is met, so option (a) is adopted. The collapse is spec, format and length gaming that the 0.5B judge rewards. It is not caused by the 256-token cap.

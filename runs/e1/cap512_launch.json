@@ -20,5 +20,61 @@
   "market": "ondemand",
   "ami": "ami-00803022f231f100e",
   "launched": "2026-10-07T17:43:32+00:00"
+ },
+ "judge_judge05_count_vowels_s0_lr2e-6_tok512": {
+  "run_id": "judge_judge05_count_vowels_s0_lr2e-6_tok512",
+  "arm": "judge",
+  "judge": "Qwen/Qwen2.5-0.5B-Instruct",
+  "task": "count_vowels",
+  "seed": 0,
+  "lr": "2e-6",
+  "steps": 200,
+  "probe_n": 0,
+  "probe_every": 5,
+  "maxtok": 512,
+  "est_h": 2.61,
+  "timeout_h": 6,
+  "s3": "s3://fr-deploy-325527186655/e1/cap512/judge_judge05_count_vowels_s0_lr2e-6_tok512",
+  "instance_id": "i-0f505da81c02cda75",
+  "az": "us-east-1b",
+  "instance_type": "g6e.xlarge",
+  "usd_per_h": 1.861,
+  "market": "ondemand",
+  "ami": "ami-00803022f231f100e",
+  "launched": "2026-10-07T18:39:21+00:00",
+  "batch": [
+   "judge_judge05_count_vowels_s0_lr2e-6_tok512",
+   "judge_judge05_second_largest_s0_lr2e-6_tok512"
+  ],
+  "per_run_timeout_h": 3,
+  "backstop_min": 390
+ },
+ "judge_judge05_second_largest_s0_lr2e-6_tok512": {
+  "run_id": "judge_judge05_second_largest_s0_lr2e-6_tok512",
+  "arm": "judge",
+  "judge": "Qwen/Qwen2.5-0.5B-Instruct",
+  "task": "second_largest",
+  "seed": 0,
+  "lr": "2e-6",
+  "steps": 200,
+  "probe_n": 0,
+  "probe_every": 5,
+  "maxtok": 512,
+  "est_h": 2.61,
+  "timeout_h": 6,
+  "s3": "s3://fr-deploy-325527186655/e1/cap512/judge_judge05_second_largest_s0_lr2e-6_tok512",
+  "instance_id": "i-0f505da81c02cda75",
+  "az": "us-east-1b",
+  "instance_type": "g6e.xlarge",
+  "usd_per_h": 1.861,
+  "market": "ondemand",
+  "ami": "ami-00803022f231f100e",
+  "launched": "2026-10-07T18:39:21+00:00",
+  "batch": [
+   "judge_judge05_count_vowels_s0_lr2e-6_tok512",
+   "judge_judge05_second_largest_s0_lr2e-6_tok512"
+  ],
+  "per_run_timeout_h": 3,
+  "backstop_min": 390
  }
 }
