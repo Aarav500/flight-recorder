@@ -67,16 +67,16 @@ PROPOSED: Name the unit of analysis in the abstract: "24 hacking and 24 benign t
   - 0.61 with Bonferroni over 20 detectors;
   - for comparison, the frozen 9 vs 9 grid had an MDE of 0.74, and its largest observed TPR is 0.44 (tex:682).
 - **Method:** exact enumeration of the one-sided Fisher test, experiments/e1_power.py.
-- **Cost of one unit:** step time is measured at 16 s on an A100, including both judge passes (LSO.STEP_S_1P5B). The probes add about 0.36 h per run. The pilot fixes the learning rate, so the cost depends on its result:
+- **Cost of one unit:** the pilot measured 9 to 13 s per step on an A100, including both judge passes and the probes (HF jobs, 2026-10-07, two log snapshots 51 s apart). The launcher's older constant is 16 s. Per run, with about 0.15 h of setup:
 
   | Pilot result | Steps per run | Hours per run | Cost per run (HF a100-large, $2.50/h) |
   |---|---|---|---|
-  | lr 1e-6 | 400 | about 2.1 | about $5.40 |
-  | lr 5e-7 | 800 | about 3.9 | about $9.80 |
+  | lr 1e-6 | 400 | 1.2 to 1.6 | $3.00 to $4.00 |
+  | lr 5e-7 | 800 | 2.2 to 3.1 | $5.50 to $7.75 |
 
 - **Total cost:** 48 runs plus up to 12 replacements.
-  - At lr 1e-6: about 100 to 130 GPU-hours, about $260 to $330.
-  - At lr 5e-7: about 190 to 235 GPU-hours, about $470 to $590. This is above the plan's cap of $300, so this branch needs a section 12 decision before the main runs.
+  - At lr 1e-6: 58 to 96 GPU-hours, $145 to $240.
+  - At lr 5e-7: 106 to 186 GPU-hours, $265 to $465. The upper end is above the plan's cap of $300, so this branch needs a section 12 decision before the main runs.
   - AWS g6e spot is about the same price per hour and bills to credits, but it had no capacity on 2026-10-07 (placement score 1/10).
 
 ## 5. Margins for "no difference" claims
@@ -166,8 +166,8 @@ AARAV WRITES THIS SECTION. Source material, not filled in:
 | Stage | Purpose | Ceiling (GPU-hours) | Ceiling (USD) | Approved by Aarav (date) |
 |---|---|---|---|---|
 | Calibration | E0: validate event definitions offline on CPU | 0 | 0 | Done 2026-10-06 |
-| Pilot | Pick the lr: 6 runs, lr 1e-6 for 400 steps and 5e-7 for 800 steps, 1 per task, seed 100. Gated by experiments/e1_pilot_gate.py, fixed in commit 24e1b5b before any data. | 25 | 60 (estimate about $45 on HF a100-large) | "lets start", chat 2026-10-07. The ceiling is PROPOSED. |
-| Primary | 48 runs plus up to 12 replacements at the pilot's lr | 130 (lr 1e-6) or 235 (lr 5e-7) | 330 or 590. The plan's cap is $300. | PENDING |
+| Pilot | Pick the lr: 6 runs, lr 1e-6 for 400 steps and 5e-7 for 800 steps, 1 per task, seed 100. Gated by experiments/e1_pilot_gate.py, fixed in commit 24e1b5b before any data. | 25 | 60 (about $29 at the measured step time) | "lets start", chat 2026-10-07. The ceiling is PROPOSED. |
+| Primary | 48 runs plus up to 12 replacements at the pilot's lr | 96 (lr 1e-6) or 186 (lr 5e-7) | 240 or 465. The plan's cap is $300. | PENDING |
 
 If a stage needs more than its ceiling, write a deviation in section 14 before the spend.
 
