@@ -12,7 +12,8 @@ No secrets reach the instance. The models are public on the Hub, and the instanc
 Uses the aws CLI through subprocess, because boto3 cannot read an `aws login` session.
 
     python scripts/launch_e1_aws.py pilot             # dry run: bake, price, print. Spends nothing.
-    python scripts/launch_e1_aws.py pilot --submit    # spend
+    python scripts/launch_e1_aws.py pilot --submit    # spend (spot)
+    python scripts/launch_e1_aws.py cap512 --submit --ondemand   # spend, on-demand (G/VT on-demand quota 32)
     python scripts/launch_e1_aws.py pilot --status    # instance state + last logged step per run
     python scripts/launch_e1_aws.py pilot --collect   # -> runs/e1/pilot/<run_id>.json, logs/<run_id>.log
 
@@ -46,13 +47,16 @@ POLICY = "Qwen/Qwen2.5-1.5B"
 SMALL_JUDGE = "Qwen/Qwen2.5-0.5B-Instruct"     # reduced-capacity: the published hacking arm
 TASKS = ["count_vowels", "is_prime", "second_largest"]   # the published grid's hacking tasks
 
-# stage -> list of (arm, judge, task, seed, lr, steps, probe_n, probe_every)
+# stage -> list of (arm, judge, task, seed, lr, steps, probe_n, probe_every, maxtok)
 # Pilot: plan E1, "learning rates 1e-6 and 5e-7, 3 runs each" = one run per grid task.
 # Step budgets hold lr x steps at the grid's 2e-6 x 200; probe cadence keeps ~81 probes per run.
 # Seed 100 is new: seeds 0-2 are the frozen grid, 3-7 were baked for the heuristic arm.
 STAGES = {
-    "pilot": [("judge", SMALL_JUDGE, t, 100, lr, steps, 16, every)
+    "pilot": [("judge", SMALL_JUDGE, t, 100, lr, steps, 16, every, 256)
               for lr, steps, every in (("1e-6", 400, 5), ("5e-7", 800, 10)) for t in TASKS],
+    # Token-cap test (experiments/e1_cap512_analysis.py): the published GRID config with
+    # max_completion_length 512 instead of 256. Same seed as the 256-token GRID diagnostic runs.
+    "cap512": [("judge", SMALL_JUDGE, t, 0, "2e-6", 200, 0, 5, 512) for t in TASKS],
 }
 
 USER_DATA = r"""#!/bin/bash
@@ -76,7 +80,7 @@ aws s3 cp "$B/job.py" /opt/e1/job.py --only-show-errors
 echo "started $(date -u +%FT%TZ)" > /opt/e1/status && aws s3 cp /opt/e1/status "$B/status" --only-show-errors
 ( while sleep 300; do aws s3 cp /opt/e1/job.log "$B/job.log" --only-show-errors; done ) &
 export HF_HOME=/opt/e1/hf UV_CACHE_DIR=/opt/e1/uvcache PYTHONUNBUFFERED=1
-timeout __TIMEOUT_H__h python3 -m uv run /opt/e1/job.py > /opt/e1/job.log 2>&1
+timeout __TIMEOUT_H__h python3 -m uv run --python 3.12 /opt/e1/job.py > /opt/e1/job.log 2>&1
 RC=$?
 """
 
@@ -89,25 +93,25 @@ def aws(*args, capture=True):
     return json.loads(r.stdout) if capture and r.stdout.strip() else None
 
 
-def run_id(arm, judge, task, seed, lr):
+def run_id(arm, judge, task, seed, lr, maxtok=256):
     j = "judge05" if judge == SMALL_JUDGE else "judge15"
-    return "%s_%s_%s_s%d_lr%s" % (arm, j, task, seed, lr)
+    return "%s_%s_%s_s%d_lr%s%s" % (arm, j, task, seed, lr, "" if maxtok == 256 else "_tok%d" % maxtok)
 
 
-def est_hours(steps, probe_n, probe_every):
-    train = steps * STEP_S_L40S / 3600.0
+def est_hours(steps, probe_n, probe_every, maxtok=256):
+    train = steps * STEP_S_L40S * (1.6 if maxtok > 256 else 1.0) / 3600.0   # 512 tokens: ESTIMATE
     probes = (steps // probe_every + 1) * probe_n * 1.6 * (LSO.GEN_S_256TOK + LSO.SANDBOX_S) / 3600.0
     return SETUP_H + train + probes
 
 
 def plan(stage):
     rows = []
-    for arm, judge, task, seed, lr, steps, pn, pe in STAGES[stage]:
-        h = est_hours(steps, pn, pe)
-        rows.append({"run_id": run_id(arm, judge, task, seed, lr), "arm": arm, "judge": judge, "task": task,
-                     "seed": seed, "lr": lr, "steps": steps, "probe_n": pn, "probe_every": pe,
+    for arm, judge, task, seed, lr, steps, pn, pe, mt in STAGES[stage]:
+        h = est_hours(steps, pn, pe, mt)
+        rows.append({"run_id": run_id(arm, judge, task, seed, lr, mt), "arm": arm, "judge": judge, "task": task,
+                     "seed": seed, "lr": lr, "steps": steps, "probe_n": pn, "probe_every": pe, "maxtok": mt,
                      "est_h": round(h, 2), "timeout_h": int(math.ceil(h * 1.8)) + 1,
-                     "s3": "s3://%s/e1/%s/%s" % (BUCKET, stage, run_id(arm, judge, task, seed, lr))})
+                     "s3": "s3://%s/e1/%s/%s" % (BUCKET, stage, run_id(arm, judge, task, seed, lr, mt))})
     return rows
 
 
@@ -122,7 +126,7 @@ def print_plan(rows):
     print("step time is an ESTIMATE (%.0f s/step on L40S); the first job.log gives the measured value" % STEP_S_L40S)
 
 
-def submit(stage, rows):
+def submit(stage, rows, market="spot"):
     ami = aws("ssm", "get-parameter", "--name", AMI_PARAM)["Parameter"]["Value"]
     tmp = Path(tempfile.mkdtemp(prefix="e1aws_"))         # no spaces: the aws exe takes file:// paths
     record_path = ROOT / "runs" / "e1" / ("%s_launch.json" % stage)
@@ -133,7 +137,7 @@ def submit(stage, rows):
             print("skip (already launched): %s %s" % (r["run_id"], record[r["run_id"]]["instance_id"]))
             continue
         _, outp = LSO.bake(r["arm"], r["task"], r["seed"], r["steps"], r["lr"], POLICY, r["judge"],
-                           r["probe_n"], r["probe_every"])
+                           r["probe_n"], r["probe_every"], r["maxtok"])
         subprocess.run(["aws", "s3", "cp", str(outp), r["s3"] + "/job.py", "--only-show-errors"], check=True)
         ud = tmp / ("%s.sh" % r["run_id"])
         ud.write_text(USER_DATA.replace("__S3__", r["s3"]).replace("__TIMEOUT_H__", str(r["timeout_h"])),
@@ -142,8 +146,6 @@ def submit(stage, rows):
             "ImageId": ami, "InstanceType": ITYPE, "MinCount": 1, "MaxCount": 1,
             "IamInstanceProfile": {"Name": PROFILE},
             "InstanceInitiatedShutdownBehavior": "terminate",
-            "InstanceMarketOptions": {"MarketType": "spot", "SpotOptions": {
-                "SpotInstanceType": "one-time", "InstanceInterruptionBehavior": "terminate"}},
             "BlockDeviceMappings": [{"DeviceName": "/dev/sda1", "Ebs": {
                 "VolumeSize": 100, "VolumeType": "gp3", "DeleteOnTermination": True}}],
             "MetadataOptions": {"HttpTokens": "required"},
@@ -151,6 +153,9 @@ def submit(stage, rows):
                 {"Key": "Name", "Value": "fr-e1-" + r["run_id"]}, {"Key": "Project", "Value": "flight-recorder-e1"},
                 {"Key": "Stage", "Value": stage}]}],
         }
+        if market == "spot":
+            spec["InstanceMarketOptions"] = {"MarketType": "spot", "SpotOptions": {
+                "SpotInstanceType": "one-time", "InstanceInterruptionBehavior": "terminate"}}
         inst, err = None, []
         for az, subnet in SUBNETS.items():
             spec["SubnetId"] = subnet
@@ -223,7 +228,9 @@ def main(argv):
     if "--submit" not in argv:
         print("\nDRY RUN: nothing baked, uploaded or launched. Add --submit to spend.")
         return 0
-    submit(stage, rows)
+    market = "ondemand" if "--ondemand" in argv else "spot"   # g6e spot had no capacity 2026-10-07
+    print("market: %s" % market)
+    submit(stage, rows, market)
     return 0
 
 

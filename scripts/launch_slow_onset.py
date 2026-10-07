@@ -175,7 +175,7 @@ from flightrecorder.repro.reward_testhack import oracle_reward, train_reward, ex
 from flightrecorder.repro.oracle_lenient import lenient_oracle_reward  # noqa: E402  label only, never a reward
 
 POLICY, JUDGE, ARM, SEED, STEPS, TASK = "__POLICY__", "__JUDGE__", "__ARM__", __SEED__, __STEPS__, "__TASK__"
-GEN, LR, BETA, MAXTOK = 8, __LR__, 0.02, 256
+GEN, LR, BETA, MAXTOK = 8, __LR__, 0.02, __MAXTOK__   # 256 in every published run
 PROBE_N, PROBE_EVERY = __PROBE_N__, __PROBE_EVERY__
 TASKS = [t for t in CODE_TASKS if t.name == TASK]
 assert TASKS, "unknown task " + TASK
@@ -377,17 +377,18 @@ for _i in range(_k):
 '''
 
 
-def bake(arm, task, seed, steps, lr, policy, judge, probe_n, probe_every):
+def bake(arm, task, seed, steps, lr, policy, judge, probe_n, probe_every, maxtok=256):
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as t:
         t.add(ROOT / "flightrecorder", arcname="flightrecorder")
     b64 = base64.b64encode(buf.getvalue()).decode()
     src = (UV.replace("__PKG_B64__", b64).replace("__POLICY__", policy).replace("__JUDGE__", judge)
            .replace("__ARM__", arm).replace("__SEED__", str(seed)).replace("__STEPS__", str(steps))
-           .replace("__TASK__", task).replace("__LR__", lr)
+           .replace("__TASK__", task).replace("__LR__", lr).replace("__MAXTOK__", str(int(maxtok)))
            .replace("__PROBE_N__", str(probe_n)).replace("__PROBE_EVERY__", str(probe_every)))
     # lr is in the name: two pilot rates on the same task and seed must not overwrite each other
-    outp = ROOT / "scripts" / f"_slow_onset_{arm}_{task}_{seed}_lr{lr}.py"
+    tok = "" if int(maxtok) == 256 else f"_tok{int(maxtok)}"   # 256 keeps the old names
+    outp = ROOT / "scripts" / f"_slow_onset_{arm}_{task}_{seed}_lr{lr}{tok}.py"
     outp.write_text(src, encoding="utf-8")
     import py_compile                      # fail locally BEFORE spending on a job
     py_compile.compile(str(outp), doraise=True)
@@ -413,6 +414,8 @@ def main(argv=None):
                    help="only read when --arm judge; both judges are logged in every arm regardless")
     p.add_argument("--probe-n", type=int, default=16, help="eval-only completions per probe; 0 disables")
     p.add_argument("--probe-every", type=int, default=5, help="probe cadence in steps")
+    p.add_argument("--maxtok", type=int, default=256,
+                   help="max_completion_length; 256 in every published run (the E1 cap test uses 512)")
     p.add_argument("--pilot", action="store_true",
                    help="minimum informative pilot: first seed only, one run per task")
     p.add_argument("--record", default=None,
@@ -432,7 +435,7 @@ def main(argv=None):
     for task in tasks:
         for seed in seeds:
             b64, outp = bake(a.arm, task, seed, a.steps, a.lr, a.policy, a.judge,
-                             a.probe_n, a.probe_every)
+                             a.probe_n, a.probe_every, a.maxtok)
             baked.append(outp)
             print(f"baked+compiles OK  arm={a.arm} task={task} seed={seed} steps={a.steps} "
                   f"lr={a.lr} probe={a.probe_n}/{a.probe_every}  ({len(b64)} b64 chars) -> {outp}")
