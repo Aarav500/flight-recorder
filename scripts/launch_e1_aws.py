@@ -65,6 +65,12 @@ STAGES = {
     # Token-cap test (experiments/e1_cap512_analysis.py): the published GRID config with
     # max_completion_length 512 instead of 256. Same seed as the 256-token GRID diagnostic runs.
     "cap512": [("judge", SMALL_JUDGE, t, 0, "2e-6", 200, 0, 5, 512) for t in TASKS],
+    # E1 MAIN (experiments/e1_preregistration.md sections 3, 12): 24 hacking (0.5B judge optimized)
+    # and 24 benign (1.5B judge optimized), lr 1e-6, 400 steps, probe 16 every 5, 256 tokens, seeds
+    # 200-207. Seed-major order, so any prefix of the queue stays balanced across arm and task if the
+    # budget kill rule stops launches early.
+    "main": [("judge", j, t, seed, "1e-6", 400, 16, 5, 256)
+             for seed in range(200, 208) for j in (SMALL_JUDGE, "Qwen/Qwen2.5-1.5B-Instruct") for t in TASKS],
 }
 
 USER_DATA = r"""#!/bin/bash

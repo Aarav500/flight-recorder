@@ -34,6 +34,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import launch_e1_aws as A  # noqa: E402
 
 STEP_S_MEASURED = 11.0   # g6e.4xlarge, 512-token cap, 2026-10-07 (is_prime run: 134 steps in 27:36)
+# Budget guard (pre-registration section 11, Budget). PLAN_H is the planning estimate of one E1 run
+# (400 steps x ~13 s on one L40S + probes + setup, measured on the pilot and the token-cap runs).
+# A batch is launched only if committed + new <= the stage's budget, priced at the type actually tried.
+PLAN_H = 2.0
+BUDGET = {"main": 300.0}
 
 USER_DATA_BATCH = r"""#!/bin/bash
 set -u
@@ -73,9 +78,22 @@ def render(keep, per_run_h, backstop_min):
     return ud
 
 
-def launch_with_fallback(spec, ud_path, tmp):
+def committed_usd(record):
+    """Planning-estimate spend already committed by launched batches (one entry per instance)."""
+    seen = {}
+    for v in record.values():
+        iid = v.get("instance_id")
+        if iid and iid not in seen:
+            seen[iid] = len(v.get("batch", [v["run_id"]])) * PLAN_H * float(v.get("usd_per_h", 0))
+    return sum(seen.values())
+
+
+def launch_with_fallback(spec, ud_path, tmp, n_runs=1, room=float("inf")):
     err = []
     for itype, usd in A.FALLBACK:
+        if n_runs * PLAN_H * usd > room:     # budget guard: this type would cross the cap
+            err.append((itype, "OverBudget"))
+            continue
         spec["InstanceType"] = itype
         for az, subnet in A.SUBNETS.items():
             spec["SubnetId"] = subnet
@@ -129,6 +147,13 @@ def main(argv):
             print("skip (SageMaker job already %s): %s" % (started[r["run_id"]], r["run_id"]))
         else:
             keep.append(r)
+    kmax = next((int(a.split("=", 1)[1]) for a in argv if a.startswith("--max-runs=")), None)
+    if kmax is not None:
+        keep = keep[:kmax]
+    budget = BUDGET.get(stage)
+    room = (budget - committed_usd(record)) if budget is not None else float("inf")
+    if budget is not None:
+        print("budget %s: committed (planning estimate) $%.0f of $%.0f; room $%.0f" % (stage, budget - room, budget, room))
     if not keep:
         print("NOTHING TO LAUNCH")
         return 0
@@ -162,7 +187,7 @@ def main(argv):
     if market == "spot":
         spec["InstanceMarketOptions"] = {"MarketType": "spot", "SpotOptions": {
             "SpotInstanceType": "one-time", "InstanceInterruptionBehavior": "terminate"}}
-    inst, itype, usd, err = launch_with_fallback(spec, ud_path, tmp)
+    inst, itype, usd, err = launch_with_fallback(spec, ud_path, tmp, len(keep), room)
     if inst is None:
         print("NO CAPACITY for the batch: %s" % sorted(set(err)))
         return 0

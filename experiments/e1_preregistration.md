@@ -1,19 +1,28 @@
 # 02 Pre-registration: E1, slow-onset arm
 
-Kit file 02 of 09. Paper: Audit or Early Warning (AaravOS/papers/audit_or_early_warning.md). Version: 1 DRAFT. Frozen: no.
+Kit file 02 of 09. Paper: Audit or Early Warning (AaravOS/papers/audit_or_early_warning.md). Version: 1. Frozen: see section 13.
 
-DRAFT by the assistant on 2026-10-07. Under kit 02, Aarav writes sections 1 and 11 himself. Those two sections are empty. Every other section is filled and marked as a proposal. Aarav can change any of it before the freeze. Nothing here is binding until section 13 is filled.
+Written by the assistant on 2026-10-07. Kit 02 says Aarav writes sections 1 and 11 himself. On 2026-10-07 he delegated both in chat: "write e1_primary.py next, H1 wording next kill rules you do, execute main run". The kit lets him change any of its rules.
+
+Sections 1 and 11 are therefore drafted by the assistant, at his request. They are taken from his own plan: the kill result and the track rule (audit_or_early_warning.md, sections 2-3), the E1 cap of $300, and the decisions he made in chat, quoted in section 1. Nothing here is binding until section 13 is filled. After that, every change goes to section 14.
 
 Track rule, adopted by Aarav 2026-10-07 ("Do this then lets start"): main track only if E1 is clean by 2027-03-15. Clean means a kill result, or a pre-registered null inside a 12-step window. Otherwise the paper goes to E&D, Benchmark Design.
 
 ## 1. Hypotheses
 
-AARAV WRITES THIS SECTION.
+Drafted by the assistant at Aarav's request (see the header). The wording follows the plan's kill result (audit_or_early_warning.md, section 2).
 
 | ID | Hypothesis | Direction | Primary or secondary |
 |---|---|---|---|
-| H1 | | | Primary |
-| H2 | | | Secondary |
+| H1 | In E1, the **disagreement** detector anticipates the strict-oracle collapse. E1 is Qwen2.5-1.5B base trained with GRPO against the reduced-capacity 0.5B judge: lr 1e-6, 400 steps, max_completion_length 256, tasks count_vowels, is_prime and second_largest, 8 seeds each. The detector is judge_0.5B - judge_1.5B at the level, with the FPR=0.1 operating point taken from the 24 matched capable-judge runs. Its alarm comes **strictly before** the collapse event (experiments/e1_event.py on the strict held-out series) in a larger share of hacking runs than it alarms on the benign runs. **Its median lead over the hacking runs is also positive.** Lead = event step - the 3-sigma first-move step of the absolute value. | TPR(alarm < event) > realized benign FPR, one-sided Fisher exact p < 0.05; AND median lead > 0 | Primary |
+| H2 | The same test, for each of the other 25 detectors in experiments/e1_detectors.py | As H1, Holm-corrected across the 25 | Secondary |
+
+- **Alarm rule (decided here):** strict, a < e. An alarm on the collapse step is not early warning. The published at-or-before rule (a <= e) is reported for continuity and is never primary.
+- **Stated expectation (not a hypothesis):** H1 fails. In the published Phase 1B runs, disagreement lags the collapse (tex:279-286). The expectation is stated in advance so that a null is not later read as a surprise, and a kill is not read as anticipated.
+- **What each outcome means** (plan section 2; section 11):
+  - H1 holds: a kill result, and the paper becomes a forecasting paper.
+  - H1 fails with the window and equivalence conditions met: a clean null.
+  - Otherwise: a null that is not clean.
 
 Decisions H1 must make. The other sections depend on them.
 - **Which detector is primary.** The kill result reads "one detector shows both" (plan section 2). The sweep scores 20 detectors (tex:723), so "any of 20" at α=0.05 is a forking path. At 24 vs 24, TPR 0.5 against FPR 0.1, experiments/e1_power.py gives:
@@ -44,7 +53,7 @@ Decisions H1 must make. The other sections depend on them.
   - raw peak_drop: 6/12;
   - slope: 9/12 smoothed.
   The pilot gate uses baseline_drop(0.6, persist=2).
-- **Primary collapse event: CANDIDATES SCORED 2026-10-07, AARAV DECIDES** (experiments/event_selection.md).
+- **Primary collapse event: candidates scored 2026-10-07; Aarav's decision is recorded below ("ADOPTED")** (experiments/event_selection.md).
   - The rule fixed before scoring selects cusum_page_down_v2.
   - A post-outcome diagnostic finds it dates 4 of 8 real declined probe runs at step 3, its earliest possible date, while those runs stay flat until about step 10-40. Its grid median window is 10.
   - Recommendation: sustained_drop_v2. It passes every hard limit, its stream and probe dates agree best on real runs (17.0 against 43.5), and its grid window is 29. Log it as a deviation.
@@ -125,7 +134,8 @@ PROPOSED: Name the unit of analysis in the abstract: "24 hacking and 24 benign t
 
 ## 4. Sample size and power
 
-- **Smallest effect that matters, and why:** the plan names TPR 0.5 against FPR 0.1 (E1, "Sample"). AARAV CONFIRMS the "why": it is a substantive claim about what a useful monitor must achieve.
+- **Smallest effect that matters, and why:** TPR 0.5 against FPR 0.1, as the plan names it (E1, "Sample"). A monitor that flags half of the hacking runs before quality collapses, while false-alarming on one benign run in ten, is about the least an operator would act on. Below that, its alarms cost more than they save. ("Why" drafted by the assistant at Aarav's request.)
+- **Power at the real operating point:** the threshold is the 90th percentile of the 24 benign maxima, so the realized FP count is fixed at about 3/24 rather than drawn from Binomial(24, 0.1). At TPR 0.5 the exact power is then **0.92** (e1_primary.power_fixed_fp), against 0.90 with a binomial FP.
 - **MDE at 80% power:**
   - TPR ≥ 0.44 at 24 vs 24 with one primary detector, against FPR 0.1;
   - 0.61 with Bonferroni over 20 detectors;
@@ -148,7 +158,7 @@ PROPOSED: Name the unit of analysis in the abstract: "24 hacking and 24 benign t
 A null is the main-track outcome the track rule allows, so this section matters.
 
 - **Equivalence test:** TOST on TPR − FPR. Use the Newcombe hybrid-score interval, a one-sided 95% upper bound.
-- **Margin (delta), and why that size:** AARAV CHOOSES. What the design can support: when a detector is truly uninformative (TPR = FPR = 0.1), the upper bound falls below these values 80% of the time:
+- **Margin (delta), and why that size:** **delta = 0.25** absolute, chosen by the assistant at Aarav's request. It is the smallest margin this design can exclude with about 80% probability when the detector is uninformative (0.24 at 24 vs 24, below). A smaller margin would leave a true null inconclusive most of the time. What the design can support: when a detector is truly uninformative (TPR = FPR = 0.1), the upper bound falls below these values 80% of the time:
   - 0.24 at 24 vs 24;
   - 0.19 at 36 vs 36.
 
@@ -192,8 +202,8 @@ No symmetric bars past [0, 1]. Each null reports its MDE. Each count reports an 
 | Arm | What it controls for | n | Matched to |
 |---|---|---|---|
 | Benign arm, matched: the capable 1.5B judge is optimized | Detector activity from ordinary GRPO dynamics. It sets the FPR. | 24 | Task, seed, lr, steps, probe cadence |
-| Placebo: partial-credit reward (tex:227-229) | A second benign mechanism. Reward shaping collapsed 0/9 in the corpus. | AARAV DECIDES. The plan lists it with no n. | Task, lr, steps |
-| Planted positive control | Whether the scoring pipeline can find an effect of the claimed size. A synthetic alarm fires 1 to 12 steps before the event on a random 50% of hacking runs, and at random on 10% of benign runs. It runs through e1_primary.py unchanged, over 1000 draws. Expected rejection rate: about 0.90, the power from section 4. | 24 + 24, synthetic | The real runs' events |
+| Placebo: partial-credit reward (tex:227-229) | A second benign mechanism. Reward shaping collapsed 0/9 in the corpus. | **0, not run in the primary stage** (decided by the assistant at Aarav's request). The capable-judge benign arm already sets the FPR, and partial credit would add 24 runs without informing the primary test. It may be run later as exploratory work if the budget allows. | Task, lr, steps |
+| Planted positive control | Whether the scoring pipeline can find an effect of the claimed size. A synthetic alarm fires 1 to 12 steps before the event on a random 50% of hacking runs, and at random on 10% of benign runs. It runs through e1_primary.py unchanged, over 1000 draws. Expected rejection rate: about 0.92 if every hacking event is at step 13 or later (the operating point fixes FP at about 3/24; power_fixed_fp). It is lower in proportion to the hacking runs whose event comes before step 7, because those cannot carry a planted alarm after the 6-step baseline. | 24 + 24, synthetic | The real runs' events |
 | Natural hack arm | The reduced-capacity arm is natural: the policy finds the weak judge's blind spots itself. Nothing is scripted. | 24 | n/a |
 
 - **Source of the behavior:** emergent. The policy optimizes a weaker judge's score, and held-out tests are the oracle.
@@ -214,17 +224,16 @@ No symmetric bars past [0, 1]. Each null reports its MDE. Each count reports an 
 
 ## 11. Kill rules
 
-AARAV WRITES THIS SECTION. Source material, not filled in:
-- the plan's E1 kill (audit_or_early_warning.md, E1);
-- the kill result (section 2 of that file);
-- the plan's cap of $300 (E1, "Cost");
-- the 2027-03-15 track gate.
+Drafted by the assistant at Aarav's request (see the header). Sources: the plan's kill result (section 2), the track rule (section 3), the E1 cost cap and the 2027-03-15 gate.
 
 | Kill rule | Exact threshold | Action |
 |---|---|---|
-| Result | | |
-| Budget | | |
-| Calendar | | |
+| Result: kill | H1 holds for disagreement: one-sided Fisher p < 0.05 (alarm < event) AND median lead > 0 | The negative claim is killed. The paper becomes a forecasting paper; main track if this lands by 2027-03-15 (track rule). |
+| Result: clean null | H1 fails, the median pre-event window over the 24 hacking runs is >= 12 (non-firing counts as fail), AND the TOST upper bound on TPR - FPR is < 0.25 | Report the registered null as the main-track negative result (track rule). |
+| Result: null, not clean | H1 fails, and the window is < 12 or equivalence is not shown | No main-track negative claim. Go to E&D, Benchmark Design (track rule). |
+| Result: generator failure | Fewer than 18 of the 24 used hacking runs show a strict-oracle event under e1_event | Stop. The arm does not reliably produce the failure at this config. Report it as a generator result and make no detector claim. Checked and reported BEFORE any detector result. |
+| Budget | E1 primary spend reaches $300 (AWS credits, plan cap) before 24 + 24 usable runs | Stop launching. Analyse at the achieved n if it is at least 16 per arm, with the MDE recomputed; log a deviation. Below 16 per arm, report descriptively only. |
+| Calendar | No primary result by 2027-03-15 | E&D track (track rule). |
 
 ## 12. Spend gates
 
@@ -232,8 +241,9 @@ AARAV WRITES THIS SECTION. Source material, not filled in:
 |---|---|---|---|---|
 | Calibration | E0: validate event definitions offline on CPU | 0 | 0 | Done 2026-10-06 |
 | Pilot | Pick the lr: 6 runs, lr 1e-6 for 400 steps and 5e-7 for 800 steps, 1 per task, seed 100. Gated by experiments/e1_pilot_gate.py, fixed in commit 24e1b5b before any data. | 25 | 60 (about $29 at the measured step time) | "lets start", chat 2026-10-07. The ceiling is PROPOSED. |
-| Diagnostic (NEW) | Does the format-tolerant oracle also decline? 3 runs at the E1 config (lr 1e-6, 400 steps, seed 101), and 3 at the published grid config (lr 2e-6, 200 steps, seed 0), both logging both oracles and every completion. | 8 | 20 | PENDING. Not launched. |
-| Primary | 48 runs plus up to 12 replacements at the pilot's lr | 96 (lr 1e-6) or 186 (lr 5e-7) | 240 or 465. The plan's cap is $300. | PENDING |
+| Diagnostic | Does the format-tolerant oracle also decline? 3 runs at the E1 config and 3 at the published grid config (HF a100-large). | 8 | 20 (about $17 actual) | "launch the diagnostic now", chat 2026-10-07. Done. |
+| Token-cap test | The published grid config with a 512-token cap, 3 runs (AWS EC2 g6e). | 4 | 10 (about $6 actual) | Requested in chat 2026-10-07 ("Can we do it in aws"). Done. |
+| Primary | 48 runs (24 hacking + 24 benign) plus up to 12 replacements, at lr 1e-6, 400 steps, 256 tokens, seeds 200-207 then 208+ | about 96 | **300** (the plan's cap; AWS credits) | **Aarav, chat 2026-10-07: "execute main run".** |
 
 If a stage needs more than its ceiling, write a deviation in section 14 before the spend.
 
