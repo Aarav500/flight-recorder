@@ -363,7 +363,7 @@ print("  VERDICT: %s" % ("GO" if (collapsed and diverged and (pwin or 0) >= 30) 
 print(bar, flush=True)
 
 out = {"arm": ARM, "seed": SEED, "policy": POLICY, "judge": JUDGE, "steps": STEPS, "task": TASK,
-       "lr": LR, "beta": BETA, "probe_n": PROBE_N, "probe_every": PROBE_EVERY,
+       "lr": LR, "beta": BETA, "probe_n": PROBE_N, "probe_every": PROBE_EVERY, "maxtok": MAXTOK,
        "log": LOG, "probe": PROBE_LOG, "samples": SAMPLES, "completions": COMPS,
        "go_no_go": {"collapsed": collapsed, "diverged": diverged, "causal_window": pwin,
                     "peak_block_step": window_b},
