@@ -1,4 +1,9 @@
 {
+ "_env": {
+  "numpy": "2.4.3",
+  "python": "3.13.14",
+  "scipy": "1.17.1"
+ },
  "anticipatory/curvature_detectors.py": "476eae1c873035203035017608315d27fbbc31249f5f3aa7830080dd576be437",
  "benchmark/harness.py": "fd51e7f55c51eddbbbb186dc15421893efc790f3165c709fdaacfddf6c9f74b6",
  "benchmark/score_prime.py": "a2c9ecdae4c73c252126f10adfae2f409d8339a8ffa28593dba2bb46c2d5b104",

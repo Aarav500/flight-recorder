@@ -38,7 +38,8 @@ STEP_S_MEASURED = 11.0   # g6e.4xlarge, 512-token cap, 2026-10-07 (is_prime run:
 # (400 steps x ~13 s on one L40S + probes + setup, measured on the pilot and the token-cap runs).
 # A batch is launched only if committed + new <= the stage's budget, priced at the type actually tried.
 PLAN_H = 2.0
-BUDGET = {"main": 300.0}
+BUDGET = {"main": 300.0, "main_replace": 300.0}   # ONE shared cap: main + replacements (pre-reg section 11)
+SHARED_BUDGET = ("main", "main_replace")
 
 USER_DATA_BATCH = r"""#!/bin/bash
 set -u
@@ -151,7 +152,13 @@ def main(argv):
     if kmax is not None:
         keep = keep[:kmax]
     budget = BUDGET.get(stage)
-    room = (budget - committed_usd(record)) if budget is not None else float("inf")
+    committed = committed_usd(record)
+    if stage in SHARED_BUDGET:              # count the other E1 stage's launches against the same cap
+        for other in SHARED_BUDGET:
+            op = ROOT / "runs" / "e1" / ("%s_launch.json" % other)
+            if other != stage and op.exists():
+                committed += committed_usd(json.loads(op.read_text()))
+    room = (budget - committed) if budget is not None else float("inf")
     if budget is not None:
         print("budget %s: committed (planning estimate) $%.0f of $%.0f; room $%.0f" % (stage, budget - room, budget, room))
     if not keep:

@@ -48,8 +48,8 @@ SUBNETS = {"us-east-1a": "subnet-0386677a3484341be", "us-east-1b": "subnet-050b2
            # 1e/1f offer p5.4xlarge but not g6e; an unoffered type there just returns Unsupported
            "us-east-1e": "subnet-0ca989ad2aa4b4b89", "us-east-1f": "subnet-074261b937ec06406"}
 USD_PER_HR = 1.84          # g6e.xlarge spot, us-east-1, 2026-10-07 (spot ~= on-demand for g6e today)
-STEP_S_L40S = 26.0         # ESTIMATE, not measured: 1.6 x the A100's measured 16 s (LSO.STEP_S_1P5B).
-                           # The pilot's job.log measures it; update this before sizing the main runs.
+STEP_S_L40S = 14.0         # MEASURED 2026-10-07 on g6e.xlarge (one L40S): 13.95 s/step, 512-token cap,
+                           # no probe. The 256-token main runs add a probe; est_hours() prices it separately.
 SETUP_H = 0.3              # uv + torch install, model download
 POLICY = "Qwen/Qwen2.5-1.5B"
 SMALL_JUDGE = "Qwen/Qwen2.5-0.5B-Instruct"     # reduced-capacity: the published hacking arm
@@ -72,6 +72,12 @@ STAGES = {
     "main": [("judge", j, t, seed, "1e-6", 400, 16, 5, 256)
              for seed in range(200, 208) for j in (SMALL_JUDGE, "Qwen/Qwen2.5-1.5B-Instruct") for t in TASKS],
 }
+# E1 replacements (pre-registration section 7a): runs/e1/main_replace.json lists [judge, task, seed] for
+# each excluded main run, with seed = the next unused >= 208 for that arm and task. Same config as main.
+# The results are collected into runs/e1/main, where e1_primary.py reads them.
+_REPLACE = ROOT / "runs" / "e1" / "main_replace.json"
+STAGES["main_replace"] = ([("judge", j, t, int(sd), "1e-6", 400, 16, 5, 256)
+                           for j, t, sd in json.loads(_REPLACE.read_text())] if _REPLACE.exists() else [])
 
 USER_DATA = r"""#!/bin/bash
 set -u
@@ -228,7 +234,7 @@ def status(stage):
 
 def collect(stage):
     record = json.loads((ROOT / "runs" / "e1" / ("%s_launch.json" % stage)).read_text())
-    out = ROOT / "runs" / "e1" / stage
+    out = ROOT / "runs" / "e1" / ("main" if stage == "main_replace" else stage)   # replacements join main
     (out / "logs").mkdir(parents=True, exist_ok=True)
     for rid, v in record.items():
         for name, dest in (("result.json", out / (rid + ".json")), ("job.log", out / "logs" / (rid + ".log")),

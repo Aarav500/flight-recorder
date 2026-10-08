@@ -60,7 +60,7 @@ def main(argv):
                     if "hlen" in kv:
                         row["hidden_lenient"] = float(kv["hlen"])
                     rows.append(row)
-            m = re.search(r"_slow_onset_\w+?_(\w+?)_(\d+)_lr([0-9.e-]+)$", name)
+            m = re.search(r"_slow_onset_[a-z]+_(?:judge\w\w_)?([a-z_]+?)_(\d+)_lr([0-9.e-]+)(?:_tok\d+)?$", name)
             if rows and m:
                 res = {"task": m.group(1), "seed": int(m.group(2)), "lr": float(m.group(3)), "log": rows,
                        "from_log_fallback": True}

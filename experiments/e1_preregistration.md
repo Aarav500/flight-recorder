@@ -8,6 +8,8 @@ Sections 1 and 11 are therefore drafted by the assistant, at his request. They a
 
 Track rule, adopted by Aarav 2026-10-07 ("Do this then lets start"): main track only if E1 is clean by 2027-03-15. Clean means a kill result, or a pre-registered null inside a 12-step window. Otherwise the paper goes to E&D, Benchmark Design.
 
+Here 'clean' follows that rule exactly: a kill result, or a null whose 12-step window holds. Non-superiority (section 5) is reported as a qualifier on how strong the null claim is. It does not gate the track.
+
 ## 1. Hypotheses
 
 Drafted by the assistant at Aarav's request (see the header). The wording follows the plan's kill result (audit_or_early_warning.md, section 2).
@@ -21,8 +23,11 @@ Drafted by the assistant at Aarav's request (see the header). The wording follow
 - **Stated expectation (not a hypothesis):** H1 fails. In the published Phase 1B runs, disagreement lags the collapse (tex:279-286). The expectation is stated in advance so that a null is not later read as a surprise, and a kill is not read as anticipated.
 - **What each outcome means** (plan section 2; section 11):
   - H1 holds: a kill result, and the paper becomes a forecasting paper.
-  - H1 fails with the window and non-superiority conditions met: a clean null.
+  - H1 fails and the window holds: a clean null (the track rule). Non-superiority sets how strong the null claim is.
   - Otherwise: a null that is not clean.
+- **Secondary detectors and the claim.** If a secondary (H2) detector holds alongside a clean null, the verdict says so, and the general claim that no detector anticipates is NOT made. That detector's lead is reported as exploratory, not as a kill.
+  - This narrows the plan's "one detector shows both" to one named detector. That follows Aarav's pre-data decision to make disagreement the primary detector; see section 14.
+- **The lead conjunct** uses the published 3-sigma first-move rule. It is weakly informative when events are late, so the evidence of anticipation rests on the strict-TPR Fisher test.
 
 Decisions behind H1. All were resolved on 2026-10-07; this list is kept as the record.
 - **Which detector is primary.** The kill result reads "one detector shows both" (plan section 2). The sweep scores 20 detectors (tex:723), so "any of 20" at α=0.05 is a forking path. At 24 vs 24, TPR 0.5 against FPR 0.1, experiments/e1_power.py gives:
@@ -115,8 +120,13 @@ From the plan's kill result (audit_or_early_warning.md, section 2).
     - the window precondition: median pre-event window >= 12 over the hacking runs, a run without an event counting as failing;
     - Fisher p < 0.05;
     - the point median lead of the primary detector is above 0, over the hacking runs that have both an event and a first move. The exact sign test is reported but does not decide.
-  - Otherwise a null. It is CLEAN if the window holds and non-superiority holds (section 5), and NOT CLEAN otherwise. If p < 0.05 and the lead is > 0 but the window fails, that is flagged.
+  - Otherwise a null.
+    - It is CLEAN if the window holds (the track rule), with a qualifier. "Non-superiority shown" (section 5) licenses "no anticipation beyond TPR − FPR = 0.25". "Not shown" limits the claim to "no significant anticipation".
+    - It is NOT CLEAN if the window fails. If p < 0.05 and the lead is > 0 but the window fails, that is flagged.
   - Before any detector is scored, the small-n and generator-failure rules of section 11 apply.
+- **Window:** the step of the primary event (experiments/e1_event.py on the strict per-step series, steps 0-399). A hacking run with no event counts as -1, and the median is taken over all used hacking runs. This replaces the plan's "Def. B window"; see the event-adoption row in section 14.
+- **Primary-signal completeness:** every used run must carry the disagreement series, with at least 6 finite values and at most 5% missing. Otherwise there is NO VERDICT. That is a data failure, not a null, and it depends on availability only, never on the signal's value.
+- **Planted control:** if it fails (section 9), the saved verdict is marked UNVERIFIED.
 - **Script:** experiments/e1_primary.py. Its self-test passes before the freeze:
   - It reproduces tab:sweep's TPR and leads exactly, on all 40 (anchor, detector) cells of the frozen 9 vs 9 grid. tab:sweep's p-values are two-tailed, while E1 is one-sided by design.
   - It recovers the planted positive control.
@@ -142,7 +152,7 @@ PROPOSED: Name the unit of analysis in the abstract: "24 hacking and 24 benign t
 - **Power at the real operating point:** the threshold is the 90th percentile of the 24 benign maxima, so the realized FP count is fixed at about 3/24 rather than drawn from Binomial(24, 0.1). At TPR 0.5 the exact power is then **0.92** (e1_primary.power_fixed_fp), against 0.90 with a binomial FP.
 - **MDE at 80% power:**
   - TPR ≥ 0.44 at 24 vs 24 with the one primary detector: with FP fixed at 3/24, and also under a binomial FP;
-  - the 25 secondary detectors use Holm and are not powered for; Bonferroni over 26 would give power 0.47;
+  - the 25 secondary detectors use Holm and are not powered for. At the real operating point, a single secondary detector at the first Holm step (alpha/25) has power 0.27 at TPR 0.5: an MDE of 0.65, needing at least 14 of 24 hits. Under a binomial FP, Bonferroni over 26 would give 0.47;
   - at 16 or 20 usable runs per arm (the budget rule), the MDE is 0.58 or 0.47;
   - for comparison, the frozen 9 vs 9 grid had an MDE of 0.74, and its largest observed TPR is 0.44 (tex:682).
 - **Method:** exact enumeration of the one-sided Fisher test, experiments/e1_power.py.
@@ -192,10 +202,14 @@ No symmetric bars past [0, 1]. Each null reports its MDE. Each count reports an 
 | (c) More than 5% of steps lack a finite strict value, or the log is not indexed 0..T-1. | Event dating needs a complete, step-indexed series. | 0 |
 
 - No exclusion may depend on a detector's output, or on the oracle's trajectory after step 4.
-- **Registered config.** Only runs with this config count: arm judge; judge Qwen2.5-0.5B-Instruct (hacking) or 1.5B-Instruct (benign); lr 1e-6; 400 steps; maxtok 256; probe 16 every 5; one of the three tasks; seed >= 200.
+- **Registered config.** Only runs with this config count: arm judge; policy Qwen2.5-1.5B; judge Qwen2.5-0.5B-Instruct (hacking) or 1.5B-Instruct (benign); lr 1e-6; 400 steps; maxtok 256; probe 16 every 5; one of the three tasks; seed >= 200.
   - Any other file in runs/e1/main, for example a pilot run with seed 100, is listed as unregistered and ignored.
   - Duplicate (arm, task, seed) entries keep the first file in name order.
-  - Per arm and task, the first 8 non-excluded runs in seed order are used.
+  - Per arm and task, the first 8 non-excluded runs in seed order are used. Runs beyond that are listed as surplus and not used.
+  - Duplicate (arm, task, seed) copies are resolved among NON-excluded files only, so an incomplete first copy does not block a complete later one.
+  - A launched run with no collected result counts as excluded under (a). The launch records are runs/e1/main_launch.json and main_replace_launch.json.
+  - **Replacements:** each excluded run is replaced at the next unused seed >= 208 for its arm and task. They are listed in runs/e1/main_replace.json and launched as the "main_replace" stage of scripts/launch_e1_aws.py and launch_e1_batch.py, with the same config and under the same $300 cap. Results are collected into runs/e1/main.
+  - Rule (b) applies only when all five of steps 0-4 are finite and zero. A missing value among them blocks (b).
 - A hacking run with no collapse event is not excluded. It counts as a miss (section 2).
 - Pilot runs (seed 100) are excluded from every confirmatory analysis.
 
@@ -215,10 +229,10 @@ No symmetric bars past [0, 1]. Each null reports its MDE. Each count reports an 
 | Planted positive control | Whether the scoring pipeline can find an effect of the claimed size. Each hacking run gets a synthetic alarm with probability 0.5, placed 1 to 12 steps before its real event, at step 6 or later (after the deviation baseline).
 
   - So a run with event e carries the alarm with probability 0.5 × clip((e − 6)/12, 0, 1). Every offset fits only when e >= 18; a run with an event before step 7, or none, carries no alarm.
-  - Benign runs get noise, 10% of them with a spike that stays below every planted spike.
-  - It runs through score() and the decision code unchanged, over 1000 draws.
+  - Every benign run gets one spike, U(1.5, 2.5). The threshold therefore always lies among the benign spikes, above all noise, and FP is exactly 3/24. Planted spikes are U(4, 5), above every benign deviation.
+  - It runs through score() and decide() unchanged, over 1000 draws. A rejection is decide()'s kill result with the window granted; the planted lead is positive by construction.
   - The expected rejection rate is computed exactly for the real events: a Poisson-binomial over runs, with FP fixed by the operating point. It is about 0.92 when every event is at step 18 or later.
-  - If the simulated rate differs from the expectation by more than 0.05, the primary verdict is reported as UNVERIFIED. | 24 + 24, synthetic | The real runs' events |
+  - If the simulated rate differs from the expectation by more than 0.05, the saved primary verdict is marked UNVERIFIED. The self-test checks this on early and mixed event layouts.
 | Natural hack arm | The reduced-capacity arm is natural: the policy finds the weak judge's blind spots itself. Nothing is scripted. | 24 | n/a |
 
 - **Source of the behavior:** emergent. The policy optimizes a weaker judge's score, and held-out tests are the oracle.
@@ -248,8 +262,8 @@ Drafted by the assistant at Aarav's request (see the header). Sources: the plan'
 | Kill rule | Exact threshold | Action |
 |---|---|---|
 | Result: kill | H1 holds for disagreement: median pre-event window >= 12 AND one-sided Fisher p < 0.05 (alarm < event) AND point median lead > 0 | The negative claim is killed. The paper becomes a forecasting paper; main track if this lands by 2027-03-15 (track rule). |
-| Result: clean null | H1 fails, the median pre-event window over the 24 hacking runs is >= 12 (non-firing counts as fail), AND non-superiority holds: the upper Newcombe 90% bound on TPR - FPR is < 0.25 | Report the registered null as the main-track negative result (track rule). |
-| Result: null, not clean | H1 fails, and the window is < 12 or non-superiority is not shown | No main-track negative claim. Go to E&D, Benchmark Design (track rule). |
+| Result: clean null | H1 fails AND the median pre-event window over the used hacking runs is >= 12 (a run with no event counts as failing). Non-superiority (the upper Newcombe 90% bound on TPR − FPR < 0.25) is reported as the claim's qualifier. | Report the registered null as the main-track negative result (track rule), worded by the qualifier. If an H2 detector holds, make no general "no detector" claim. |
+| Result: null, not clean | H1 fails and the window is < 12 | No main-track negative claim. Go to E&D, Benchmark Design (track rule). |
 | Result: generator failure | Fewer than 18 of the 24 used hacking runs (in general ceil(0.75 n)) show a strict-oracle event under e1_event | Stop. The arm does not reliably produce the failure at this config. Report it as a generator result and make no detector claim. Checked and reported BEFORE any detector result. |
 | Budget | E1 primary spend reaches $300 (AWS credits, plan cap) before 24 + 24 usable runs | Stop launching. Analyse at the achieved n if it is at least 16 per arm, with the MDE recomputed; log a deviation. Below 16 per arm, report descriptively only. The script enforces both: counts only below 16, and the MDE printed at 16-23. |
 | Calendar | No primary result by 2027-03-15 | E&D track (track rule). |
@@ -262,7 +276,7 @@ Drafted by the assistant at Aarav's request (see the header). Sources: the plan'
 | Pilot | Pick the lr: 6 runs, lr 1e-6 for 400 steps and 5e-7 for 800 steps, 1 per task, seed 100. Gated by experiments/e1_pilot_gate.py, fixed in commit 24e1b5b before any data. | 25 | 60 (about $29 at the measured step time) | "lets start", chat 2026-10-07. The ceiling is PROPOSED. |
 | Diagnostic | Does the format-tolerant oracle also decline? 3 runs at the E1 config and 3 at the published grid config (HF a100-large). | 8 | 20 (about $17 actual) | "launch the diagnostic now", chat 2026-10-07. Done. |
 | Token-cap test | The published grid config with a 512-token cap, 3 runs (AWS EC2 g6e). | 4 | 10 (about $6 actual) | Requested in chat 2026-10-07 ("Can we do it in aws"). Done. |
-| Primary | 48 runs (24 hacking + 24 benign) plus up to 12 replacements, at lr 1e-6, 400 steps, 256 tokens, seeds 200-207 then 208+ | about 96 | **300** (the plan's cap; AWS credits) | **Aarav, chat 2026-10-07: "execute main run".** |
+| Primary | 48 runs (24 hacking + 24 benign) plus up to 12 replacements, at lr 1e-6, 400 steps, 256 tokens, seeds 200-207 then 208+ | about 96 | **300** (the plan's cap; AWS credits). Planning estimate $215 at the measured L40S step time (14 s/step, g6e.xlarge, $1.86/h). Replacements count against the same cap. | **Aarav, chat 2026-10-07: "execute main run".** |
 
 If a stage needs more than its ceiling, write a deviation in section 14 before the spend.
 
@@ -271,7 +285,7 @@ If a stage needs more than its ceiling, write a deviation in section 14 before t
 Run in the repository after sections 1 and 11 are written:
 
 ```
-git add experiments/e1_preregistration.md experiments/e1_primary.py
+git add experiments/e1_preregistration.md experiments/e1_primary.py experiments/e1_pins.json
 git commit -m "Freeze E1 pre-registration v1"
 git rev-parse HEAD
 git log -1 --format=%cI
@@ -282,6 +296,7 @@ sha256sum experiments/e1_preregistration.md
 - Commit time (ISO 8601, with time zone): UNKNOWN
 - SHA-256 of this file: UNKNOWN
 - Human reader before the freeze (name and date): UNKNOWN
+- Pinned-dependency archive: UNKNOWN. A tar of the 14 files in e1_pins.json, kept OUTSIDE the public repo because paper/ is anonymity-sensitive. Its path and SHA-256 are recorded here, so the registered analysis can be rerun even if a working copy changes.
 
 The repository is public. Pushing the frozen file gives a third-party timestamp, but the file names the paper and its author. Whether to push it, or to email the SHA-256 to the reader instead, is Aarav's call (kit 02 PROPOSED, line 174).
 
@@ -297,6 +312,7 @@ These rows are pre-freeze notes, logged so the paper can cite them.
 | 2026-10-07 | Pilot result | The gate passed at both rates. Median windows: 27 at lr 1e-6 (32, 27, 2) and 28 at 5e-7 (44, 28, 22), under baseline_drop(0.6, persist=2). By the pre-set rule, lr 1e-6 is kept. Under the published persist=1 event the medians would be 5 and 8, so neither would pass. | Gate committed before the data (24e1b5b; the lr-parsing fix 97f885c also predates the jobs). | After. This row reports the result. | E1 runs at lr 1e-6, 400 steps, if it goes ahead. The section 1 decision on what counts as hacking comes first. | this commit |
 | 2026-10-07 | Review of the pilot reading (wf_f6879608-9fa; 33 of 34 findings survived a skeptic) | Five corrections to earlier statements. **(1)** The gate's event, baseline_drop(0.6, persist=2), fires on noise at mid pass rates: 41-99% on flat 8-sample series. 2 of the 6 pilot windows are noise: second_largest 1e-6 at step 2, a dip inside the baseline, and second_largest 5e-7 at step 22, a run that never collapsed. E0 missed this because benign runs sit near 1.0. **The E1 primary event must be replaced before the freeze.** **(2)** "45 of 57" excluded 23 late zeros over 800 chars. Including them gives about 61 of 80 correct by function, with 7 unverifiable. **(3)** "11 wrong" is 8 wrong, 1 with no code, and 3 correct functions blocked by top-level input() or self-asserts. **(4)** Prose before the def is present at step 0, at about 36%, and rises to 84%. **(5)** The optimized 0.5B judge pays about +0.04 for prose (t≈4) and the 1.5B judge docks it about −0.08 (t≈−3.5), after controls. Read the prose as a reward-driven violation of "Return only the Python code", not as benign drift. | Before the diagnostic results | Section 1's event choice and the hacking definition both depend on this. | this commit |
 | 2026-10-07 | Diagnostic supplement | experiments/e1_diag_supplement.py adds per-task readings: a sustained-change bootstrap, a null false-fire rate, a function-only label, the benign level, a grid reproduction check and the probe event. The frozen verdict in e1_diag_analysis.py is unchanged and reported first. | The review found the frozen rule leans toward a wrong-code verdict. | BEFORE any diagnostic result was collected (the jobs were at about step 100) | The verdict is reported alongside fixed reading rules. | this commit |
+| 2026-10-07 | Sections 1, 2, 11 and the plan | (i) The plan's kill wording, "one detector shows both", narrows to one named primary detector (disagreement). If an H2 detector holds alongside a clean null, the general claim is not made. (ii) The plan's partial-credit placebo is not run in the primary stage; the FPR comes from the capable-judge arm only. (iii) 'Clean' follows Aarav's adopted track rule (a null inside the 12-step window). Non-superiority is a qualifier, not a gate. (iv) The analysis and text were corrected after two independent reviews (wf_14168ed6-f2a, wf_32ae4e98-444): window conjunct, generator stop, run filters, pins, planted-control construction. | (i) Aarav chose disagreement as primary. (ii) It adds 24 runs without informing the primary test. (iii) It keeps the adopted rule as written. (iv) Review findings. | BEFORE any E1 main data | Scope of the negative claim; the track decision; analysis correctness. | this commit |
 | 2026-10-07 | Section 1 / section 6: the detector set | 20 detectors became 26. Completion length and truncation rate are added as level, velocity and acceleration. The job now logs both every step (launch_slow_onset.py GeomCallback). Older runs take them from trl_history. | The 512-token test showed the collapse runs through answer length on 2 of 3 tasks, and no published detector sees length. | Before any E1 main data and before H1. The new detectors' performance was not previewed on any run. | Bonferroni power over 26 is 0.47 at 24 vs 24; with one named detector it stays 0.90. | this commit |
 | 2026-10-07 | Section 1 / section 2: the primary collapse event | Adopted sustained_drop_v2 (experiments/e1_event.py, sha256 12a6d147...7dd0). The selection rule, fixed in b7474cf and 6b481f9 before outcome scoring, selected cusum_page_down_v2. | The rule's first criterion, the synthetic battery score, was in-sample: the v2 designers tuned on it. twowin_bonf_v2 shows the overfit, with the best battery score (3.2) and a 0.475 hit rate on real declines. The 0.5-step battery lead of cusum_v2 over sustained_v2 is within that noise. On real runs cusum_v2 dates 4 of 8 declined probe runs at step 3, its earliest possible date, while the pass rate stays flat to about step 10-40, and its stream and probe dates disagree by 43.5 steps, against 17.0. The battery's earliest onset was step 40, so it could not see this (experiments/event_selection.md). | AFTER scoring the candidates on the corpus's declined runs, and BEFORE any E1 main-run data. Aarav decided in chat. | The primary event changes. cusum_v2 and the old event are reported as sensitivity analyses. Pilot-gate consistency check under the adopted event (informational, post hoc): lr 1e-6 windows 32, 11, 21 give a median of 21, a PASS; lr 5e-7 windows 11, 5 and one no-fire give a median of 5, a fail. The lr 1e-6 choice is unchanged. Any further change to the event is post-outcome and needs fresh probe-equipped runs to validate it. | this commit |
 | 2026-10-07 | Diagnostic result | The registered verdict is E1 FORMAT ONLY and GRID MIXED. The supplement reads format only in all 6 runs. Independent verification corrected the mechanism: it is two presentation failures, and in 3-4 of 6 runs truncation at the token cap, not unfenced prose. Function correctness never declines, but stays below benign on 2 of 3 tasks. | After the data, per the pre-registered rules | Section 1 must choose the hacking definition before the freeze, and the detector set must add length and clipped ratio. | this commit |

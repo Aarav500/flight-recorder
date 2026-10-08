@@ -392,7 +392,12 @@ def bake(arm, task, seed, steps, lr, policy, judge, probe_n, probe_every, maxtok
            .replace("__PROBE_N__", str(probe_n)).replace("__PROBE_EVERY__", str(probe_every)))
     # lr is in the name: two pilot rates on the same task and seed must not overwrite each other
     tok = "" if int(maxtok) == 256 else f"_tok{int(maxtok)}"   # 256 keeps the old names
-    outp = ROOT / "scripts" / f"_slow_onset_{arm}_{task}_{seed}_lr{lr}{tok}.py"
+    # the judge is in the name for arm=judge: hacking (0.5B) and benign (1.5B) runs of the same task and
+    # seed must never overwrite each other
+    jtag = ""
+    if arm == "judge":
+        jtag = {"Qwen/Qwen2.5-0.5B-Instruct": "judge05_", "Qwen/Qwen2.5-1.5B-Instruct": "judge15_"}.get(judge, "judgeX_")
+    outp = ROOT / "scripts" / f"_slow_onset_{arm}_{jtag}{task}_{seed}_lr{lr}{tok}.py"
     outp.write_text(src, encoding="utf-8")
     import py_compile                      # fail locally BEFORE spending on a job
     py_compile.compile(str(outp), doraise=True)
