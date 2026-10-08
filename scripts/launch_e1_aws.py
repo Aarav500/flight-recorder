@@ -43,6 +43,16 @@ ITYPE = "g6e.xlarge"
 FALLBACK = [("g6e.xlarge", 1.861), ("g6e.2xlarge", 2.242), ("g6e.4xlarge", 3.004), ("g7e.2xlarge", 3.363),
             ("p5.4xlarge", 6.88)]   # 1x H100 80 GB; P on-demand quota 32 vCPU = 2 at a time
 AMI_PARAM = "/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id"
+# Region support (2026-10-07: us-east-2 G/VT on-demand quota 32 approved). The bucket stays in us-east-1;
+# instances elsewhere pin their S3 calls to it. us-east-2 has no SSM parameter for this AMI, so the
+# SAME release (20261002) is pinned by id there.
+REGION = "us-east-1"
+BUCKET_REGION = "us-east-1"
+REGION_CFG = {
+    "us-east-2": {"ami": "ami-0a2f3a3226fd42ce3",   # Deep Learning Base OSS Nvidia Driver GPU AMI (Ubuntu 22.04) 20261002
+                  "subnets": {"us-east-2a": "subnet-074b870b48d922f8c", "us-east-2b": "subnet-0c2d1e0b520d8ed3d",
+                              "us-east-2c": "subnet-0c20f36c548bb8338"}},
+}
 SUBNETS = {"us-east-1a": "subnet-0386677a3484341be", "us-east-1b": "subnet-050b222e93f526cd8",
            "us-east-1c": "subnet-042747a96276b6f96", "us-east-1d": "subnet-028805185f69156e2",
            # 1e/1f offer p5.4xlarge but not g6e; an unoffered type there just returns Unsupported
@@ -106,7 +116,7 @@ RC=$?
 
 
 def aws(*args, capture=True):
-    r = subprocess.run(["aws", *args, "--region", "us-east-1", "--output", "json"],
+    r = subprocess.run(["aws", *args, "--region", REGION, "--output", "json"],
                        capture_output=capture, text=True)
     if r.returncode != 0:
         raise RuntimeError("aws %s failed: %s" % (" ".join(args[:2]), (r.stderr or "").strip()[-600:]))

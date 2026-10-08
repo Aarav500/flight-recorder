@@ -32,9 +32,13 @@ def main():
         print("no main runs launched yet")
         return 0
     states = {}
-    ids = sorted({v["instance_id"] for v in rec.values() if v.get("instance_id")})
-    if ids:
-        d = json.loads(sh("aws", "ec2", "describe-instances", "--instance-ids", *ids, "--output", "json") or "{}")
+    by_region = {}
+    for v in rec.values():
+        if v.get("instance_id"):
+            by_region.setdefault(v.get("region", "us-east-1"), set()).add(v["instance_id"])
+    for region, ids in by_region.items():
+        d = json.loads(sh("aws", "ec2", "describe-instances", "--region", region, "--instance-ids", *sorted(ids),
+                          "--output", "json") or "{}")
         for res in d.get("Reservations", []):
             for i in res["Instances"]:
                 states[i["InstanceId"]] = i["State"]["Name"]

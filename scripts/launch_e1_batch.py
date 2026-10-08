@@ -43,6 +43,7 @@ SHARED_BUDGET = ("main", "main_replace")
 
 USER_DATA_BATCH = r"""#!/bin/bash
 set -u
+export AWS_DEFAULT_REGION=us-east-1   # the S3 bucket's region, whatever region the instance is in
 mkdir -p /opt/e1 && cd /opt/e1
 exec > /opt/e1/boot.log 2>&1
 BOOT="__BOOT__"
@@ -135,6 +136,10 @@ def sagemaker_state(stage):
 
 def main(argv):
     stage = argv[0] if argv and not argv[0].startswith("--") else "cap512"
+    region = next((a.split("=", 1)[1] for a in argv if a.startswith("--region=")), "us-east-1")
+    if region != "us-east-1":
+        A.REGION = region
+        A.SUBNETS = A.REGION_CFG[region]["subnets"]
     market = "ondemand" if "--ondemand" in argv else "spot"
     rows = A.plan(stage)
     record_path = ROOT / "runs" / "e1" / ("%s_launch.json" % stage)
@@ -173,7 +178,8 @@ def main(argv):
     if "--submit" not in argv:
         print("DRY RUN: nothing baked, uploaded or launched.")
         return 0
-    ami = A.aws("ssm", "get-parameter", "--name", A.AMI_PARAM)["Parameter"]["Value"]
+    ami = (A.REGION_CFG[A.REGION]["ami"] if A.REGION in A.REGION_CFG else
+           A.aws("ssm", "get-parameter", "--name", A.AMI_PARAM)["Parameter"]["Value"])
     tmp = Path(tempfile.mkdtemp(prefix="e1batch_"))
     for r in keep:
         _, outp = A.LSO.bake(r["arm"], r["task"], r["seed"], r["steps"], r["lr"], A.POLICY, r["judge"],
@@ -200,7 +206,7 @@ def main(argv):
         return 0
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     for r in keep:
-        record[r["run_id"]] = dict(r, instance_id=inst["InstanceId"], az=inst["Placement"]["AvailabilityZone"],
+        record[r["run_id"]] = dict(r, instance_id=inst["InstanceId"], az=inst["Placement"]["AvailabilityZone"], region=A.REGION,
                                    instance_type=itype, usd_per_h=usd, market=market, ami=ami, launched=now,
                                    batch=[k["run_id"] for k in keep], per_run_timeout_h=per_run_h,
                                    backstop_min=backstop_min)
