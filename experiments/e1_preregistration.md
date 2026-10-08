@@ -292,11 +292,11 @@ git log -1 --format=%cI
 sha256sum experiments/e1_preregistration.md
 ```
 
-- Commit hash: UNKNOWN
-- Commit time (ISO 8601, with time zone): UNKNOWN
-- SHA-256 of this file: UNKNOWN
-- Human reader before the freeze (name and date): UNKNOWN
-- Pinned-dependency archive: UNKNOWN. A tar of the 14 files in e1_pins.json, kept OUTSIDE the public repo because paper/ is anonymity-sensitive. Its path and SHA-256 are recorded here, so the registered analysis can be rerun even if a working copy changes.
+- Commit hash: d1aa11809db552b86b115bed98c6ba706695fee9
+- Commit time (ISO 8601, with time zone): 2026-10-07T22:25:10-04:00
+- SHA-256 of this file: 8bdd9c487fe3ca5b5cf31befbe9cb1b5568aa29cc77622a8d0f49418fe1c7d3a (the version in the freeze commit, LF line endings, as `git show d1aa118:experiments/e1_preregistration.md | sha256sum` gives it).
+- Human reader before the freeze (name and date): none. Aarav delegated sections 1 and 11 and asked to proceed: "write e1_primary.py next, H1 wording next kill rules you do, execute main run" (chat, 2026-10-07). Instead of a human reader, two independent adversarial reviews (wf_14168ed6-f2a, wf_32ae4e98-444) were addressed before the freeze.
+- Pinned-dependency archive: paper/freeze/e1_pinned_files_20261007.tar.gz. It holds the 14 pinned files plus e1_pins.json, is gitignored and kept local because paper/ is anonymity-sensitive. SHA-256 30e8507d1cc8745918d1b7f092660f3d2b126344d0d518abbcaa125c14806e80.
 
 The repository is public. Pushing the frozen file gives a third-party timestamp, but the file names the paper and its author. Whether to push it, or to email the SHA-256 to the reader instead, is Aarav's call (kit 02 PROPOSED, line 174).
 
