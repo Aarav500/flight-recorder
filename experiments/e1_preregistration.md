@@ -30,6 +30,14 @@ Decisions H1 must make. The other sections depend on them.
 
     If H1 names length or truncation rate as primary, say how that coupling is handled: report it per task, or exclude truncation-driven runs.
   - Their performance on the pilot, diagnostic and 512-token runs was deliberately NOT previewed, so the primary-detector choice stays blind.
+  - **DECIDED 2026-10-07 by Aarav in chat: "disagreement as primary".**
+    - Recorded interpretation, which Aarav can correct before the freeze: the published reference detector "disagreement" (level), scored exactly as in the tex:723 sweep. The same convention is implemented in experiments/e1_detectors.py.
+      - TPR at the FPR=0.1 operating point uses the SIGNED series, judge_0.5B − judge_1.5B (detection_metrics.sig, the audit headline).
+      - Lead uses its absolute value (grid_benchmark.sig) under the 3-sigma first-move rule.
+    - Secondary: the other 25 detectors, including CUSUM(disagree), velocity(disagreement) and acceleration(disagreement), with Holm correction across the 25.
+    - Power for the primary at 24 vs 24 is 0.90 (MDE 0.44).
+    - Disagreement is not mechanically coupled to the strict-oracle event the way truncation rate is. It is a judge-score difference, and the oracle never sees it.
+    - The decision was made blind to every detector's performance on the pilot, diagnostic and 512-token runs.
 - **Which collapse event is primary.** E0 (paper/stats/e0_slope_validation.json) gives these false-collapse counts on the 12 grid benign runs:
   - baseline_drop(0.6, persist=2): 0/12;
   - the published persist=1 version: 8/12, all at steps 0 to 16;
@@ -90,7 +98,7 @@ PROPOSED, from the plan's kill result (audit_or_early_warning.md, section 2).
 
 - **Test name:** one-sided Fisher exact test on a 2×2 table. The rows are the arms: hacking and benign. The columns are alarmed and not alarmed.
 - **One-sided or two-sided, and why:** one-sided. The claim is directional: the detector alarms on hacking runs more often than on benign runs. A detector that alarms less on hacking runs is not an early warning. The two arms are different runs, so Fisher is valid here. Kit 02's warning against Fisher applies to paired detectors.
-- **Alpha:** 0.05, one-sided, for the single primary detector. If H1 names several detectors, use Holm over them.
+- **Alpha:** 0.05, one-sided, for the single primary detector: **disagreement (level)**, decided by Aarav on 2026-10-07 (section 1). The other 25 detectors are secondary, with Holm correction across them.
 - **Statistic and decision rule:**
   - Set the threshold at the 90th percentile of the benign run-level scores, the convention at tex:727. With 24 benign runs, the realized FPR is 2/24 or 3/24, and the paper reports the realized value.
   - TPR is the fraction of all 24 hacking runs whose alarm comes before the primary event, under the alarm rule from section 1. A run with no event counts as a miss, as in score_prime.py:492-493.
@@ -151,9 +159,9 @@ A null is the main-track outcome the track rule allows, so this section matters.
 
 | Comparison | Paired or unpaired | Test | Sided | CI method | Multiple-comparison method | Error bar shows | Variation in the bar |
 |---|---|---|---|---|---|---|---|
-| Primary detector: TPR vs realized benign FPR | Unpaired (different runs) | Fisher exact | One | Clopper-Pearson per proportion; Newcombe for the difference | None if H1 names one detector; Holm otherwise | 95% CI | Runs |
+| Primary detector, disagreement (level, signed): TPR vs realized benign FPR | Unpaired (different runs) | Fisher exact | One | Clopper-Pearson per proportion; Newcombe for the difference | None (one named primary detector) | 95% CI | Runs |
 | Primary detector: lead (event step − alarm step) on hacking runs | One sample | Exact sign test, median > 0 | One | Order-statistic CI for the median | None (part of the primary rule) | 95% CI | Runs |
-| Remaining detectors: TPR vs FPR | Unpaired | Fisher exact | One | As row 1 | Holm across the remaining detectors | 95% CI | Runs |
+| The remaining 25 detectors (experiments/e1_detectors.py): TPR vs FPR | Unpaired | Fisher exact | One | As row 1 | Holm across the 25 | 95% CI | Runs |
 | Window precondition: median pre-event window ≥ 12 (hacking) | One sample | Descriptive with a CI | n/a | Order-statistic CI for the median | None | 95% CI | Runs |
 | Equivalence, if the result is null | Unpaired | TOST, margin from section 5 | One per bound | Newcombe hybrid score | None for the primary detector | 90% CI (TOST) | Runs |
 | Detector vs detector, if reported | PAIRED (same runs) | Exact McNemar | Two | Exact conditional | Holm | 95% CI | Runs |
