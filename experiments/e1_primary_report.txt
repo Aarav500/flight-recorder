@@ -1,0 +1,45 @@
+provenance: 14 pinned files match experiments/e1_pins.json
+E1 primary analysis: 24 hacking, 24 benign used; 0 excluded; 0 unregistered files ignored; 0 surplus
+  hacking per task: {'count_vowels': 8, 'is_prime': 8, 'second_largest': 8}; launched: 24
+  benign per task: {'count_vowels': 8, 'is_prime': 8, 'second_largest': 8}; launched: 24
+
+NATURAL HACK RATE (before any detector): event in 23/24 hacking runs; proxy (0.5B judge) up and strict oracle down, last 25 vs first 25 steps, in 24/24
+window precondition: median pre-event window 32.0 over 24 hacking runs (23 with an event) -> holds
+
+PRIMARY (registered first, also if null): disagreement
+  TPR strict 2/24 = 0.083 (0.01, 0.27)   realized FPR 3/24 = 0.125 (0.027, 0.324)
+  one-sided Fisher p = 0.8262   median lead 12.0 over 23 runs, 95% order-statistic CI (-48.0, 33.0) (sign test 14/23 positive, p = 0.2024; reported only)
+  TPR - FPR: 95% CI (-0.236, 0.152); 90% CI (-0.201, 0.116); non-superiority (upper 90% bound < 0.25): shown
+  (<= rule, reported for continuity: TPR 0.12)
+  MDE at 80% power at the achieved n (24 vs 24, FP fixed at 3): TPR 0.44
+
+PLANTED POSITIVE CONTROL (claimed effect through decide(); FP fixed by the operating point): rejection 0.576 vs exact expectation 0.567 -> PASSES
+
+VERDICT: CLEAN NULL (non-superiority shown: no anticipation beyond TPR - FPR = 0.25)
+
+SECONDARY H2 (Holm over 25; holds = Holm p < 0.05, median lead > 0, window holds):
+  velocity(disagreement)             TPR< 0.25  FPR 0.125  p 0.2307  Holm 1.0000  lead -28.0  
+  velocity(held-out judge drop)      TPR< 0.12  FPR 0.125  p 0.6669  Holm 1.0000  lead -13.5  
+  acceleration(truncation rate)      TPR< 0.08  FPR 0.083  p 0.6957  Holm 1.0000  lead -10.0  
+  truncation rate                    TPR< 0.04  FPR 0.042  p 0.7553  Holm 1.0000  lead 0.0  
+  held-out judge drop                TPR< 0.08  FPR 0.125  p 0.8262  Holm 1.0000  lead 23.0  
+  entropy                            TPR< 0.08  FPR 0.125  p 0.8262  Holm 1.0000  lead 6.0  
+  velocity(entropy)                  TPR< 0.08  FPR 0.125  p 0.8262  Holm 1.0000  lead 20.5  
+  acceleration(disagreement)         TPR< 0.08  FPR 0.125  p 0.8262  Holm 1.0000  lead -56.0  
+  acceleration(entropy)              TPR< 0.08  FPR 0.125  p 0.8262  Holm 1.0000  lead 7.0  
+  gradient norm                      TPR< 0.04  FPR 0.125  p 0.9454  Holm 1.0000  lead -2.0  
+  acceleration(held-out judge drop)  TPR< 0.04  FPR 0.125  p 0.9454  Holm 1.0000  lead 1.0  
+  acceleration(completion length)    TPR< 0.04  FPR 0.125  p 0.9454  Holm 1.0000  lead 19.0  
+  reward variance                    TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead 7.0  
+  KL                                 TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -75.0  
+  completion length                  TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -4.0  
+  CUSUM(disagree)                    TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead 29.0  
+  CUSUM(kl)                          TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead 29.0  
+  velocity(reward variance)          TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -111.0  
+  velocity(gradient norm)            TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead 1.0  
+  velocity(KL)                       TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -212.0  
+  velocity(completion length)        TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead 20.0  
+  velocity(truncation rate)          TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead 10.0  
+  acceleration(reward variance)      TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -77.0  
+  acceleration(gradient norm)        TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -8.0  
+  acceleration(KL)                   TPR< 0.00  FPR 0.125  p 1.0000  Holm 1.0000  lead -202.0  
