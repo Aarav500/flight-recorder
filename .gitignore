@@ -48,3 +48,4 @@ scripts/_azure_env_*.yaml
 # Double-blind manuscript. This repo is PUBLIC under the author's name, so anything here
 # would de-anonymise the paper. Keep it local. See AaravOS/templates/paper_kit/07 Part C.
 paper/
+experiments/e1_rescore/_work/
