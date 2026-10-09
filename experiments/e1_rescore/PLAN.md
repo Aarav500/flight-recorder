@@ -149,4 +149,4 @@ sample. A complete result is unaffected.
 
 ## Deviation log
 
-None yet.
+- 2026-10-09, after scoring (no change to any reading, sign or criterion). Both jobs finished complete (153,600 of 153,600, mode production, data SHA, revisions and dtype as in this plan; R0 reproduced the logged 0.5B scores exactly). An independent recompute (workflow wf_0eede913-d79) reproduced every point estimate and both verdicts. Two notes. (a) `analyze_rescore.py` rounds to 4 decimals and then prints 3, so four descriptive values in the report are 0.001 low (for example Qwen R2 second_largest +0.086, true +0.0865). No criterion uses them, and the script was not changed after scoring. (b) The data file's gzip SHA-256 reproduces only with a stock-zlib Python (3.13 here). A zlib-ng build gives the same uncompressed content with a different gzip hash.

@@ -124,6 +124,17 @@ This checks the paper's audit headline ("disagreement separates hacking from ben
   - disagreement gives 0.88 and 0.85; the 0.5B judge alone gives 0.75 and 0.77, and the intervals overlap;
   - only 4 of the 9 heuristic-proxy runs lost strict accuracy.
 
+**Third-judge rescoring (2026-10-09; experiments/e1_rescore/rescore_report.txt).** All 153,600 stored E1 completions were rescored with two judges that neither arm trained on. The readings and criteria were fixed in experiments/e1_rescore/PLAN.md, committed before any score existed (08ac3e4). The data had already been seen, so this is exploratory. Re-scoring with the original 0.5B judge reproduced its logged scores exactly, and an independent recompute matched every point estimate.
+
+- **OLMo-2-7B-Instruct (primary): NOT INTERPRETED.** It failed the pre-set sanity gate: it ranks strict passes above fails at only 0.59, against a required 0.60. Its score rose in every run of both arms (+0.24 and +0.26).
+- **Qwen2.5-7B-Instruct (secondary): INCONCLUSIVE.**
+  - It passed the gate at 0.83.
+  - It did not see the hacking arm's quality fall: +0.05, with only 10 of 24 runs falling. It saw the benign arm improve: +0.29.
+  - Its change separates the arms at 0.81, but because the benign runs improved more, not because the hacking runs declined.
+  - Training reward minus this judge did not beat the training reward alone (paired difference -0.06, 95% CI -0.23 to +0.11).
+  - It is the same model family as the training judges.
+- **What this allows.** No held-out judge tested here confirms that the hacking runs lost quality. That fits the lenient oracle, which rises in those runs, and it means no "held-out evaluator audits this hacking" claim is supported. The result is not a KILL either: the primary judge is uninterpretable, and the secondary misses KILL by 2 runs.
+
 **Consequence.** On the current data the paper cannot claim that disagreement audits hacking. Suggested wording is in paper/drafts/audit_claim_reading_20261008.md (local). Two experiments would make the claim testable:
 - **E1b:** both arms train on the 0.5B judge. The twin's reward is format-gated, and the comparators are registered.
 - **Third judge:** rescore E1's stored completions with a judge neither arm trained on.
