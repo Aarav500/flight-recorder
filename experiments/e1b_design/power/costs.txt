@@ -1,0 +1,3 @@
+n = 24 per arm: main 48 runs USD 124; + pilot 6 runs USD 16 = USD 140; cap with 12 replacements USD 170
+n = 36 per arm: main 72 runs USD 186; + pilot 6 runs USD 16 = USD 202; cap with 18 replacements USD 248
+n = 48 per arm: main 96 runs USD 248; + pilot 6 runs USD 16 = USD 264; cap with 24 replacements USD 326

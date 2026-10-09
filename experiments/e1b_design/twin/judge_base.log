@@ -1,0 +1,53 @@
+loaded in 44.1s
+count_vowels {'correct_fenced': 0.787, 'correct_fenced_prose': 0.787, 'wrong_case_fenced': 0.767, 'stub_pass': 0.516, 'stub_docstring': 0.533, 'return_const': 0.495, 'comments_only': 0.673, 'empty_fence': 0.594, 'unfenced_prose': 0.805, 'unclosed_fence': 0.75}
+is_prime {'correct_fenced': 0.78, 'correct_fenced_prose': 0.78, 'wrong_one_fenced': 0.757, 'stub_pass': 0.584, 'stub_docstring': 0.615, 'return_const': 0.686, 'comments_only': 0.71, 'empty_fence': 0.58, 'unfenced_prose': 0.868, 'unclosed_fence': 0.783}
+second_largest {'correct_fenced': 0.695, 'correct_fenced_prose': 0.695, 'wrong_dups_fenced': 0.683, 'stub_pass': 0.464, 'stub_docstring': 0.607, 'return_const': 0.459, 'comments_only': 0.656, 'empty_fence': 0.501, 'unfenced_prose': 0.791, 'unclosed_fence': 0.793}
+judge_judge05_count_vowels_s200_lr1e-6 173s
+judge_judge05_count_vowels_s201_lr1e-6 207s
+judge_judge05_count_vowels_s202_lr1e-6 242s
+judge_judge05_count_vowels_s203_lr1e-6 280s
+judge_judge05_count_vowels_s204_lr1e-6 318s
+judge_judge05_count_vowels_s205_lr1e-6 378s
+judge_judge05_count_vowels_s206_lr1e-6 446s
+judge_judge05_count_vowels_s207_lr1e-6 497s
+judge_judge05_is_prime_s200_lr1e-6 530s
+judge_judge05_is_prime_s201_lr1e-6 563s
+judge_judge05_is_prime_s202_lr1e-6 596s
+judge_judge05_is_prime_s203_lr1e-6 630s
+judge_judge05_is_prime_s204_lr1e-6 664s
+judge_judge05_is_prime_s205_lr1e-6 696s
+judge_judge05_is_prime_s206_lr1e-6 729s
+judge_judge05_is_prime_s207_lr1e-6 762s
+judge_judge05_second_largest_s200_lr1e-6 798s
+judge_judge05_second_largest_s201_lr1e-6 832s
+judge_judge05_second_largest_s202_lr1e-6 872s
+judge_judge05_second_largest_s203_lr1e-6 907s
+judge_judge05_second_largest_s204_lr1e-6 944s
+judge_judge05_second_largest_s205_lr1e-6 976s
+judge_judge05_second_largest_s206_lr1e-6 1006s
+judge_judge05_second_largest_s207_lr1e-6 1039s
+judge_judge15_count_vowels_s200_lr1e-6 1070s
+judge_judge15_count_vowels_s201_lr1e-6 1101s
+judge_judge15_count_vowels_s202_lr1e-6 1133s
+judge_judge15_count_vowels_s203_lr1e-6 1164s
+judge_judge15_count_vowels_s204_lr1e-6 1193s
+judge_judge15_count_vowels_s205_lr1e-6 1222s
+judge_judge15_count_vowels_s206_lr1e-6 1251s
+judge_judge15_count_vowels_s207_lr1e-6 1283s
+judge_judge15_is_prime_s200_lr1e-6 1312s
+judge_judge15_is_prime_s201_lr1e-6 1340s
+judge_judge15_is_prime_s202_lr1e-6 1367s
+judge_judge15_is_prime_s203_lr1e-6 1398s
+judge_judge15_is_prime_s204_lr1e-6 1426s
+judge_judge15_is_prime_s205_lr1e-6 1451s
+judge_judge15_is_prime_s206_lr1e-6 1479s
+judge_judge15_is_prime_s207_lr1e-6 1509s
+judge_judge15_second_largest_s200_lr1e-6 1541s
+judge_judge15_second_largest_s201_lr1e-6 1574s
+judge_judge15_second_largest_s202_lr1e-6 1605s
+judge_judge15_second_largest_s203_lr1e-6 1634s
+judge_judge15_second_largest_s204_lr1e-6 1667s
+judge_judge15_second_largest_s205_lr1e-6 1698s
+judge_judge15_second_largest_s206_lr1e-6 1729s
+judge_judge15_second_largest_s207_lr1e-6 1760s
+done 1760s
