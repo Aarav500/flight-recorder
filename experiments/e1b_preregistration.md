@@ -10,6 +10,10 @@ Companion file: experiments/e1b_analysis_spec.md gives every computation in sect
 
 Design evidence: three offline design passes on E1's stored data, nothing launched and no repo file changed (experiments/e1b_design/: power/, twin/, spec/, review_design/). Every number below that was computed on E1 runs is exploratory, because E1's data have been seen.
 
+**Draft history**
+- 2026-10-09: first draft (commit e8f0ed4).
+- 2026-10-09: third judge decided. Aarav replied "5) do it lets see" in chat to the draft's open choice on J3. J3 is Qwen/Qwen2.5-7B-Instruct and branch A applies (section 2, "The third judge"). Changed to match: the "cannot show" list, sections 2, 10, 12 and 13, and spec sections 3.1, 3.2, 3.5, 3.6, 6.2, 7, 8.3, 8.4 and 9. No other decision changed.
+
 ## Why E1b exists
 
 E1 (frozen d1aa118; experiments/e1_results.md) returned a registered CLEAN NULL: disagreement alarmed before the collapse in 2/24 hacking runs against 3/24 benign runs, one-sided Fisher p 0.83. Six problems were found after the result.
@@ -39,6 +43,7 @@ E1b cannot show:
 - **Generality.** One policy (Qwen2.5-1.5B base), one judge pair, three single-prompt tasks. E2 is the 7B test.
 - **A change to E1's verdict.** E1b is a separate registered arm. E1's runs are not reused, because they have been seen.
 - **A blind choice of primary rule.** Its two detector-favoring choices were picked after E1's exploratory D2 and D3 were seen (section 1).
+- **An independent third judge.** J3, Qwen2.5-7B-Instruct, is the same model family as both judges that disagreement compares: Qwen2.5-0.5B-Instruct, which both arms train on, and Qwen2.5-1.5B-Instruct, which both arms hold out (in E1 these were the two arms' training judges). "Held-out" means only that neither arm trains on it. It may share those judges' blind spots, so the C6 rows and the Q3 qualifier are not evidence from an independent evaluator. It was also chosen after its E1 rescoring results were seen (section 2, "The third judge").
 
 ## 1. Hypotheses
 
@@ -99,9 +104,9 @@ Decisions behind section 1, for Aarav to confirm before the freeze:
 - **Scores**, one per run. chg(x) is the mean over steps 375-399 minus the mean over steps 0-24 (e1_supplementary.chg).
   - S = +chg(disagreement). The sign is fixed now, and an AUROC below 0.5 is reported as it comes out.
   - Tier 1 comparators, in the decision rule: C1 = chg(ungated 0.5B judge), the judge both arms optimize and the hacking arm's training reward; C2 = chg(1.5B judge), held out by both arms.
-  - Tier 2 comparators, registered and reported against S, outside the decision rule: C3 completion length, C4 truncation rate, C5 gate failure rate (1 − g, recomputed offline from the stored completions with the pinned gate). C5 is expected near AUROC 1.00 by construction, and C3 and C4 may separate the arms partly by construction too.
+  - Tier 2 comparators, registered and reported against S, outside the decision rule: C3 completion length, C4 truncation rate, C5 gate failure rate (1 − g, recomputed offline from the stored completions with the pinned gate), and C6 = −chg(J3 series), where J3 is the third judge Qwen2.5-7B-Instruct (below). C5 is expected near AUROC 1.00 by construction, and C3 and C4 may separate the arms partly by construction too.
   - Each comparator's AUROC is taken in its better direction, max(A, 1 − A), recomputed in every bootstrap draw. This is conservative for disagreement: a comparator sign guessed wrong in advance cannot hand disagreement a win.
-  - Reported only: the realized training reward (J05 × g in the twin, so it contains g) and the lenient oracle. The third judge depends on the branch below.
+  - Reported only: the realized training reward (J05 × g in the twin, so it contains g) and the lenient oracle.
 - **AUROC:** midrank Mann-Whitney, hacking positive.
 - **Bootstrap:** 10,000 draws, numpy default_rng(0). Runs are resampled with replacement within each (arm, task) cell, and every score uses the same draws, so differences are paired.
 - **Statistic:** Δ = AUROC(S) − max(AUROC*(C1), AUROC*(C2)), with the maximum re-taken in every draw.
@@ -119,14 +124,12 @@ Decisions behind section 1, for Aarav to confirm before the freeze:
 - **Qualifiers**, appended, never changing the row:
   - Q1: if any tier 2 comparator has a point AUROC* ≥ AUROC(S), append "a length, truncation or format monitor does as well", and the paper says so.
   - Q2: if the 5th percentile of AUROC(disagreement max|dev| after a trailing 10-step mean) is ≤ 0.5, the paper may not defend the published peak-deviation number.
-  - Q3: the third judge, branch A only.
+  - Q3: if AUROC*(C6) ≥ AUROC(S), append "a held-out 7B judge does as well". J3 coverage below 100% marks the C6 rows PROVISIONAL and Q3 is not applied (the third judge, below).
 - Under TWIN NOT BENIGN or TWIN DID NOT TRAIN, RESCUE and PARTIAL read "NOT CONFIRMED (twin flag)". A twin that collapsed or never trained makes any trend score separate the arms for the wrong reason.
 
 ### The third judge: two branches
 
-The E1 third-judge rescoring (experiments/e1_rescore/PLAN.md; primary judge allenai/OLMo-2-1124-7B-Instruct at revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, bfloat16) finished on 2026-10-09 (commit d01e561). The primary judge's R1 is 0.590, below 0.60, so under the rule below **branch B applies** unless the author changes the rule before the freeze. The secondary judge, Qwen/Qwen2.5-7B-Instruct (revision a09a35458c702b33eeacc393d103063234e8bc28), passed R1 at 0.829. It is the same family as the training judges.
-
-**Author's decision before the freeze.** Either keep branch B, or name Qwen2.5-7B as J3 and apply branch A with it. Choosing it from its E1 sanity score is a pre-data choice for E1b, because no E1b data exist. Whatever is chosen is written in section 13 before any E1b data exist.
+**The rule, kept as drafted (the record).** J3 was to be the E1 third-judge rescoring's primary judge (experiments/e1_rescore/PLAN.md): allenai/OLMo-2-1124-7B-Instruct at revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, bfloat16.
 
 | | Branch A: J3 registered | Branch B: J3 not registered |
 |---|---|---|
@@ -136,6 +139,16 @@ The E1 third-judge rescoring (experiments/e1_rescore/PLAN.md; primary judge alle
 | Spend | Section 12, the J3 row | No J3 spend |
 
 The rescoring's own verdict on E1 (KILL or LIMITED RESCUE) does not pick the branch. R1 asks whether J3 can tell working code from broken code at all, and that is what a comparator needs. In both branches the E1 rescoring result is reported in the paper's E1 section, as exploratory.
+
+**Outcome under the rule: branch B.** The rescoring finished on 2026-10-09 (commit d01e561; experiments/e1_rescore/rescore_report.txt). The primary judge's R1 is 0.590, below 0.60. Condition (i) fails, so the rule gives branch B: no registered third judge.
+
+**Author's decision, 2026-10-09: J3 is Qwen2.5-7B-Instruct, and branch A applies.** The draft left Aarav one choice before the freeze: keep branch B, or name the rescoring's secondary judge as J3 and apply branch A with it. He replied in chat on 2026-10-09: "5) do it lets see". So:
+- J3 is Qwen/Qwen2.5-7B-Instruct at revision a09a35458c702b33eeacc393d103063234e8bc28, bfloat16, scored with the repo's JudgeScorer (flightrecorder/repro/reward_judge.py) as in the rescoring: the same template, reward_testhack.extract_code, truncation at 1,024 tokens.
+- Branch A applies with this judge, as in the table. An offline job scores every completion of every used E1b run from the stored texts. C6 = −chg(J3 series) is a registered tier 2 comparator, and Q3 applies. J3 never changes the verdict row. The section 12 J3 row applies.
+- Evidence, from E1 (rescore_report.txt, commit d01e561): R1 strict-pass AUROC 0.829 (95% CI 0.792 to 0.865), above the 0.60 gate; 153,600 of 153,600 completions scored; R0 reproduced the logged 0.5B scores; revision, dtype and data SHA as in PLAN.md, and no flag. Branch A's three conditions hold for this judge.
+- Disclosure, timing. No E1b data exist, so this is a pre-data choice for E1b. It was made after both judges' E1 rescoring results had been seen, the primary judge's R1 failure included. Under the rule as drafted, E1b would have had no registered third judge. The choice adds the C6 rows, the Q3 qualifier and the J3 spend row. No verdict row depends on it.
+- Disclosure, family. Qwen2.5-7B-Instruct is the same model family as both E1b judges: Qwen2.5-0.5B-Instruct, which both arms train on, and Qwen2.5-1.5B-Instruct, which both arms hold out (in E1 these were the two arms' training judges). "Held-out" means only that neither arm trains on it. It does not mean independent, and J3 may share those judges' blind spots ("What E1b can and cannot show").
+- Disclosure, what it showed on E1 (seen data, exploratory). Its mean change was +0.29 in the benign arm and +0.05 in the hacking arm, where it fell in 10 of 24 runs. So it saw the benign arm improve and barely moved where the strict oracle collapsed. Its gap score (training reward minus J3) did not beat the training reward alone (paired AUROC difference −0.062, 95% CI −0.234 to +0.109), and its E1 verdict was INCONCLUSIVE.
 
 ### Script
 
@@ -348,7 +361,7 @@ Registered reporting, printed by e1b_primary.py, never deciding:
 | XB9 | Smoothing sweep for disagreement max abs dev (w = 1, 5, 10, 25) | E1: 0.90, 0.62, 0.52, 0.54 |
 | XB10 | E1's centred derivatives on E1b data against the causal ones | Size of the look-ahead effect |
 | XB11 | An Abahana-style logistic model, leave-one-task-out (acceptance action 10) | A multi-feature detector reviewers will ask about |
-| XB12 | The third judge if branch B applies; the gap score (training reward minus J3) as in rescore R4; the secondary judge Qwen2.5-7B-Instruct | Held-out evaluation beyond the registered comparators |
+| XB12 | The gap score (training reward minus J3, the registered Qwen2.5-7B judge) as in rescore R4 | Held-out evaluation beyond the registered comparators |
 | XB13 | Step-0 identity of matched pairs, and per-pair trajectories | Seed-matching check |
 | XB14 | The reward-variance detector on adv_std as logged (the gated reward's SD in the twin) | E1's definition; in E1b it is coupled to the gate |
 
@@ -376,7 +389,7 @@ Approve the spend one stage at a time. Aarav approves each row in chat before it
 | Calibration | Gate, power and analysis checks on E1's stored data, on CPU (twin, power and spec design passes) | 0 | 0 | No spend, so no approval asked. Done 2026-10-09 while drafting. |
 | Pilot | 6 runs (3 tasks × seed 299 × {H, T}), read only through the pilot gate P0-P5 | 15 | 30 (estimate USD 16) | pending |
 | Primary | 72 runs (36 H + 36 T), seeds 300-311, plus up to 18 replacements from seed 312, AWS g6e | 125 | 250 (estimate USD 186 for 72 runs; USD 232 with all 18 replacements) | pending |
-| J3 scoring, branch A only | The third judge on every completion of every used E1b run, from the stored texts | 10 | 20 (estimate USD 11, scaled from the E1 rescoring's USD 7.44 worst case for 153,600 completions) | pending; no such stage in branch B |
+| J3 scoring (Qwen2.5-7B-Instruct; branch A, decided 2026-10-09) | The third judge on every completion of every used E1b run, from the stored texts | 10 | 20 (estimate USD 11, scaled from the E1 rescoring's USD 7.44 worst case for 153,600 completions) | pending approval |
 | Total | | 150 | 300 | |
 
 If a stage needs more than its ceiling, write a deviation in section 14 before the spend.
@@ -388,8 +401,8 @@ Empty. Every field below is filled before any E1b launch, the pilot included. Th
 Before the freeze:
 - Aarav decides section 1 and section 11. If he delegates them, his words are quoted here.
 - Commit the files the manifest lists below. The planned names of the new job files are scripts/e1b_job.py (the job template; E1's scripts/launch_slow_onset.py stays as frozen), scripts/launch_e1b_aws.py (launcher and collector), scripts/e1b_autorun.py and experiments/e1b_uv.lock (exact pins and hashes, exclude-newer set before the freeze).
-- Model revisions are passed as revision= to every from_pretrained, tokenizers included: Qwen/Qwen2.5-1.5B 8faed761d45a263340a0528343f099c05c9a4323, Qwen/Qwen2.5-0.5B-Instruct 7ae557604adf67be50417f59c2c2f167def9a775, Qwen/Qwen2.5-1.5B-Instruct 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, rechecked on the freeze day. JudgeScorer takes no revision today and GRPOTrainer receives the policy as a string, so both need a code change before the freeze.
-- Read the J3 branch from experiments/e1_rescore/rescore_results.json at the freeze commit.
+- Model revisions are passed as revision= to every from_pretrained, tokenizers included: Qwen/Qwen2.5-1.5B 8faed761d45a263340a0528343f099c05c9a4323, Qwen/Qwen2.5-0.5B-Instruct 7ae557604adf67be50417f59c2c2f167def9a775, Qwen/Qwen2.5-1.5B-Instruct 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, and for the J3 job Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28, rechecked on the freeze day. JudgeScorer takes no revision today and GRPOTrainer receives the policy as a string, so both need a code change before the freeze.
+- The J3 branch is decided: A, with Qwen/Qwen2.5-7B-Instruct (Aarav, 2026-10-09; section 2, "The third judge"). At the freeze, copy that judge's R1, coverage and flags from experiments/e1_rescore/rescore_results.json at the freeze commit into the J3 field below.
 
 Commands, run by Aarav or at his request:
 
@@ -418,7 +431,7 @@ An RFC 3161 TSA query (`openssl ts -query -data experiments/e1b_freeze_manifest.
 | External timestamp: service, receipt path, time. Required before any launch. Only the hash leaves the machine. Sending it is Aarav's call; if he declines, E1b is not launched under this version. | none yet |
 | Human reader before the freeze: name, date, sections read. Required before any launch. Aarav, or a reader he names, reads sections 1-12 in full. | none yet |
 | Who wrote H1, H-audit and the kill rules, in Aarav's words | none yet |
-| J3 branch (A or B), with R1, coverage and flags at the freeze commit | none yet |
+| J3: branch A, decided by Aarav on 2026-10-09 ("5) do it lets see"; section 2). Judge Qwen/Qwen2.5-7B-Instruct, revision a09a35458c702b33eeacc393d103063234e8bc28, bfloat16, with its E1 R1, coverage and flags read from rescore_results.json at the freeze commit | none yet |
 | First launch time (cloud audit trail), which must come after the timestamp | none yet |
 
 ## 14. Deviation log
