@@ -65,6 +65,49 @@ Sources: experiments/e1_supplementary_report.txt and the verification workflow. 
 6. **Exploratory (supplementary D4): disagreement lags.** Its alarm comes a median 83 steps after the event. Of the 15 runs that have both an alarm and an event, it comes before the event in only 2.
 7. **Registered (e1_primary_report.txt prints the 0.567 expectation; supplementary D5 restates it; section 14, wording row): the planted control has power 0.567 at the realized events.** Section 9's "about 0.92" holds only when every event is at step 18 or later, and 9 of the 23 events are earlier.
 
+## Exploratory analyses X1-X7 (pre-registration section 10)
+
+Source: experiments/e1_exploratory_report.txt (experiments/e1_exploratory.py). Every result here is exploratory, and none changes the registered verdict. Choices made after the data are printed in the report as "CHOICE" lines.
+
+- **X1, the probe-series event** (the first probe at or below 0.8 times the probe peak; the job's stored causal_window):
+  - It fires in 24/24 hacking runs and 2/24 benign runs, with a median window of 27.5 steps.
+  - The primary result is unchanged: 2/24 vs 3/24, p 0.826.
+  - The probe dates barely agree with the registered dates (Spearman 0.30).
+  - An online, running-peak version of the rule fires on 20/24 benign runs.
+- **X2, the published events.**
+  - Under baseline_drop(0.6, persist=1), the event fires on 23/24 benign runs, the window is 3.5 steps, and no detector has a strict hit.
+  - Under the smoothed peak_drop (w=15, 20%; acausal, a label only), the window is 25.5 steps with 0/24 benign events, and the primary is 2/24 vs 3/24.
+  - Across all 7 event definitions and 26 detectors, no one-sided p is below 0.05; the smallest is 0.2307.
+  - The published first-move event (Definition A) is two-sided, so 5/14 of its hacking "events" and 16/19 of its benign ones are upward moves.
+- **X3, the task-stratified exact test.**
+  - p 0.821 (pooled 0.826); Mantel-Haenszel odds ratio 0.67.
+  - Both hits are on count_vowels (2/8 vs 0/8).
+  - No detector has a stratified p below 0.05.
+- **X4, lead against window.**
+  - The tex:710 correlation recurs: Spearman 0.852 (n 23, 95% CI 0.64-0.94). Like-for-like under the paper's Definition B events, it is 0.893 (raw) and 0.824 (smoothed).
+  - The correlation is largely mechanical. The best detector first-moves at a near-constant early step (median 8), and the correlation recurs even under the persist=1 event, whose window is 3.5 steps (rho 0.803).
+  - The registered +12-step first-move lead comes from a disagreement first move that also fires in 18/24 benign runs, at a similar step (median 20.5, against 24 in hacking runs).
+  - A short window does not explain the null on count_vowels (median 39) or second_largest (65.5). It may on is_prime (9).
+- **X5, the pilot.**
+  - The registered event fires in 5/6 runs, and its windows match the pre-freeze record.
+  - The primary alarms before the event in 0/6.
+- **X6, the two judges.**
+  - In the hacking arm, disagreement widens because the 0.5B judge rises (+0.192, rising in 24/24). That judge is that arm's reward, so this is partly by construction.
+  - The held-out 1.5B judge barely moves (+0.036, falling in only 5/24).
+  - Compared with the strict oracle, disagreement first-moves before it in 7/13 dated runs and after it in 6/13; the oracle cannot be dated in 10/23. Neither the paper's reversal nor its opposite is reproduced.
+- **X7, the collapse mechanism.**
+  - The mechanism varies by seed within a task. 6/24 hacking runs are truncation-driven: count_vowels 3/8, second_largest 3/8, is_prime 0/8.
+  - On those 6 runs the truncation rate has already risen by the event.
+  - No length or truncation detector shows early warning in either group.
+  - The primary's two strict hits are the two latest-event runs. Both are truncation-driven count_vowels runs, consistent with an alarm that comes a median 83 steps after the event.
+
+### Paper text that E1 contradicts (pre-E1 text in paper/neurips_paper.tex)
+
+- **fig:dis caption (tex:262-264):** disagreement widens because the held-out 1.5B judge falls. In E1, the 0.5B judge rises in 24/24 runs, and the 1.5B judge falls in only 5/24 (X6).
+- **tex:281-282:** disagreement first-moves after the collapse in every seed, or never. In E1, it moves first in 7 of 13 dated runs (X6).
+- **tex:712:** no detector leads under any event definition tested. In E1, 13/26 detectors have a positive median first-move lead under the registered and the smoothed events (X2). None is significant at the operating point.
+- **Pre-registration :41-45:** second_largest, and count_vowels at 256 tokens, collapse through truncation as whole tasks. In E1, 3/8 runs of each do (X7; section 14).
+
 ## What the paper may and may not claim
 
 May claim:
@@ -83,6 +126,10 @@ May not claim:
 - that the design had about 0.92 power at the realized events (the exact expectation was 0.567);
 - wrong-code hacking;
 - exact reproducibility from the freeze commit (section 14, job code and environment rows);
+- that disagreement first-moves after the collapse (the tex:281-282 reversal; X6), or that it widens because the held-out judge falls (X6);
+- that the window-lead correlation shows warning was unavailable: it recurs even with a 3.5-step window and is largely mechanical (X4);
+- that every detector is causal or online: the 16 velocity and acceleration detectors look 2 steps ahead (section 14);
+- that a whole task collapses through truncation (X7);
 - that the pre-registration was externally time-stamped or registered on a public registry (section 14, timestamp row).
 
 ## Provenance
