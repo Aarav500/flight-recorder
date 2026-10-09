@@ -108,6 +108,26 @@ Source: experiments/e1_exploratory_report.txt (experiments/e1_exploratory.py). E
 - **tex:712:** no detector leads under any event definition tested. In E1, 13/26 detectors have a positive median first-move lead under the registered and the smoothed events (X2). None is significant at the operating point.
 - **Pre-registration :41-45:** second_largest, and count_vowels at 256 tokens, collapse through truncation as whole tasks. In E1, 3/8 runs of each do (X7; section 14).
 
+## Audit-baseline check (2026-10-08; experiments/audit_baselines_report.txt)
+
+This checks the paper's audit headline ("disagreement separates hacking from benign runs at AUROC 0.98", the grid, 9 v 9). It is not part of E1's registered analysis, and every E1 line in it is exploratory.
+
+- **Reproduction.** The published audit table reproduces exactly; disagreement's AUROC is 79/81. An independent checker recomputed the key numbers with its own code.
+- **Single judges do as well.**
+  - In the grid every hacking run trains on the 0.5B judge and every benign run on the 1.5B judge. The 0.5B judge's score alone, scored the same way, gives AUROC 1.00.
+  - The training reward alone gives 0.85, and 1.00 with the signed score.
+  - Across all 69 logged runs that train on the 0.5B judge, every run is labeled hacking and every one collapsed, and no benign run trains on it. In this data, no audit number can tell a hacking detector apart from a detector of which judge the run trained on.
+- **E1 (exploratory) has the same confound.** Disagreement gives 0.90; the 0.5B judge alone gives 1.00.
+- **Most of the separation is step-to-step noise** (exploratory; windows chosen after seeing the data). Smoothing disagreement with a causal 10-step moving mean before scoring lowers the AUROC to 0.64 on the grid and 0.52 in E1.
+- **The held-out 1.5B judge does not fall in hacking runs:** +0.022 on the grid (falling in 4/9) and +0.036 in E1 (5/24). At the end of training, the gap between the training reward and the other judge is larger in benign runs (AUROC 0.25 on the grid, 0.14 in E1).
+- **Contrasts where neither arm trains on a judge** (heuristic-proxy against partial-credit or verifier-coverage, 9 v 9):
+  - disagreement gives 0.88 and 0.85; the 0.5B judge alone gives 0.75 and 0.77, and the intervals overlap;
+  - only 4 of the 9 heuristic-proxy runs lost strict accuracy.
+
+**Consequence.** On the current data the paper cannot claim that disagreement audits hacking. Suggested wording is in paper/drafts/audit_claim_reading_20261008.md (local). Two experiments would make the claim testable:
+- **E1b:** both arms train on the 0.5B judge. The twin's reward is format-gated, and the comparators are registered.
+- **Third judge:** rescore E1's stored completions with a judge neither arm trained on.
+
 ## What the paper may and may not claim
 
 May claim:
@@ -128,6 +148,7 @@ May not claim:
 - exact reproducibility from the freeze commit (section 14, job code and environment rows);
 - that disagreement first-moves after the collapse (the tex:281-282 reversal; X6), or that it widens because the held-out judge falls (X6);
 - that the window-lead correlation shows warning was unavailable: it recurs even with a 3.5-step window and is largely mechanical (X4);
+- that disagreement audits hacking: in all current data, which judge a run trains on is collinear with the hacking label, and the 0.5B judge's score alone does as well (audit-baseline check above);
 - that every detector is causal or online: the 16 velocity and acceleration detectors look 2 steps ahead (section 14);
 - that a whole task collapses through truncation (X7);
 - that the pre-registration was externally time-stamped or registered on a public registry (section 14, timestamp row).
