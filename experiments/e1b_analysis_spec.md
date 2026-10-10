@@ -155,6 +155,8 @@ Then, in this order:
 
 ### 1.13 Planted positive control at the time-matched point (construction M)
 
+Decided 2026-10-10 by Aarav ("minimum detectable effect", D12). Kit 02 asks for the claimed effect (TPR 0.5); at 36 v 36 that control's expected rejection is 0.997, which checks little, so the MDE is used.
+
 A synthetic detector is passed through the same E1b functions (score and decide), as in E1, with the twins' windows taken from the real events. The planted effect size is the MDE at the achieved n, so the control's expected rejection rate stays near 0.82 on layouts like E1's. On any layout where the window holds, at least 18 of 36 hacking runs have an event at step 12 or later, so at least 18 have room, and the exact expectation lies between 0.80 (36 with room, q = 0.36) and 0.90 (18 with room, q = 0.72). E1's construction (probability 0.5 x clip((e - 6)/12, 0, 1)) depended on the layout: 0.567 at E1's events, and 0.75 to 0.93 (10th to 90th percentile) over bootstrap layouts at n = 36.
 
 - Every run (hacking and twin) gets a noise series U(0, 1) of length T. So every unplanted dev_up value is below 1.
@@ -512,3 +514,4 @@ Each item names what the draft pre-registration proposes. Aarav can change any o
 - **D9. The gate.** Proposed: the parse-and-bind gate G (0.1). The literal reading of action 8 (closed fence AND parse AND end-of-sequence before the cap) zeroes 47-50% of fully correct answers at steps 0-4 and leaves 11.7% of early steps without reward spread, so it was rejected.
 - **D10. The reward-variance detector.** Proposed: `js_std` in both arms (2.1); `adv_std` as logged is XB14.
 - **D11. The margin.** DECIDED 2026-10-09 by Aarav ("0.25", in reply to "Should E1b's margin be 0.20, tighter but more often inconclusive, or stay at E1's 0.25?"): DELTA 0.25, E1's registered margin, so the two results compare directly. Non-superiority holds at TP <= 7 of 36. An uninformative detector shows it with probability 0.959 (known rate) or 0.873 (estimated threshold), and the outcome is inconclusive with probability 0.44 at TPR 0.25 and 0.35 at TPR 0.30. The draft had proposed 0.20 (TP <= 6; 0.902 or 0.800; inconclusive 0.56 and 0.41), a tighter claim with more inconclusive outcomes (1.11).
+- **D12. Planted-control size.** DECIDED 2026-10-10 by Aarav ("minimum detectable effect", in reply to "Should the planted control use the minimum detectable effect (expected 0.82, a real check) or the claimed effect of 0.5 (expected 0.997)?"): construction M plants at the MDE at the achieved n (0.36 at 36 v 36), expected rejection about 0.82. Kit 02's claimed-effect version (TPR 0.5) gives 0.997 at 36 v 36 and is set aside because it would pass with a broken pipeline.
