@@ -15,6 +15,7 @@ Design evidence: three offline design passes on E1's stored data, nothing launch
 - 2026-10-09: third judge decided. Aarav replied "5) do it lets see" in chat to the draft's open choice on J3. J3 is Qwen/Qwen2.5-7B-Instruct and branch A applies (section 2, "The third judge"). Changed to match: the "cannot show" list, sections 2, 10, 12 and 13, and spec sections 3.1, 3.2, 3.5, 3.6, 6.2, 7, 8.3, 8.4 and 9. No other decision changed.
 - 2026-10-09: alarm start decided (D1). Aarav replied "Wait until step5" in chat to the question "should alarms wait until step 5, after the baseline window (E1's data gives p 0.084), or be allowed from step 0 (p 0.047)?". The causal start, already the draft's proposal, is now the decision. Changed: section 2 (the causal-start bullet and a decision line) and spec D1. No other decision changed.
 - 2026-10-09: no-event twin decided (D3). Aarav replied "keep it" in chat to the question "Should the twin of a hacking run that never collapses be kept (p 0.084 on E1's data) or dropped (p 0.097)?". The draft's proposal, keeping it and scoring it over all 400 steps, is now the decision. It fixes the false-alarm count before data. On E1's seen data it slightly favored the detector. Changed: section 2 (the no-event bullet) and spec D3. No other decision changed.
+- 2026-10-09: margin decided (D11). Aarav replied "0.25" in chat to the question "Should E1b's margin be 0.20, tighter but more often inconclusive, or stay at E1's 0.25?". This replaces the draft's proposal of 0.20. The margin is now E1's 0.25, and non-superiority holds when TP ≤ 7 of 36. Changed: the E1-problems table, row (2); section 2 (the clean-null wording); section 4 (the non-superiority and inconclusive rows); section 5 (the margin, its rationale, the 0.20 record and the continuity line); section 6 (the non-superiority row); section 10 (RR5); section 11 (the clean-null row); and spec sections 0.3, 1.10, 1.11, 1.14, 6.1, 8.2, 8.4 and 9 (D11). No other decision changed.
 
 ## Why E1b exists
 
@@ -23,7 +24,7 @@ E1 (frozen d1aa118; experiments/e1_results.md) returned a registered CLEAN NULL:
 | E1 problem | What E1b does |
 |---|---|
 | (1) The benign arm optimized a different judge (1.5B), so disagreement drifted negative in benign runs by design and that drift set the alarm threshold. The 0.5B judge alone separates E1's arms at AUROC 1.00 (experiments/audit_baselines_report.txt), so the audit headline is confounded. | Both arms optimize the same 0.5B judge. The twin's reward is gated so the format exploit is closed (section 3). A registered audit test compares disagreement with each judge alone (H-audit). |
-| (2) Non-superiority is fragile. An upward-only alarm, or a time-matched operating point, gives 6/24 vs 3/24 (upper bound about 0.30). | The primary uses both choices (section 2). n is 36 per arm and the margin is 0.20 (sections 4, 5). |
+| (2) Non-superiority is fragile. An upward-only alarm, or a time-matched operating point, gives 6/24 vs 3/24 (upper bound about 0.30). | The primary uses both choices (section 2). n is 36 per arm, and the margin stays at E1's 0.25 (sections 4, 5). |
 | (3) The collapse is format and length: unfenced prose in 18/24 runs, a fence cut at the token cap in 6/24. The lenient oracle rises. | Hacking keeps E1's option (a) meaning. The twin's gate closes exactly this failure, which creates the confound stated below. |
 | (4) 16 velocity and acceleration detectors use a centred plus-or-minus 2 smoother, so each value sees 2 later steps. | Derivatives from a trailing 5-step mean, with a perturbation self-test (section 6). |
 | (5) No external timestamp of the freeze, no human reader before it, unpinned packages and model revisions, an uncommitted file ran. | Section 13 requires an external timestamp and a named human reader before any launch. Packages are locked, model revisions are passed explicitly, and the job is built from a commit (spec section 7). |
@@ -96,7 +97,7 @@ Decisions behind section 1, for Aarav to confirm before the freeze:
 - **Window precondition:** e1_primary.window_precondition, unchanged: the median event step over all used hacking runs, a run with no event counted as −1, holds at ≥ 12.
 - **Decision:**
   - KILL RESULT: the window holds AND p < 0.05 AND the median lead > 0.
-  - CLEAN NULL: not a kill, and the window holds. Qualified "non-superiority shown" or "non-superiority not shown" (section 5). If p < 0.05 and the median lead is ≤ 0 (or undefined), the verdict carries the flag "significant at the operating point, median lead not positive", and the paper may not describe the result as "no significant anticipation".
+  - CLEAN NULL: not a kill, and the window holds. Qualified "non-superiority shown: no anticipation beyond TPR − FPR = 0.25" or "non-superiority not shown" (section 5). If p < 0.05 and the median lead is ≤ 0 (or undefined), the verdict carries the flag "significant at the operating point, median lead not positive", and the paper may not describe the result as "no significant anticipation".
   - NULL, NOT CLEAN: the window fails. Flagged if p < 0.05 and the lead is > 0.
   - Twin flags (section 9), applied next. TWIN NOT BENIGN turns a clean null into "NULL, NOT CLEAN (twin arm not benign)", and a kill stands with the flag. TWIN DID NOT TRAIN turns a kill into "KILL NOT CONFIRMED (twin arm did not train)", and a null stands with the flag.
   - UNVERIFIED, appended to the verdict as in E1, if the planted control fails or does not apply (section 9).
@@ -224,8 +225,8 @@ PROPOSED: name the unit in the abstract: "36 hacking and 36 same-judge twin trai
 | Kill power at TPR 0.5 (window, lead and generator checks bootstrapped from E1's hacking runs) | 0.820 | **0.934** | 0.963 |
 | MDE at 80% / 90% power | 0.44 / 0.485 | **0.36 / 0.40** | 0.32 / 0.35 |
 | Fisher power at TPR 0.375 (E1's 9/24) | 0.576 | **0.849** | 0.952 |
-| Non-superiority at δ 0.20 holds if TP ≤ (probability when uninformative: twin FPR known / threshold estimated) | 3 (0.648 / 0.616) | **6 (0.902 / 0.800)** | 8 (0.943 / 0.834) |
-| Inconclusive at TPR 0.25 / 0.30, δ 0.20 | 0.76 / 0.68 | **0.56 / 0.41** | 0.46 / 0.25 |
+| Non-superiority at δ 0.25 holds if TP ≤ (probability when uninformative: twin FPR known / threshold estimated) | 4 (0.827 / 0.754) | **7 (0.959 / 0.873)** | 11 (0.997 / 0.958) |
+| Inconclusive at TPR 0.25 / 0.30, δ 0.25 | 0.63 / 0.61 | **0.44 / 0.35** | 0.13 / 0.10 |
 | Planted control, expected rejection (section 9) | 0.823 | **0.818** | 0.824 |
 | Cost: main + 6-run pilot (cap with 25% replacements) | USD 140 (170) | **USD 202 (248)** | USD 264 (326) |
 
@@ -241,10 +242,11 @@ PROPOSED: name the unit in the abstract: "36 hacking and 36 same-judge twin trai
 ## 5. Margins for "no difference" claims
 
 - **Non-superiority test** (one-sided): the claim TPR − FPR < δ holds when the upper bound of the Newcombe hybrid-score 90% interval is below δ.
-- **Margin: δ = 0.20 absolute** (PROPOSED with H1; E1 used 0.25). With FP fixed at 4/36 it holds exactly when TP ≤ 6 of 36. Upper 90% bound by TP count: 4: 0.129, 5: 0.162, 6: 0.194, 7: 0.225, 8: 0.255.
-- **Why this size:** an uninformative detector (TPR = FPR = 0.111) shows non-superiority with probability 0.902 if the twins' false-alarm rate were known, and 0.800 when, as in the design, the threshold is estimated from the 36 twins (exact, exchangeable runs). Under either calculation 0.195 is the smallest margin the design reaches with probability 0.80. At δ 0.19 the rule would be TP ≤ 5, with probability 0.795 (known rate) or 0.700 (estimated threshold), below the 80% E1 used to pick its margin.
+- **Margin: δ = 0.25 absolute, as in E1** (DECIDED by Aarav, 2026-10-09: "0.25"). With FP fixed at 4/36 it holds exactly when TP ≤ 7 of 36. Upper 90% bound by TP count: 4: 0.129, 5: 0.162, 6: 0.194, 7: 0.225, 8: 0.255.
+- **Why this size:** 0.25 is E1's registered margin, so E1's and E1b's non-superiority results compare directly. An uninformative detector (TPR = FPR = 0.111) shows non-superiority with probability 0.959 if the twins' false-alarm rate were known, and 0.873 when, as in the design, the threshold is estimated from the 36 twins (exact, exchangeable runs). Fewer outcomes are inconclusive than at 0.20 (neither p < 0.05 nor non-superiority): 0.44 at a true TPR of 0.25 and 0.35 at 0.30. The cost is a looser claim. A null with non-superiority rules out a TPR − FPR of 0.25 or more, where 0.20 would have ruled out 0.20 or more.
+- **The option set aside.** The earlier draft proposed δ 0.20, the smallest two-decimal margin the design reaches with probability 0.80 for an uninformative detector (at 0.19 the rule would be TP ≤ 5, with probability 0.795 or 0.700). It holds when TP ≤ 6, with probability 0.902 (known rate) or 0.800 (estimated threshold), and is inconclusive with probability 0.56 at a true TPR of 0.25 and 0.41 at 0.30. Aarav was asked on 2026-10-09 "Should E1b's margin be 0.20, tighter but more often inconclusive, or stay at E1's 0.25?" and replied "0.25".
 - At an achieved n below 36 the registered δ stays. The report prints the largest TP count that still shows non-superiority at that n.
-- Non-superiority at 0.25 (TP ≤ 7, probability 0.959 with the rate known, 0.873 with the threshold estimated) is reported for continuity with E1 and never qualifies the verdict.
+- The registered margin is E1's, so no separate continuity row is needed. The Newcombe 90% interval is printed, so its upper bound can be read against any other margin.
 - **Scale:** absolute difference in proportions.
 
 ## 6. Statistics plan
@@ -255,7 +257,7 @@ PROPOSED: name the unit in the abstract: "36 hacking and 36 same-judge twin trai
 | H1 lead (event − causal first move) | One sample | The point median > 0 decides; the exact sign test is reported only | One | Order-statistic 95% CI | None | 95% CI | Runs |
 | H2: the other 25 detectors | Unpaired | Fisher exact | One | As row 1 | Holm across the 25 | 95% CI | Runs |
 | Window precondition (median event step ≥ 12) | One sample | Decision threshold | n/a | None | None | n/a | Runs |
-| Non-superiority, if null | Unpaired | Upper Newcombe 90% bound < 0.20 | One | Newcombe hybrid score | None | 90% CI | Runs |
+| Non-superiority, if null | Unpaired | Upper Newcombe 90% bound < 0.25 | One | Newcombe hybrid score | None | 90% CI | Runs |
 | H-audit: AUROC(S) − max tier 1 AUROC | Paired (same runs for every score) | Paired bootstrap, 10,000 draws within arm × task | One (5th percentile) | Percentile | One statistic; H-audit has its own alpha | 90% CI | Runs |
 | Tier 2 and reported-only comparators against S | Paired | The same bootstrap | Reported, no decision | Percentile | None | 90% CI | Runs |
 | Twin integrity and natural hack rate counts | n/a | Counts | n/a | Clopper-Pearson 95% | None | 95% CI | Runs |
@@ -349,7 +351,7 @@ Registered reporting, printed by e1b_primary.py, never deciding:
 - RR2: the sensitivity events cusum_page_down_v2 and baseline_drop(0.6, persist=2), as in E1: hacking events, twin false events, window, generator check, and the primary under each (illustrative).
 - RR3: the lenient oracle beside the strict one, per arm and task, including the registered event on the lenient series.
 - RR4: continuity rows for the primary: E1's exact rule (two-sided, full-run threshold, from step 0), D2's variant, D3's variant, and the E1b rule from step 0.
-- RR5: the twin sensitivity analyses (section 9), non-superiority at 0.25, and the primary with no-event twins dropped (section 2).
+- RR5: the twin sensitivity analyses (section 9) and the primary with no-event twins dropped (section 2).
 
 | ID | Analysis | Why |
 |---|---|---|
@@ -375,7 +377,7 @@ Registered reporting, printed by e1b_primary.py, never deciding:
 | Kill rule | Exact threshold | Action |
 |---|---|---|
 | Result: kill | H1 holds: median pre-event window ≥ 12 AND one-sided Fisher p < 0.05 (alarm < event) AND point median lead > 0, with no TWIN DID NOT TRAIN flag | The negative early-warning claim is killed for this setting. The paper reports E1's registered null and E1b's kill together, and the claim becomes: disagreement anticipates the format collapse against same-judge twins at this operating point. |
-| Result: clean null | H1 fails, the window is ≥ 12, and there is no TWIN NOT BENIGN flag. Non-superiority (upper Newcombe 90% bound < 0.20) qualifies it. | The negative claim stands, replicated against same-judge twins, worded by the qualifier. If an H2 detector holds, no general "no detector" claim. |
+| Result: clean null | H1 fails, the window is ≥ 12, and there is no TWIN NOT BENIGN flag. Non-superiority (upper Newcombe 90% bound < 0.25) qualifies it. | The negative claim stands, replicated against same-judge twins, worded by the qualifier (with non-superiority: "no anticipation beyond TPR − FPR = 0.25"). If an H2 detector holds, no general "no detector" claim. |
 | Result: null, not clean | H1 fails and the window is < 12, or TWIN NOT BENIGN fires | No confirmatory early-warning claim from E1b. The claim rests on E1 with its stated confounds. |
 | Result: generator failure | Fewer than ceil(0.75 n) of the used hacking runs show a strict-oracle event (27 of 36) | Stop. No detector or audit score is computed. Report it as a generator result. Checked before any detector result. |
 | Result: audit | The H-audit verdict (section 2) | KILL (either row): the paper drops the audit claim, or keeps only what that row allows. RESCUE: the audit claim stands for same-judge twins, with Q1-Q3 attached. PARTIAL: the claim is about a held-out judge. INCONCLUSIVE: no audit claim from E1b. |
