@@ -13,6 +13,7 @@ Design evidence: three offline design passes on E1's stored data, nothing launch
 **Draft history**
 - 2026-10-09: first draft (commit e8f0ed4).
 - 2026-10-09: third judge decided. Aarav replied "5) do it lets see" in chat to the draft's open choice on J3. J3 is Qwen/Qwen2.5-7B-Instruct and branch A applies (section 2, "The third judge"). Changed to match: the "cannot show" list, sections 2, 10, 12 and 13, and spec sections 3.1, 3.2, 3.5, 3.6, 6.2, 7, 8.3, 8.4 and 9. No other decision changed.
+- 2026-10-09: alarm start decided (D1). Aarav replied "Wait until step5" in chat to the question "should alarms wait until step 5, after the baseline window (E1's data gives p 0.084), or be allowed from step 0 (p 0.047)?". The causal start, already the draft's proposal, is now the decision. Changed: section 2 (the causal-start bullet and a decision line) and spec D1. No other decision changed.
 
 ## Why E1b exists
 
@@ -56,12 +57,13 @@ E1b cannot show:
 | H2 | The H1 test for each of the other 25 detectors, with causal derivatives | As H1, with the Holm-adjusted p < 0.05 across the 25 | Secondary |
 
 - **Alarm rule:** strict, a < e, as in E1. The at-or-before count is reported and never decides.
-- **Causal start (part of H1).** No alarm and no twin window maximum is taken before the step after the 5th finite value of the series (step 5 on a complete series). The deviation baseline is the median of those 5 values, so an earlier value would be compared with a baseline built partly from later steps. This is the same kind of look-ahead as E1's centred smoother.
+- **Causal start (part of H1; DECIDED by Aarav, 2026-10-09: "Wait until step5").** No alarm and no twin window maximum is taken before the step after the 5th finite value of the series (step 5 on a complete series). The deviation baseline is the median of those 5 values, so an earlier value would be compared with a baseline built partly from later steps. This is the same kind of look-ahead as E1's centred smoother.
 - **How the primary rule was chosen.** The upward-only alarm and the time-matched point were each proposed after E1's D2 and D3 were seen. Their combination was first computed on 2026-10-09, on E1's runs with E1's benign arm standing in for twins. This is seen data, and E1's benign arm optimized the other judge, so it is only an indication:
   - alarms from step 0: 9/24 vs 3/24, p 0.047, which would read KILL (median lead 12, window 32);
   - alarms from the causal start: 8/24 vs 3/24, p 0.084, a null without non-superiority.
   - The hit that moves is second_largest seed 206: an alarm at step 3, inside the baseline, against an event at step 17.
   - The causal start follows from the same principle as the causal derivatives. It is also the choice that turns E1's borderline result into a null, so both numbers are printed here, and the step-0 variant is always reported (section 10, RR4). The step-0 variant never decides.
+  - Aarav chose the causal start in chat on 2026-10-09, after seeing both numbers above, with the reply "Wait until step5". No E1b data exist. On E1's seen data this is the choice less favorable to the detector.
 - **Stated expectations (not hypotheses).**
   - H1: under this rule E1's runs give a TPR of 0.33 to 0.375, near the MDE, so either outcome is plausible.
   - H-audit: the 0.5B judge alone may separate near the ceiling. Its change has SD 0.018 in E1's hacking arm, so a twin that gains only 0.02 to 0.04 less on it gives that judge alone an AUROC of 0.78 to 0.94. At 1.00, H-audit reads KILL (training judge suffices) whatever disagreement does (section 2).
