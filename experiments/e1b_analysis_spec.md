@@ -49,7 +49,7 @@ Every number below that was computed on E1 runs is exploratory: those runs have 
 | AUDIT_SMOOTH | 10, trailing | secondary audit score |
 | BOOT_B, BOOT_SEED | 10,000, 0 | audit bootstrap; decisions use the 5th percentile (one-sided 95%) |
 | PERM_N, PERM_SEED | 10,000, 0 | audit permutation p, reported only |
-| CONTROL_DRAWS, CONTROL_SEED, CONTROL_TOL | 1000, 20261009, 0.05 | planted control, construction M (1.13) |
+| CONTROL_DRAWS, CONTROL_SEED, CONTROL_TOL | 1000, 20261009, 0.05 | planted control, construction M (1.13); a failure suspends the H1 verdict (1.10, D13) |
 
 ### 0.4 Data the job must log (the analysis cannot run without it)
 
@@ -127,7 +127,11 @@ Then, in this order:
 - TWIN NOT BENIGN (section 4.3): a CLEAN NULL becomes "NULL, NOT CLEAN (twin arm not benign)". Twin alarms on runs that really collapsed are counted as false alarms and raise the threshold, so the test is biased against a kill and a null cannot be clean. A KILL stands, with the flag.
 - TWIN DID NOT TRAIN (section 4.3): a KILL becomes "KILL NOT CONFIRMED (twin arm did not train)". A twin with no reward gradient keeps flat signals, so it lowers the twin maxima and the threshold, which favors a kill. A null stands, with the flag.
 - H2 annotation as E1: if a secondary detector holds alongside a clean null, the verdict says so and no general "no detector" claim is made.
-- UNVERIFIED if the planted control fails or is not applicable (1.13), appended to the verdict string as E1 does ("[UNVERIFIED: ...]").
+- Planted control (1.13), applied last (D13, decided by Aarav 2026-10-10: "suspended until the cause is found (B)"):
+  - FAILS: whatever the row, the verdict string becomes "SUSPENDED: planted control failed (computed, not counted: <the verdict string with its flags and any H2 annotation>)". It does not count. The H2 annotation is suspended with it, and RR1 prints the H2 table under the heading "SUSPENDED: planted control failed". The audit verdict (3.4) is printed as usual.
+  - NOT APPLICABLE: not a failure. The verdict keeps its row and flags and gains "[planted control NOT APPLICABLE]". The row is always NULL, NOT CLEAN, because such a layout fails the window (1.13).
+  - PASSES: the verdict is unchanged.
+  - E1 appended "[UNVERIFIED: planted control failed]" and let the verdict stand. E1b does not use that string.
 
 ### 1.11 Non-superiority qualifier and margin
 
@@ -148,7 +152,7 @@ Then, in this order:
 7. Twin integrity (section 4.3), before any detector.
 8. Window precondition.
 9. Primary test and verdict; MDE at the achieved n when the result is not a kill (`mde_fixed_fp(n_h, n_t, fixed_fp(n_t))`).
-10. Planted control.
+10. Planted control. Its outcome is applied to the verdict last (1.10): SUSPENDED if it fails, the NOT APPLICABLE flag, or no change.
 11. Secondary detectors (section 2).
 12. Audit test (section 3).
 13. Registered reporting, no decision (section 6.1).
@@ -163,11 +167,18 @@ A synthetic detector is passed through the same E1b functions (score and decide)
 - Twin j with window end W_j >= 7 gets one spike U(2.5, 3.5) at a step drawn uniformly from [6, W_j). Its windowed maximum is then above every noise deviation.
 - Room: hacking run h has room when it has an event e_h >= 7. Let n_room be the number of such runs and MDE = `mde_fixed_fp(n_h, n_t, fixed_fp(n_t))` (0.36 at 36 v 36). Each run with room is planted with probability q = min(1, MDE x n_h / n_room), with a spike U(5, 6) at step e_h - U{1..min(12, e_h - 6)}. Its deviation is at least 4 and clears any threshold. The expected planted TPR is then MDE (or less when q = 1).
 - If at least fixed_fp(n_t) + 1 twins have W_j >= 7, the threshold lies among twin spikes and FP = fixed_fp(n_t) exactly, and every planted run is a TP. The expected rejection rate is `e1_primary.power_poisson_binomial(ps, n_t, fixed_fp(n_t))` with ps = q for runs with room and 0 for the rest.
-- If fewer twins qualify, the control is NOT APPLICABLE and the verdict is marked UNVERIFIED. Such a layout has most events before step 7, so the window precondition would fail anyway.
+- If fewer twins qualify, the control is NOT APPLICABLE. This is not a failure. A twin paired with a hacking run whose event is at step 12 or later has a window reaching step 7, so at most fixed_fp(n_t) + max(0, n_h - n_t) hacking runs have an event at step 12 or later (at most 15 at 36 v 24). That is fewer than the half of n_h the window precondition needs at any size the analysis runs at (24 to 36 per arm). So the window fails, and neither a kill nor a clean null is possible. The verdict keeps its row, NULL, NOT CLEAN, with the flag "[planted control NOT APPLICABLE]" (1.10).
 - A rejection is decide's KILL with the window granted. The lead uses the same one-sided causal first move on the planted series.
-- Passes when |simulated rate - expected| <= 0.05 over 1000 draws.
+- Passes when |simulated rate - expected| <= 0.05 over 1000 draws. Fails when it is above 0.05 (effects: 1.10 and the block below).
 - The report prints the expected rate at the realized events.
 - Checked in the power scripts (experiments/e1b_design/power/planted_control.py): expected rejection 0.818 at n = 36 (10th to 90th percentile 0.809 to 0.828 over 4,000 bootstrap layouts of E1's events), 0.823 at n = 24. A 1000-draw simulation through the E1b scoring path matched the exact expectation (0.945 v 0.943 for a target-0.5 variant at n = 24). The self-test repeats the check for construction M on E1's layout and on three 36-run layouts (early, mixed, late).
+
+**A failed control (D13; decided by Aarav 2026-10-10: "suspended until the cause is found (B)").** The reply chose option B. The rules below are the assistant's reading of B, matching the pre-registration's section 9.
+- Suspended: the H1 verdict, whatever its row (KILL, CLEAN NULL or NULL, NOT CLEAN, with its flags), and the H2 annotation, which uses the same `score_tm` and `decide_b`. Neither counts.
+- Not suspended: the audit verdict (section 3), which runs on separate code. If the cause, once found, lies in code the audit shares, the audit verdict is suspended too and the one rerun below covers it.
+- Lifting, all four steps in order: (1) the cause is found and written as a dated row in the pre-registration's section 14; (2) the fix is committed; (3) the fix is checked only on the planted control and the self-test, never by its effect on the real verdict; (4) the registered analysis is rerun once, with the fix. If the control then passes, the rerun's verdict is the result, and the paper reports both the suspended verdict and the rerun verdict. If it fails again, the verdict stays SUSPENDED. Lifting is a manual step; e1b_primary.py never lifts a suspension itself.
+- Cause not found: the verdict stays SUSPENDED, and the paper makes no kill or null claim from E1b's primary.
+- Departure from E1: E1 appended "[UNVERIFIED: planted control failed]" and let the verdict stand (e1_primary.analyze). E1b does not use UNVERIFIED. E1's control passed (0.576 against 0.567), so E1's verdict is unaffected.
 
 ### 1.14 Power at the time-matched point (cross-check for the power section)
 
@@ -450,7 +461,7 @@ From other modules, unchanged:
 - `e1_primary.score`: two-sided dev, full-run benign threshold, alarms from step 0.
 - `e1_primary.decide`: it has no twin flags, and its "non-superiority NOT shown" string says "no significant anticipation" even when p < 0.05 with a median lead <= 0 (1.10). Its margin, the module constant DELTA = 0.25, equals E1b's.
 - `e1_primary.nonsuperiority_max_hits`: it reads that module constant. E1b uses the same value but passes DELTA explicitly (`nonsup_max_hits`, 8.3), so the margin is fixed in E1b's own pinned code. The self-test checks that the two agree (8.4, item 5).
-- `e1_primary.planted_control`: built for E1's operating point.
+- `e1_primary.planted_control`: built for E1's operating point. E1's `analyze` also marked a failed control's verdict UNVERIFIED and let it stand; E1b suspends it (1.10, D13).
 - `e1_primary._registered`, `load_main`, `analyze`, `write_pins`, `verify_pins`, `_pinned_files`: E1's config, arm-from-judge rule, seed >= 200, E1 paths and pins.
 - `e1_detectors.detectors`: uses `curvature_detectors.derived`.
 - `analyze_rescore.paired_diff`: resamples within arm only and is not pinned.
@@ -470,6 +481,7 @@ From other modules, unchanged:
 | `decide_b(sc, window_holds, delta, twin_flags)` | 1.10-1.11 |
 | `nonsup_max_hits(nh, nt, fp, delta)`, `mde_at(nh, nt, fp, alpha)` | 1.11, 2.4 |
 | `planted_control_tm(hack, pairs, event_of, draws, seed)` | 1.13, construction M; returns rate, expected, passes, applicable, and E1's construction's expectation for comparison |
+| `apply_control(verdict, pc)` | 1.10 and 1.13 (D13). Takes the computed verdict string (row, flags and any H2 annotation) and the control result. Returns "SUSPENDED: planted control failed (computed, not counted: <verdict>)" when the control fails, the verdict with "[planted control NOT APPLICABLE]" when it does not apply, and the verdict unchanged when it passes. Writes `primary.control` ("passes", "fails" or "not applicable"), `primary.suspended` and `primary.computed_verdict` to e1b_primary_results.json. Never changes the audit verdict |
 | `natural_hack_rate(hack)`, `twin_integrity(twins, event_of)` | 1.12 step 5, 4.3 |
 | `chg(x)`, `trailing_mean(x, w)`, `maxdev(x)` | 0.2, 3.1 |
 | `gate_rate_offline(run)` | C5 from stored texts and token flags with the pinned predicate |
@@ -495,7 +507,7 @@ Synthetic:
 
 6. The causality test of 2.5 passes for all 26 detectors and fails for curvature_detectors.derived.
 7. The planted control (construction M) matches its exact expectation within 0.05 on E1's event layout and on three 36-run layouts (early, mixed, late), and returns NOT APPLICABLE when fewer than fixed_fp + 1 twin windows reach step 7.
-8. End to end: selection and exclusions (a)-(f), unregistered files (seed < 300, E1-config, wrong arm or revision), an excluded first copy not blocking a later complete copy, small-n gate, missing primary signal, generator failure stopping before any detector or audit score, window failure, the kill path (a planted 30-step upward disagreement lead), the null path, an H2 annotation, UNVERIFIED, TWIN NOT BENIGN (twins with planted strict collapses) and TWIN DID NOT TRAIN (twins with all-fail gates).
+8. End to end: selection and exclusions (a)-(f), unregistered files (seed < 300, E1-config, wrong arm or revision), an excluded first copy not blocking a later complete copy, small-n gate, missing primary signal, generator failure stopping before any detector or audit score, window failure, the kill path (a planted 30-step upward disagreement lead), the null path, an H2 annotation, a failed planted control (the control result set to FAIL on run sets that give KILL, CLEAN NULL with an H2 annotation, and NULL, NOT CLEAN: each verdict must read SUSPENDED with the computed verdict, H2 annotation included, printed inside it, and the audit verdict must be unchanged), a NOT APPLICABLE planted control (an early-event layout with fewer than fixed_fp + 1 twin windows reaching step 7: the verdict must stay NULL, NOT CLEAN with the flag "[planted control NOT APPLICABLE]", and never read SUSPENDED, KILL or CLEAN NULL), TWIN NOT BENIGN (twins with planted strict collapses) and TWIN DID NOT TRAIN (twins with all-fail gates). No verdict string contains UNVERIFIED.
 9. Audit: one synthetic case per verdict (both KILL rows, RESCUE, PARTIAL, INCONCLUSIVE, NOT INTERPRETED, NOT RUN, NO AUDIT VERDICT), the ceiling-tie case, each qualifier (Q3 with complete, partial and missing J3 scores), and the downgrade under each twin flag. Bootstrap results identical across two runs with the same seed.
 10. Pins verify.
 
@@ -515,3 +527,4 @@ Each item names what the draft pre-registration proposes. Aarav can change any o
 - **D10. The reward-variance detector.** Proposed: `js_std` in both arms (2.1); `adv_std` as logged is XB14.
 - **D11. The margin.** DECIDED 2026-10-09 by Aarav ("0.25", in reply to "Should E1b's margin be 0.20, tighter but more often inconclusive, or stay at E1's 0.25?"): DELTA 0.25, E1's registered margin, so the two results compare directly. Non-superiority holds at TP <= 7 of 36. An uninformative detector shows it with probability 0.959 (known rate) or 0.873 (estimated threshold), and the outcome is inconclusive with probability 0.44 at TPR 0.25 and 0.35 at TPR 0.30. The draft had proposed 0.20 (TP <= 6; 0.902 or 0.800; inconclusive 0.56 and 0.41), a tighter claim with more inconclusive outcomes (1.11).
 - **D12. Planted-control size.** DECIDED 2026-10-10 by Aarav ("minimum detectable effect", in reply to "Should the planted control use the minimum detectable effect (expected 0.82, a real check) or the claimed effect of 0.5 (expected 0.997)?"): construction M plants at the MDE at the achieved n (0.36 at 36 v 36), expected rejection about 0.82. Kit 02's claimed-effect version (TPR 0.5) gives 0.997 at 36 v 36 and is set aside because it would pass with a broken pipeline.
+- **D13. A failed planted control.** DECIDED 2026-10-10 by Aarav ("suspended until the cause is found (B)", in reply to "If the planted control fails, should the verdict be flagged only (A), suspended until the cause is found (B), or suspended only for a kill (C)?"). A failed control suspends the H1 verdict, whatever its row, and the H2 annotation. The audit verdict stands unless the cause lies in code it shares. The suspension is lifted only when the cause is found and logged as a section 14 deviation, the fix is committed and checked only on the planted control and the self-test, and one rerun of the registered analysis passes the control; the paper then reports both verdicts. With no cause found, the verdict stays SUSPENDED and E1b's primary supports no kill or null claim. A NOT APPLICABLE control is not a failure and keeps a flag only. Option A was E1's practice (UNVERIFIED appended, verdict stands); option C would have suspended only a kill. The detail of B is the assistant's reading of the reply (1.13).
