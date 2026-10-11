@@ -1,0 +1,25 @@
+PLANTED CONTROL, E1b. Exact expectation = e1_primary.power_poisson_binomial(p_i, n, fixed_fp(n)).
+E1's realized layout (24 events, one none): E1 construction 0.567 (registered expectation 0.567); R 0.748; T 0.943 (q = 0.600, 20 runs with room)
+mean planted TPR at E1's layout: E1 0.370, R 0.417, T 0.500
+
+n = 24 per arm (FP fixed at 3/24), 4000 bootstrap event layouts:
+  E1 expected rejection mean 0.560 (10th pct 0.386, 90th 0.709); mean planted TPR 0.370
+  R  expected rejection mean 0.732 (10th pct 0.593, 90th 0.857); mean planted TPR 0.416
+  T  expected rejection mean 0.944 (10th pct 0.933, 90th 0.957); mean planted TPR 0.500
+  M  expected rejection mean 0.823 (10th pct 0.810, 90th 0.838); mean planted TPR 0.440
+  reference: binomial TPR 0.5 at fixed FP: 0.924
+  simulation check of T through the E1b scoring path (one layout, 1000 draws): 0.945 vs exact 0.943 -> PASSES; FP counts seen [3]
+n = 36 per arm (FP fixed at 4/36), 4000 bootstrap event layouts:
+  E1 expected rejection mean 0.846 (10th pct 0.747, 90th 0.927); mean planted TPR 0.370
+  R  expected rejection mean 0.941 (10th pct 0.876, 90th 0.982); mean planted TPR 0.417
+  T  expected rejection mean 0.997 (10th pct 0.996, 90th 0.998); mean planted TPR 0.500
+  M  expected rejection mean 0.818 (10th pct 0.809, 90th 0.828); mean planted TPR 0.360
+  reference: binomial TPR 0.5 at fixed FP: 0.994
+  simulation check of T through the E1b scoring path (one layout, 1000 draws): 0.998 vs exact 0.997 -> PASSES; FP counts seen [4]
+n = 48 per arm (FP fixed at 5/48), 4000 bootstrap event layouts:
+  E1 expected rejection mean 0.951 (10th pct 0.911, 90th 0.982); mean planted TPR 0.370
+  R  expected rejection mean 0.989 (10th pct 0.976, 90th 0.997); mean planted TPR 0.417
+  T  expected rejection mean 1.000 (10th pct 1.000, 90th 1.000); mean planted TPR 0.500
+  M  expected rejection mean 0.824 (10th pct 0.818, 90th 0.830); mean planted TPR 0.320
+  reference: binomial TPR 0.5 at fixed FP: 1.000
+  simulation check of T through the E1b scoring path (one layout, 1000 draws): 1.000 vs exact 1.000 -> PASSES; FP counts seen [5]

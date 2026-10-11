@@ -1,0 +1,100 @@
+fixed_fp(n) for n = 24..48: {24: 3, 25: 3, 26: 3, 27: 3, 28: 3, 29: 3, 30: 3, 31: 3, 32: 4, 33: 4, 34: 4, 35: 4, 36: 4, 37: 4, 38: 4, 39: 4, 40: 4, 41: 4, 42: 5, 43: 5, 44: 5, 45: 5, 46: 5, 47: 5, 48: 5}
+
+=== n = 24 v 24: FP fixed at fixed_fp(24) = 3 (3/24 = 0.1250)
+  hits needed for one-sided Fisher p < 0.05: 9 (p at 9 = 0.0467; at 8 = 0.0840); kill at TPR 9/24 = 0.375
+  size, twin FPR known (binomial TP at TPR = FPR): 0.0017
+  Fisher power at TPR 0.33/0.35/0.375/0.40/0.50: 0.392 / 0.474 / 0.576 / 0.672 / 0.924
+  MDE 80% / 90%: frozen helper 0.44 / 0.49; 0.005 grid 0.44 / 0.485
+  H2 first Holm step (alpha/25): hits 14, power at TPR 0.5 0.271, MDE (0.01 step) 0.65
+  non-superiority at delta 0.25: holds iff TP <= 4 (upper90 at 4 = 0.2153, at 5 = 0.2615); P(shown | TPR=FPR, rate known) = 0.827; inconclusive at TPR 0.25 / 0.30: 0.632 / 0.614
+  non-superiority at delta 0.20: holds iff TP <= 3 (upper90 at 3 = 0.1671, at 4 = 0.2153); P(shown | TPR=FPR, rate known) = 0.648; inconclusive at TPR 0.25 / 0.30: 0.764 / 0.683
+  helper e1_primary.nonsuperiority_max_hits(24,24,3) = 4
+  upper 90% bound by TP: 2:0.1165, 3:0.1671, 4:0.2153, 5:0.2615, 6:0.3062, 7:0.3496, 8:0.3918, 9:0.4329, 10:0.4730
+  interpolated 90th pct sits at order stats 21 and 22 (1-indexed), fraction 0.70; 3 twins above it; mean TP under exchangeable null = n (1 - E thr) = 3.168
+
+=== n = 32 v 32: FP fixed at fixed_fp(32) = 4 (4/32 = 0.1250)
+  hits needed for one-sided Fisher p < 0.05: 11 (p at 11 = 0.0373; at 10 = 0.0644); kill at TPR 11/32 = 0.344
+  size, twin FPR known (binomial TP at TPR = FPR): 0.0012
+  Fisher power at TPR 0.33/0.35/0.375/0.40/0.50: 0.500 / 0.595 / 0.704 / 0.795 / 0.975
+  MDE 80% / 90%: frozen helper 0.41 / 0.44; 0.005 grid 0.405 / 0.44
+  H2 first Holm step (alpha/25): hits 16, power at TPR 0.5 0.570, MDE (0.01 step) 0.56
+  non-superiority at delta 0.25: holds iff TP <= 7 (upper90 at 7 = 0.2487, at 8 = 0.2822); P(shown | TPR=FPR, rate known) = 0.960; inconclusive at TPR 0.25 / 0.30: 0.414 / 0.432
+  non-superiority at delta 0.20: holds iff TP <= 5 (upper90 at 5 = 0.1793, at 6 = 0.2144); P(shown | TPR=FPR, rate known) = 0.796; inconclusive at TPR 0.25 / 0.30: 0.693 / 0.593
+  helper e1_primary.nonsuperiority_max_hits(32,32,4) = 7
+  upper 90% bound by TP: 3:0.1056, 4:0.1431, 5:0.1793, 6:0.2144, 7:0.2487, 8:0.2822, 9:0.3151, 10:0.3474, 11:0.3791, 12:0.4102
+  interpolated 90th pct sits at order stats 28 and 29 (1-indexed), fraction 0.90; 4 twins above it; mean TP under exchangeable null = n (1 - E thr) = 3.976
+
+=== n = 36 v 36: FP fixed at fixed_fp(36) = 4 (4/36 = 0.1111)
+  hits needed for one-sided Fisher p < 0.05: 11 (p at 11 = 0.0397; at 10 = 0.0674); kill at TPR 11/36 = 0.306
+  size, twin FPR known (binomial TP at TPR = FPR): 0.0013
+  Fisher power at TPR 0.33/0.35/0.375/0.40/0.50: 0.682 / 0.766 / 0.849 / 0.910 / 0.994
+  MDE 80% / 90%: frozen helper 0.36 / 0.4; 0.005 grid 0.36 / 0.4
+  H2 first Holm step (alpha/25): hits 16, power at TPR 0.5 0.797, MDE (0.01 step) 0.51
+  non-superiority at delta 0.25: holds iff TP <= 7 (upper90 at 7 = 0.2249, at 8 = 0.2553); P(shown | TPR=FPR, rate known) = 0.959; inconclusive at TPR 0.25 / 0.30: 0.435 / 0.354
+  non-superiority at delta 0.20: holds iff TP <= 6 (upper90 at 6 = 0.1939, at 7 = 0.2249); P(shown | TPR=FPR, rate known) = 0.902; inconclusive at TPR 0.25 / 0.30: 0.557 / 0.413
+  helper e1_primary.nonsuperiority_max_hits(36,36,4) = 7
+  upper 90% bound by TP: 3:0.0957, 4:0.1295, 5:0.1621, 6:0.1939, 7:0.2249, 8:0.2553, 9:0.2852, 10:0.3145, 11:0.3433, 12:0.3717
+  interpolated 90th pct sits at order stats 32 and 33 (1-indexed), fraction 0.50; 4 twins above it; mean TP under exchangeable null = n (1 - E thr) = 4.378
+
+=== n = 48 v 48: FP fixed at fixed_fp(48) = 5 (5/48 = 0.1042)
+  hits needed for one-sided Fisher p < 0.05: 13 (p at 13 = 0.0326; at 12 = 0.0534); kill at TPR 13/48 = 0.271
+  size, twin FPR known (binomial TP at TPR = FPR): 0.0010
+  Fisher power at TPR 0.33/0.35/0.375/0.40/0.50: 0.848 / 0.906 / 0.952 / 0.978 / 1.000
+  MDE 80% / 90%: frozen helper 0.32 / 0.35; 0.005 grid 0.32 / 0.35
+  H2 first Holm step (alpha/25): hits 18, power at TPR 0.5 0.970, MDE (0.01 step) 0.43
+  non-superiority at delta 0.25: holds iff TP <= 11 (upper90 at 11 = 0.2493, at 12 = 0.2716); P(shown | TPR=FPR, rate known) = 0.997; inconclusive at TPR 0.25 / 0.30: 0.132 / 0.098
+  non-superiority at delta 0.20: holds iff TP <= 8 (upper90 at 8 = 0.1805, at 9 = 0.2038); P(shown | TPR=FPR, rate known) = 0.943; inconclusive at TPR 0.25 / 0.30: 0.458 / 0.253
+  helper e1_primary.nonsuperiority_max_hits(48,48,5) = 11
+  upper 90% bound by TP: 4:0.0832, 5:0.1084, 6:0.1329, 7:0.1569, 8:0.1805, 9:0.2038, 10:0.2267, 11:0.2493, 12:0.2716, 13:0.2936, 14:0.3155
+  interpolated 90th pct sits at order stats 43 and 44 (1-indexed), fraction 0.30; 5 twins above it; mean TP under exchangeable null = n (1 - E thr) = 5.584
+
+=== planted control M, exact expectation by number of hacking runs with room (window holds => >= n/2 with room)
+  n=24 MDE 0.44: room 24 -> q 0.440 exp 0.8006; room 12 -> q 0.880 exp 0.9536; min 0.8006 max 0.9536 over room 12..24
+  n=32 MDE 0.41: room 32 -> q 0.410 exp 0.8264; room 16 -> q 0.820 exp 0.9473; min 0.8264 max 0.9473 over room 16..32
+  n=36 MDE 0.36: room 36 -> q 0.360 exp 0.8021; room 18 -> q 0.720 exp 0.8986; min 0.8021 max 0.8986 over room 18..36
+  n=48 MDE 0.32: room 48 -> q 0.320 exp 0.8107; room 24 -> q 0.640 exp 0.8868; min 0.8107 max 0.8868 over room 24..48
+   all: 24:0.887, 25:0.879, 26:0.873, 27:0.867, 28:0.861, 29:0.856, 30:0.852, 31:0.848, 32:0.844, 33:0.841, 34:0.838, 35:0.835, 36:0.832, 37:0.830, 38:0.827, 39:0.825, 40:0.823, 41:0.821, 42:0.820, 43:0.818, 44:0.816, 45:0.815, 46:0.813, 47:0.812, 48:0.811
+  construction T (TPR 0.5), all runs with room, n=36: 0.99433; binomial power at 0.5: 0.99433
+  construction T (TPR 0.5), all runs with room, n=48: 0.99964; binomial power at 0.5: 0.99964
+
+=== CONTROL_TOL 0.05 at 1000 draws
+  expectation 0.800: SD 0.0126, tolerance = 3.95 SD; exact P(fail) 6.9e-05
+  expectation 0.820: SD 0.0121, tolerance = 4.12 SD; exact P(fail) 3.6e-05
+  expectation 0.824: SD 0.0120, tolerance = 4.15 SD; exact P(fail) 3.1e-05
+  expectation 0.840: SD 0.0116, tolerance = 4.31 SD; exact P(fail) 1.6e-05
+  expectation 0.850: SD 0.0113, tolerance = 4.43 SD; exact P(fail) 9.7e-06
+  expectation 0.900: SD 0.0095, tolerance = 5.27 SD; exact P(fail) 2.8e-07
+
+=== NOT APPLICABLE implies window failure? need fixed_fp(nt) + max(0, nh - nt) < nh/2
+  sizes 24..36 per arm: pairs where it fails: none; at most 15 hacking runs with room-for-window at (nh, nt) = (36, 24)
+  sizes 24..48 per arm: pairs where it fails: [(42, 24), (43, 24), (44, 24), (44, 25), (45, 24), (45, 25), (46, 24), (46, 25), (46, 26), (47, 24), (47, 25), (47, 26)]; at most 27 hacking runs with room-for-window at (nh, nt) = (48, 24)
+  sizes 32..48 per arm: pairs where it fails: none; at most 20 hacking runs with room-for-window at (nh, nt) = (48, 32)
+  (nh 36, nt 24): bound fixed_fp(nt) + nh - nt = 15; half of nh = 18.0
+  (nh 48, nt 32): bound fixed_fp(nt) + nh - nt = 20; half of nh = 24.0
+  (nh 48, nt 24): bound fixed_fp(nt) + nh - nt = 27; half of nh = 24.0
+
+=== thresholds
+  n=24: generator ceil(0.75 n) = 18; twin flag (more than 0.10 n) fires at 3 or more; MIN_ARM ceil(2/3 n) = 16; LAUNCH_CAP n + n/4 = 30
+  n=32: generator ceil(0.75 n) = 24; twin flag (more than 0.10 n) fires at 4 or more; MIN_ARM ceil(2/3 n) = 22; LAUNCH_CAP n + n/4 = 40
+  n=36: generator ceil(0.75 n) = 27; twin flag (more than 0.10 n) fires at 4 or more; MIN_ARM ceil(2/3 n) = 24; LAUNCH_CAP n + n/4 = 45
+  n=48: generator ceil(0.75 n) = 36; twin flag (more than 0.10 n) fires at 5 or more; MIN_ARM ceil(2/3 n) = 32; LAUNCH_CAP n + n/4 = 60
+
+=== AUROC 95% half-width at A 0.80 (Hanley-McNeil)
+  n=24: SE 0.0647, 95% half-width 0.127
+  n=32: SE 0.0558, 95% half-width 0.109
+  n=36: SE 0.0526, 95% half-width 0.103
+  n=48: SE 0.0454, 95% half-width 0.089
+
+=== costs (E1 measured USD 124 for 48 runs; GPU-hours 125 per 90 runs in the 36 draft = 1.389 per run)
+  n=36: main 72 runs USD 186.00, 100.0 GPU-h; pilot 6 USD 15.50; main+pilot USD 201.50; with 25% (18) replacements USD 248.00
+  n=48: main 96 runs USD 248.00, 133.3 GPU-h; pilot 6 USD 15.50; main+pilot USD 263.50; with 25% (24) replacements USD 325.50
+  J3 230400 completions: typical 3.30 (USD 2.2 per 153,600), worst 11.16 (USD 7.44 per 153,600 = 4 h backstop x 1.861)
+  J3 307200 completions: typical 4.40 (USD 2.2 per 153,600), worst 14.88 (USD 7.44 per 153,600 = 4 h backstop x 1.861)
+  J3 307,200 worst-case hours: 8.00; typical scoring hours (E1 qwen job 3434 s per 153,600): 1.91
+  ceilings pilot 30, J3 15 -> primary 285: replacements that fit 14 (primary estimate with all of them USD 284.17; 152.8 GPU-h)
+  ceilings pilot 30, J3 16 -> primary 284: replacements that fit 13 (primary estimate with all of them USD 281.58; 151.4 GPU-h)
+  ceilings pilot 30, J3 20 -> primary 280: replacements that fit 12 (primary estimate with all of them USD 279.00; 150.0 GPU-h)
+  ceilings pilot 16, J3 15 -> primary 299: replacements that fit 19 (primary estimate with all of them USD 297.08; 159.7 GPU-h)
+  ceilings pilot 31, J3 15 -> primary 284: replacements that fit 13 (primary estimate with all of them USD 281.58; 151.4 GPU-h)
+  24 replacements need primary USD 310.00; total with pilot 30 and J3 15: 355.00
+  estimate totals: pilot 15.50 + main 248.00 + 14 repl 36.17 + J3 typical 4.40 / worst 14.88 = 304.07 / 314.55
