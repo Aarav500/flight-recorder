@@ -36,18 +36,22 @@ class JudgeScorer:
     score = softmax over {Yes, No} logits at the answer position = P(Yes)."""
 
     def __init__(self, model_id: str, device: str = "cuda", dtype: str = "float16",
-                 max_length: int = 1024):
+                 max_length: int = 1024, revision: str | None = None):
+        # revision: a commit sha passed to both from_pretrained calls (E1b pins every model this way).
+        # None loads the hub's main branch, as every run before E1b did.
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
         self.torch = torch
         self.max_length = max_length
-        self.tok = AutoTokenizer.from_pretrained(model_id)
+        self.revision = revision
+        rev = {} if revision is None else {"revision": revision}   # None: the calls are unchanged
+        self.tok = AutoTokenizer.from_pretrained(model_id, **rev)
         if self.tok.pad_token is None:
             self.tok.pad_token = self.tok.eos_token
         self.tok.padding_side = "right"  # last real token at attention_mask.sum()-1
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_id, dtype=getattr(torch, dtype)).to(device).eval()
+            model_id, dtype=getattr(torch, dtype), **rev).to(device).eval()
         self.device = device
         self._yes_ids = self._first_token_variants("Yes")
         self._no_ids = self._first_token_variants("No")
