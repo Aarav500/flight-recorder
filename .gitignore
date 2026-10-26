@@ -49,3 +49,6 @@ scripts/_azure_env_*.yaml
 # would de-anonymise the paper. Keep it local. See AaravOS/templates/paper_kit/07 Part C.
 paper/
 experiments/e1_rescore/_work/
+# held by an E1b launcher --submit while it runs (launch_e1b_aws.py, launch_e1b_j3.py); a killed one leaves it
+runs/e1b/**/launch.lock
+runs/e1b/instance_hours.json.lock
