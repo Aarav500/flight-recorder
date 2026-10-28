@@ -86,17 +86,19 @@ READINGS FIXED HERE (section 9 does not spell them out)
     wrong length, a missing or non-finite value) and the other runs do not decide it either way. It is
     neither a pass nor a fail, does not trigger the section 11 Pilot kill rule, and the P0 action governs
     (broken inputs always fail P0). A criterion the other runs decide is PASS or FAIL as usual.
-  - P0 failed together with a genuine P1-P5 failure: both actions are printed with a note that Aarav
-    decides whether the failures count (section 9 does not say).
+  - P0 failed together with a genuine P1-P5 failure: the P0 rerun replaces the pilot (section 9, decided
+    by Aarav on 2026-10-27): the P1-P5 failures are reported and not acted on, the P1-P5 actions and the
+    section 11 Pilot kill rule are not printed, and that rule reads the rerun.
 
 PILOT ACTIONS (section 9; printed as advice, the script launches nothing)
   All pass: the main runs may launch once Aarav approves the primary spend.
   P0 fails: fix the logging and rerun the pilot at seed 298 (then 297). Log a deviation. The gate
-    does not change.
+    does not change. The rerun replaces the pilot: P1-P5 here are reported and not acted on.
   P1 fails: H does not reproduce E1 at fresh seeds. Stop and report. Aarav decides.
   P2, P3, P4 or P5 fails: do not adjust the gate on pilot data. Report the pilot. A new gate is a new
     pre-registration version, frozen and time-stamped before a new pilot at new seeds.
-  Kill rule (section 11, Pilot): any of P1-P5 fails -> no main runs under this version.
+  Kill rule (section 11, Pilot): any of P1-P5 fails on a pilot whose P0 passes -> no main runs under this
+    version.
 
 OUTPUT: the report is printed and written to runs/e1b/pilot_gate/pilot_gate_seed<seed>.txt (LF), with
 pilot_gate_seed<seed>.json beside it (outside runs/e1b/pilot, which holds only result files; build_contract
@@ -883,16 +885,24 @@ def advice(seed, status, failed, not_evaluable=()):
                    "and do not trigger the section 11 Pilot kill rule. The P0 action governs."
                    % ", ".join(not_evaluable))
     genuine = [p for p in failed if p != "P0"]
-    if "P0" in failed and genuine:
-        out.append("Note: P0 failed, so %s failed on runs whose instrumentation failed. Section 9 does not say "
-                   "whether they count; Aarav decides." % ", ".join(genuine))
+    if "P0" in failed:                     # section 9: the rerun replaces the pilot (Aarav, 2026-10-27)
+        if genuine and any(s < seed for s in PILOT_SEEDS):
+            out.append("P0 failed, so the rerun replaces this pilot (section 9, decided by Aarav on 2026-10-27): "
+                       "%s failed on runs whose instrumentation failed and are reported, not acted on. The section "
+                       "11 Pilot kill rule reads the rerun." % ", ".join(genuine))
+        elif genuine:
+            out.append("P0 failed at the last registered rerun seed, so no rerun can replace this pilot: %s failed on "
+                       "runs whose instrumentation failed and are reported, not acted on; Aarav decides."
+                       % ", ".join(genuine))
+        return out
     if "P1" in failed:
         out.append("P1 fails: H does not reproduce E1 at fresh seeds. Stop and report. Aarav decides.")
     if any(p in failed for p in ("P2", "P3", "P4", "P5")):
         out.append("P2, P3, P4 or P5 fails: do not adjust the gate on pilot data. Report the pilot. A new gate is a "
                    "new pre-registration version, frozen and time-stamped before a new pilot at new seeds.")
     if genuine:
-        out.append("Kill rule (section 11, Pilot): any of P1-P5 fails -> no main runs under this version.")
+        out.append("Kill rule (section 11, Pilot): any of P1-P5 fails on a pilot whose P0 passes -> no main runs "
+                   "under this version.")
     return out
 
 
@@ -1579,10 +1589,10 @@ _CASES = [
      EXIT_FAIL, ["P0"], ["P5"],
      ("completions step 390: texts missing or invalid", "not evaluable (completions step 390: texts missing",
       "NOT EVALUABLE: P5", "The P0 action governs"), ("Kill rule", "do not adjust the gate")),
-    ("A2: P0 and a genuine P3 failure: both actions, Aarav decides", 299,
+    ("A2: P0 and a genuine P3 failure: the rerun replaces the pilot", 299,
      {"profiles": _P3_PROF, "mutate": _m_reward(2e-6)}, EXIT_FAIL, ["P0", "P3"], [],
-     ("rerun the pilot at seed 298", "so P3 failed on runs whose instrumentation failed", "Aarav decides",
-      "Kill rule"), ()),
+     ("rerun the pilot at seed 298", "so the rerun replaces this pilot", "P3 failed on runs whose instrumentation "
+      "failed and are reported, not acted on"), ("Kill rule", "do not adjust the gate", "Aarav decides")),
     # A3: the log series P1-P4 read must equal their completions
     ("A3: logged gate_rate 1.0 while the per-completion G gives 0.86", 299,
      {"profiles": _P3_PROF, "mutate": _m_log_gate_rate}, EXIT_FAIL, ["P0"], [],

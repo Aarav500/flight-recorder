@@ -12,6 +12,7 @@ Draft history. 2026-10-25: corrections and proposals from the code review. The c
 
 Draft history. 2026-10-27: PARTIAL rule decided (D14, section 9; the pre-registration's draft history has the matching entry). 3.4's PARTIAL row now needs C2's fixed-sign AUROC (its 5th percentile above 0.5) and Delta(S, C2)'s 5th percentile at or below 0; the old 'AUROC*(C2) > 0.5' was always met.
 2026-10-27: the code review's items (b) and (c) decided (Aarav: "accept all ten"; the pre-registration's draft history lists the ten). Their PROPOSED markers here (3.5, 3.6, 4.3, 5, 7.3) now read DECIDED.
+2026-10-27: the pre-registration's sections 1 and 11 approved as drafted by Aarav, with the pilot rerun replacing the pilot when P0 fails (its draft history has the entry). No section of this spec changes.
 
 Sources read: experiments/e1_preregistration.md (frozen d1aa118 plus its section 14), e1_primary.py, e1_event.py, e1_detectors.py, e1_supplementary.py and its report, e1_results.md, audit_baselines_report.txt, e1_rescore/PLAN.md and analyze_rescore.py, paper/drafts/audit_claim_reading_20261008.md, acceptance_actions_20261008.md (action 8), mock_reviews_20261008.md, anticipatory/curvature_detectors.py, paper/analysis/threshold_sweep.py, detection_metrics.py, grid_benchmark.py, benchmark/score_prime.py, scripts/launch_slow_onset.py, flightrecorder/repro/reward_testhack.py and oracle_lenient.py, the kit 02 template and the planning document.
 

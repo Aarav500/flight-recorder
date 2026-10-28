@@ -4,7 +4,7 @@
 
 Kit file 02 of 09. Paper: Audit or Early Warning (AaravOS/papers/audit_or_early_warning.md). Version: 1, draft. Frozen: no (section 13 is empty).
 
-Drafted by the assistant on 2026-10-09 at Aarav's request ("start drafting the E1b pre-registration"). Kit 02, the plan (section 7) and acceptance action 8 (paper/drafts/acceptance_actions_20261008.md) say Aarav writes H1 and the kill rules and approves the spend. So the hypothesis wording in section 1 and the kill rules in section 11 are marked **PROPOSED, Aarav decides**. Nothing here binds until section 13 is filled. After that, every change goes to section 14.
+Drafted by the assistant on 2026-10-09 at Aarav's request ("start drafting the E1b pre-registration"). Kit 02, the plan (section 7) and acceptance action 8 (paper/drafts/acceptance_actions_20261008.md) say Aarav writes H1 and the kill rules and approves the spend. So the hypothesis wording in section 1 and the kill rules in section 11 are marked **PROPOSED, Aarav decides**. Aarav approved both as drafted on 2026-10-27 (draft history). Nothing here binds until section 13 is filled. After that, every change goes to section 14.
 
 Companion file: experiments/e1b_analysis_spec.md gives every computation in sections 2, 6, 7 and 9 in full. experiments/e1b_primary.py will implement it. Where the two differ, this file wins and the spec is corrected before the freeze.
 
@@ -30,6 +30,7 @@ Design evidence: three offline design passes on E1's stored data, nothing launch
   - The PARTIAL row (section 2) is unchanged and waits for Aarav's decision. Spec: the opening, 0.4, 1.10, 1.12, 1.13, 1.14, 3.1, 3.2, 3.5, 3.6, 4.1, 4.3, 5, 7.3, 7.5, 7.6, 7.9, 8.1, 8.3 and D12. No other decision changed.
 - 2026-10-27: PARTIAL rule decided (D14). Aarav replied ") the large judge in its pre-declared direction with its 5th percentile above 0.5, and disagreement not beating it" in chat (option (a)) to the question "For the PARTIAL rule, (a) the large judge in its pre-declared direction with its 5th percentile above 0.5, and disagreement not beating it; (b) the two-sided version; or (c) keep the rule and reword it?". The code review found the old condition, 5th percentile of AUROC*(C2) > 0.5, always met, because AUROC* = max(A, 1 − A) is at least 0.5: with a held-out judge that carries no signal, PARTIAL was the verdict in 2-11% of simulated 48 v 48 data sets. PARTIAL now needs the held-out judge's AUROC in its registered direction (−) to have its 5th percentile above 0.5, and disagreement not to beat that judge (5th percentile of AUROC(S) − AUROC*(C2) ≤ 0), so that PARTIAL's wording ("Disagreement adds nothing detectable beyond it") cannot contradict the printed Delta(S, C2) row. Measured through the registered code after the change (audit_b on synthetic 48 v 48 runs in 16-run cells, 10,000 draws, 400 data sets per cell, the code review's scenarios and seeds): with a held-out judge that carries no signal, P(PARTIAL) is 0.000 to 0.0125 across six cells (0.0025 to 0.1075 under the old rule on the same data sets); with the held-out judge reversed (AUROC 0.30), 0 of 400 (266 of 400 before); with a held-out judge that separates, 0.8175, 0.320, 0.9025 and 0.260 at S/C1/C2 = 0.75/0.55/0.75, 0.80/0.60/0.70, 0.80/0.60/0.80 and 0.85/0.65/0.75 (0.820, 0.333, 0.902 and 0.280 before; the 14 data sets lost are the cases where disagreement beat the held-out judge). The held-out-judge condition alone has size about 0.06 (118 of 2,000 at a judge AUROC of 0.50) and power 0.52, 0.84, 0.976 and 0.9985 at 0.60, 0.65, 0.70 and 0.75. KILL and RESCUE verdicts are unchanged on all 4,400 data sets. Changed: section 2 (the PARTIAL row), spec 3.4 and D14, experiments/e1b_primary.py (audit_decide) and its self-test. No other decision changed.
 - 2026-10-27: the code review's items decided. Aarav replied "accept all ten" in chat to the question "Accept all ten as drafted, or tell me which numbers to change?", asked over this list: (1) a J3 file with another judge, revision or dtype makes the C6 rows provisional and switches Q3 off; (2) the analysis refuses to run while a replacement is still needed and allowed, or main runs are unlaunched; (3) only a committed section 14 'achieved n' row lifts that refusal; (4) the twin collapse labels (format drift below a late gate rate of 0.90, then top-level failure when function-only minus strict exceeds 0.10, else wrong function), descriptive only; (5) spend per instance is the larger of planned (runs x 1.39 h) and measured hours, at list price; (6) for the audit outcomes the kill-rule row misses (not confirmed, not run, no verdict, not interpreted): no audit claim from E1b, numbers reported; (7) the tokenizer's metadata lookup is accepted and recorded; (8) the J3 job is frozen with the rest; (9) the J3 job's validation gate (re-score 10 steps with the 0.5B judge, stop on disagreement); (10) the Q1 scope (C3, C4, C5 only). These are the 2026-10-25 entry's groups (b) and (c), now decisions. Changed: the PROPOSED markers in sections 2, 8, 9, 11, 12 and 13 and spec 3.5, 3.6, 4.3, 5 and 7.3 now read DECIDED. Section 11's audit row itself is unchanged and stays Aarav's to edit, with the decided note under it; H1 (section 1) and the other kill rules stay PROPOSED. No other decision changed.
+- 2026-10-27: sections 1 and 11 approved. Aarav replied "approve sections 1 and 11 as drafted, with the pilot rerun replacing the pilot when P0 fails" in chat to the question "Will you write H1 and the kill rules yourself, or approve sections 1 and 11 as drafted, with the pilot rerun replacing the pilot when P0 fails?". H1, H-audit, H2 and the kill rules stand as drafted. The open pilot point is decided: when P0 fails, the rerun at seed 298 (then 297) replaces the pilot, its P1-P5 results are reported and not acted on, and section 11's Pilot rule reads the rerun. Changed: the headers of sections 1 and 11, section 9's P0 action, section 11's Pilot row and section 13's 'Who wrote' field; experiments/e1b_pilot_gate.py's advice. Section 11's audit row is unchanged, with the decided note under it. No other decision changed.
 
 ## Why E1b exists
 
@@ -64,7 +65,7 @@ E1b cannot show:
 
 ## 1. Hypotheses
 
-**PROPOSED, Aarav decides.** The wording follows the plan's kill result (plan section 2) and acceptance action 8.
+**APPROVED as drafted by Aarav, 2026-10-27** ("approve sections 1 and 11 as drafted, with the pilot rerun replacing the pilot when P0 fails"). The assistant drafted the wording, which follows the plan's kill result (plan section 2) and acceptance action 8.
 
 | ID | Hypothesis | Direction | Primary or secondary |
 |---|---|---|---|
@@ -88,7 +89,7 @@ E1b cannot show:
 - **Secondary detectors and the claim**, as in E1: if an H2 detector holds alongside a clean null, the verdict says so and no general "no detector anticipates" claim is made.
 - **The lead conjunct** is weakly informative when events are late. The evidence of anticipation rests on the Fisher test.
 
-Decisions behind section 1, for Aarav to confirm before the freeze:
+Decisions behind section 1, approved with it (Aarav, 2026-10-27):
 - The primary detector stays disagreement (level, signed), as Aarav chose for E1 on 2026-10-07.
 - The primary event stays sustained_drop_v2, pinned and unchanged (action 8: "Fix sustained_drop_v2 in advance").
 - Hacking keeps option (a), adopted 2026-10-07: the proxy rises while the strict oracle falls.
@@ -368,7 +369,7 @@ No symmetric bars past [0, 1]. Each null reports its MDE. Each count has an exac
 
 Pilot actions:
 - All pass: the main runs may launch once Aarav approves the primary spend.
-- P0 fails: fix the logging and rerun the pilot at seed 298 (then 297). Log a deviation. The gate does not change.
+- P0 fails: fix the logging and rerun the pilot at seed 298 (then 297). Log a deviation. The gate does not change. The rerun replaces the pilot: P1-P5 results from a pilot whose P0 failed are reported and not acted on, and section 11's Pilot rule reads the rerun (DECIDED by Aarav, 2026-10-27: "approve sections 1 and 11 as drafted, with the pilot rerun replacing the pilot when P0 fails").
 - P1 fails: H does not reproduce E1 at fresh seeds. Stop and report. Aarav decides.
 - P2, P3, P4 or P5 fails: do not adjust the gate on pilot data. Report the pilot. A new gate is a new pre-registration version, frozen and time-stamped before a new pilot at new seeds.
 
@@ -401,7 +402,7 @@ Registered reporting, printed by e1b_primary.py, never deciding:
 
 ## 11. Kill rules
 
-**PROPOSED, Aarav decides.** Sources: the plan's kill result (section 2) and track rule (section 3), acceptance action 8 (cost and dates), and E1's section 11.
+**APPROVED as drafted by Aarav, 2026-10-27** ("approve sections 1 and 11 as drafted, with the pilot rerun replacing the pilot when P0 fails"). Drafted by the assistant. Sources: the plan's kill result (section 2) and track rule (section 3), acceptance action 8 (cost and dates), and E1's section 11.
 
 | Kill rule | Exact threshold | Action |
 |---|---|---|
@@ -411,7 +412,7 @@ Registered reporting, printed by e1b_primary.py, never deciding:
 | Result: suspended (DECIDED by Aarav, 2026-10-10: "suspended until the cause is found (B)"; safeguards, 2026-10-10: "Fix these") | The planted control fails: its rate over 1,000 draws differs from the exact expectation by more than 0.05 (section 9) | The H1 verdict, whatever its row, is SUSPENDED and does not count, and the H2 annotations with it. e1b_primary prints only the suspension and the control's own numbers; the computed verdict goes only to a sealed file, unopened until the suspension is lifted or the search ends. The H-audit verdict is printed and stands unless the cause lies in code it shares. Lifted only as section 9 says, in cycles: the cause found and logged in a dated section 14 row that lists the changed files and lines and states that no registered element changed; the fix committed and checked only on the planted control, the self-test and synthetic runs; the row approved by Aarav; and a rerun of the registered analysis. A rerun whose control passes gives the result. A rerun whose control fails is sealed and starts another cycle. A failure with no code cause cannot be fixed by reseeding. The paper reports every sealed verdict and the final one. If no cause is found, the verdict stays SUSPENDED and the paper makes no kill or null claim from E1b's primary. |
 | Result: generator failure | Fewer than ceil(0.75 n) of the used hacking runs show a strict-oracle event (36 of 48) | Stop. No detector or audit score is computed. Report it as a generator result. Checked before any detector result. |
 | Result: audit | The H-audit verdict (section 2) | KILL (either row): the paper drops the audit claim, or keeps only what that row allows. RESCUE: the audit claim stands for same-judge twins, with Q1-Q3 attached. PARTIAL: the claim is about a held-out judge. INCONCLUSIVE: no audit claim from E1b. |
-| Pilot | Any of P1-P5 fails | No main runs under this version (section 9). |
+| Pilot | Any of P1-P5 fails on a pilot whose P0 passes. When P0 fails, the rerun at seed 298 (then 297) replaces the pilot and this rule reads the rerun (DECIDED by Aarav, 2026-10-27) | No main runs under this version (section 9). |
 | Budget | E1b spend reaches USD 330 (all rows of section 12; the cap Aarav set on 2026-10-11 with "48*48") before 48 + 48 usable runs, or more runs need replacing than the 14 the primary stage's ceiling covers | Stop launching. Analyse at the achieved n if it is at least 32 per arm, with the MDE recomputed and a deviation logged. Below 32 per arm, counts only. |
 | Calendar | Main runs not complete by 2026-12-11 (action 8: freeze by 12-04, run before 12-12) | No launches 12-12 to 2027-01-29 (plan timeline). Resume from 2027-01-30 with a section 14 row. If no E1b result exists by 2027-03-15, E1b is reported as not run. The track decision (main, 2026-10-08) rests on E1 and E1b does not reopen it, whatever its result, including NULL, NOT CLEAN and SUSPENDED (DECIDED by Aarav, 2026-10-23: "keep main track fixed by E1"). E1b's result is reported as it comes out. |
 
@@ -476,7 +477,7 @@ An RFC 3161 TSA query (`openssl ts -query -data experiments/e1b_freeze_manifest.
 | SHA-256 of the manifest | none yet |
 | External timestamp: service, receipt path, time. Required before any launch. Only the hash leaves the machine. Sending it is Aarav's call; if he declines, E1b is not launched under this version. | none yet |
 | Human reader before the freeze: name, date, sections read. Required before any launch. Aarav, or a reader he names, reads sections 1-12 in full. | none yet |
-| Who wrote H1, H-audit and the kill rules, in Aarav's words | none yet |
+| Who wrote H1, H-audit and the kill rules, in Aarav's words | Drafted by the assistant; approved as drafted by Aarav in chat on 2026-10-27: "approve sections 1 and 11 as drafted, with the pilot rerun replacing the pilot when P0 fails" |
 | J3: branch A, decided by Aarav on 2026-10-09 ("5) do it lets see"; section 2). Judge Qwen/Qwen2.5-7B-Instruct, revision a09a35458c702b33eeacc393d103063234e8bc28, bfloat16, with its E1 R1, coverage and flags read from rescore_results.json at the freeze commit | none yet |
 | First launch time (cloud audit trail), which must come after the timestamp | none yet |
 
