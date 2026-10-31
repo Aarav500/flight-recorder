@@ -1,6 +1,6 @@
 # E1b build contract (2026-10-23)
 
-Shared interfaces for the E1b freeze-prerequisite code, so the files can be built in parallel and still fit together. experiments/e1b_preregistration.md and experiments/e1b_analysis_spec.md (both DRAFT, not frozen) define what the code must do. Where this file and they differ, they win. Report the difference; never change them silently.
+Shared interfaces for the E1b freeze-prerequisite code, so the files can be built in parallel and still fit together. experiments/e1b_preregistration.md and experiments/e1b_analysis_spec.md define what the code must do. Where this file and they differ, they win. Report the difference; never change them silently.
 
 ## 1. Files and owners
 
