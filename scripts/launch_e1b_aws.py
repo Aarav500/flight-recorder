@@ -358,8 +358,8 @@ def aws(region, *args):
 
 def s3(*args):
     """aws s3 ... against the bucket's region -> (returncode, stdout, stderr)."""
-    r = subprocess.run([_aws_exe(), "s3", *args, "--region", BUCKET_REGION, "--only-show-errors"],
-                       capture_output=True, text=True)
+    quiet = [] if args[0] == "ls" else ["--only-show-errors"]      # the real `aws s3 ls` rejects the option (rc 252)
+    r = subprocess.run([_aws_exe(), "s3", *args, "--region", BUCKET_REGION, *quiet], capture_output=True, text=True)
     return r.returncode, r.stdout, r.stderr
 
 
@@ -1151,6 +1151,10 @@ def instance_info(recs):
         info = {"state": "unknown", "launch": None, "end": None}
         try:
             d = aws(region, "ec2", "describe-instances", "--instance-ids", iid)
+            if d is not None and d.get("Reservations") == []:      # AWS has purged it: rc 0, no reservations, no NotFound
+                info["state"] = "gone"
+                out[iid] = info
+                continue
             i = d["Reservations"][0]["Instances"][0]
             info["state"] = i["State"]["Name"]
             info["launch"] = _parse_utc(i.get("LaunchTime"))

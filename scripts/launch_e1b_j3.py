@@ -538,6 +538,8 @@ def describe(rec):
     call fails otherwise."""
     try:
         d = L.aws(rec.get("region", BUCKET_REGION), "ec2", "describe-instances", "--instance-ids", rec["instance_id"])
+        if d is not None and d.get("Reservations") == []:      # AWS has purged it: rc 0, no reservations, no NotFound
+            return "gone", None, None
         i = d["Reservations"][0]["Instances"][0]
     except RuntimeError as e:
         return ("gone" if _code(e) == "InvalidInstanceID.NotFound" else "unknown"), None, None
