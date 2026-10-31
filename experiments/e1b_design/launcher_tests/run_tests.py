@@ -244,6 +244,17 @@ class Ctx:
         for rel, text in (("experiments/e1b_pins.json", "{}\n"), ("experiments/e1b_selftest.txt", "placeholder\n")):
             src = REPO / rel
             (self.clone / rel).write_bytes(lf_bytes(src) if src.exists() else text.encode())
+        # F holds the draft's record cells whatever the real file holds: the tests write their own, and the refusal tests
+        # need the draft values
+        P = self.clone / "experiments/e1b_preregistration.md"
+        b = P.read_bytes()
+        for pat, rep in ((rb"(?m)^(\| Commit hash \| )[^|\n]*( \|)$", rb"\1none yet\2"),
+                         (rb"(?m)^(\| Human reader before the freeze[^\n]*\| )[^|\n]*( \|)$", rb"\1none yet\2"),
+                         (rb"(?m)^(\| Pilot \| 6 runs[^\n]*\| )[^|\n]*( \|)$", rb"\1pending\2"),
+                         (rb"(?m)^(\| Primary \| 96 runs[^\n]*\| )[^|\n]*( \|)$", rb"\1pending\2"),
+                         (rb"(?m)^(\| J3 scoring [^\n]*\| )[^|\n]*( \|)$", rb"\1pending approval\2")):
+            b = re.sub(pat, rep, b)
+        P.write_bytes(b)
         self.git("add", "-A")
         self.git("commit", "-q", "-m", "scratch: E1b freeze candidate F")
         self.F = self.git("rev-parse", "HEAD")

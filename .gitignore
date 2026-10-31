@@ -52,3 +52,4 @@ experiments/e1_rescore/_work/
 # held by an E1b launcher --submit while it runs (launch_e1b_aws.py, launch_e1b_j3.py); a killed one leaves it
 runs/e1b/**/launch.lock
 runs/e1b/instance_hours.json.lock
+scripts/e1b_autorun.pid

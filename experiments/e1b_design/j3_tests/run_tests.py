@@ -172,6 +172,17 @@ def make_clone(ctx, name):
             (clone / rel).parent.mkdir(parents=True, exist_ok=True)
             (clone / rel).write_bytes(lf(REPO / rel))
     (clone / "experiments/e1b_primary.py").write_bytes(lf(HERE / "stub_e1b_primary.py"))
+    # F holds the draft's record cells whatever the real file holds: the tests write their own, and the refusal tests
+    # need the draft values
+    P = clone / "experiments/e1b_preregistration.md"
+    b = P.read_bytes()
+    for pat, rep in ((rb"(?m)^(\| Commit hash \| )[^|\n]*( \|)$", rb"\1none yet\2"),
+                     (rb"(?m)^(\| Human reader before the freeze[^\n]*\| )[^|\n]*( \|)$", rb"\1none yet\2"),
+                     (rb"(?m)^(\| Pilot \| 6 runs[^\n]*\| )[^|\n]*( \|)$", rb"\1pending\2"),
+                     (rb"(?m)^(\| Primary \| 96 runs[^\n]*\| )[^|\n]*( \|)$", rb"\1pending\2"),
+                     (rb"(?m)^(\| J3 scoring [^\n]*\| )[^|\n]*( \|)$", rb"\1pending approval\2")):
+        b = re.sub(pat, rep, b)
+    P.write_bytes(b)
     git(clone, "add", "-A")
     git(clone, "commit", "-q", "-m", "scratch: E1b files with the J3 job (freeze candidate F)")
     return clone, git(clone, "rev-parse", "HEAD")
