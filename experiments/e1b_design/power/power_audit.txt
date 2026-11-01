@@ -1,0 +1,48 @@
+E1b AUDIT TEST POWER: paired bootstrap of AUROC(disagreement) - max AUROC(5 comparators), one-sided 95% percentile bound > 0. 1000 simulated experiments per cell, B = 2000. Monte Carlo SE <= 0.016.
+Model: MVN signal changes, unit variance; best comparator at A_best, 4 nuisance comparators at 0.60; corr(disagreement, best) = rho, all other pairs 0.3; comparator AUROCs direction-free.
+
+size check, A_dis = A_best = 0.80, rho 0.5, n = 24: rejection 0.035 (nominal 0.05)
+size check, A_dis = A_best = 0.80, rho 0.5, n = 36: rejection 0.046 (nominal 0.05)
+size check, A_dis = A_best = 0.80, rho 0.5, n = 48: rejection 0.033 (nominal 0.05)
+
+A_dis  A_best  rho  n=24   n=36   n=48 
+0.95   0.75   0.0  0.870  0.964  0.993
+0.95   0.75   0.5  0.959  0.997  0.999
+0.95   0.75   0.9  0.998  1.000  1.000
+0.95   0.85   0.0  0.517  0.664  0.767
+0.95   0.85   0.5  0.660  0.835  0.915
+0.95   0.85   0.9  0.970  0.999  1.000
+0.90   0.75   0.0  0.537  0.723  0.829
+0.90   0.75   0.5  0.699  0.900  0.967
+0.90   0.75   0.9  0.899  0.993  0.999
+0.90   0.80   0.0  0.392  0.484  0.597
+0.90   0.80   0.5  0.525  0.678  0.779
+0.90   0.80   0.9  0.839  0.984  1.000
+0.85   0.65   0.0  0.466  0.738  0.886
+0.85   0.65   0.5  0.529  0.858  0.970
+0.85   0.65   0.9  0.643  0.866  0.974
+0.85   0.75   0.0  0.263  0.379  0.480
+0.85   0.75   0.5  0.293  0.507  0.649
+0.85   0.75   0.9  0.529  0.838  0.974
+0.80   0.60   0.0  0.243  0.505  0.675
+0.80   0.60   0.5  0.263  0.533  0.745
+0.80   0.60   0.9  0.325  0.553  0.779
+0.75   0.60   0.0  0.087  0.180  0.321
+0.75   0.60   0.5  0.083  0.191  0.330
+0.75   0.60   0.9  0.081  0.231  0.349
+0.95   0.99   0.0  0.000  0.000  0.000
+0.95   0.99   0.5  0.001  0.000  0.000
+0.95   0.99   0.9  0.000  0.000  0.000
+
+One-sample alternative (disagreement AUROC > 0.5 alone, one-sided Mann-Whitney, alpha 0.05):
+  AUROC 0.60: n=24 0.318  n=36 0.425  n=48 0.519
+  AUROC 0.65: n=24 0.561  n=36 0.701  n=48 0.828
+  AUROC 0.70: n=24 0.794  n=36 0.919  n=48 0.969
+  AUROC 0.75: n=24 0.934  n=36 0.987  n=48 0.998
+  AUROC 0.80: n=24 0.991  n=36 1.000  n=48 1.000
+
+Anchors: AUROC implied by a hacking-minus-twin mean difference, both arms with E1's hacking-arm SD:
+  disagree    SD 0.056: diff 0.04 -> 0.69, diff 0.08 -> 0.84, diff 0.12 -> 0.93
+  judge_small SD 0.018: diff 0.01 -> 0.65, diff 0.02 -> 0.78, diff 0.04 -> 0.94
+  judge_big   SD 0.049: diff 0.02 -> 0.61, diff 0.04 -> 0.72, diff 0.08 -> 0.88
+  mean_len    SD 27.197: diff 10 -> 0.60, diff 20 -> 0.70, diff 40 -> 0.85

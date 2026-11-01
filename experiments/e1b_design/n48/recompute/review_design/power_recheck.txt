@@ -1,0 +1,25 @@
+n=24 fp=3 need=9 p(need)=0.0467 p(need-1)=0.0840 size_binom(TPR=FPR)=0.0017 pow0.5=0.924 mde80=0.44 pow0.375=0.576 pow0.33=0.392 pow0.35=0.474 pow0.40=0.672
+   mde90=0.49
+   nonsup0.20 max TP=3  P(TP<=k | TPR=FPR)=0.648  upper bounds: {3: 0.167, 4: 0.215, 5: 0.262, 6: 0.306, 7: 0.35}
+   inconclusive at TPR 0.25: P(4<=TP<=8)=0.76
+   inconclusive at TPR 0.30: P(4<=TP<=8)=0.68
+   H2 first Holm step need=14 pow0.5=0.271 mde=0.65
+n=36 fp=4 need=11 p(need)=0.0397 p(need-1)=0.0674 size_binom(TPR=FPR)=0.0013 pow0.5=0.994 mde80=0.36 pow0.375=0.849 pow0.33=0.682 pow0.35=0.766 pow0.40=0.910
+   mde90=0.4
+   nonsup0.20 max TP=6  P(TP<=k | TPR=FPR)=0.902  upper bounds: {4: 0.129, 5: 0.162, 6: 0.194, 7: 0.225, 8: 0.255}
+   inconclusive at TPR 0.25: P(7<=TP<=10)=0.56
+   inconclusive at TPR 0.30: P(7<=TP<=10)=0.41
+   H2 first Holm step need=16 pow0.5=0.797 mde=0.51
+n=48 fp=5 need=13 p(need)=0.0326 p(need-1)=0.0534 size_binom(TPR=FPR)=0.0010 pow0.5=1.000 mde80=0.32 pow0.375=0.952 pow0.33=0.848 pow0.35=0.906 pow0.40=0.978
+   mde90=0.35
+   nonsup0.20 max TP=8  P(TP<=k | TPR=FPR)=0.943  upper bounds: {5: 0.108, 6: 0.133, 7: 0.157, 8: 0.181, 9: 0.204}
+   inconclusive at TPR 0.25: P(9<=TP<=12)=0.46
+   inconclusive at TPR 0.30: P(9<=TP<=12)=0.25
+   H2 first Holm step need=18 pow0.5=0.970 mde=0.43
+E1 anchors p(8/24 v 3/24)=0.0840 p(9/24)=0.0467
+newcombe90 8v3 (0.007198097710730433, 0.39176382288547584) 9v3 (0.04355348033509854, 0.4328809170956036)
+nonsup at 0.25 at 36: 7 0.959159021439799
+planted Bin(36,0.36) power: 0.8020996909767854
+n=24 exchangeable null: FP always [3]; mean TP 3.164 (binomial model 3.000); var TP 4.987 (binomial 2.625); P(TP>=9)=0.0227 (binomial 0.0017); P(reject Fisher at realized FP)=0.0234
+n=36 exchangeable null: FP always [4]; mean TP 4.369 (binomial model 4.000); var TP 7.119 (binomial 3.556); P(TP>=11)=0.0246 (binomial 0.0013); P(reject Fisher at realized FP)=0.0245
+n=48 exchangeable null: FP always [5]; mean TP 5.584 (binomial model 5.000); var TP 9.341 (binomial 4.479); P(TP>=13)=0.0247 (binomial 0.0010); P(reject Fisher at realized FP)=0.0252

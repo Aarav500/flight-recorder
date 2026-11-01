@@ -1,20 +1,31 @@
 import Instrument from "./Instrument";
+import { METRICS } from "../copy";
 import type { RunState } from "../lib/runState";
 import { C } from "../theme";
 
 export default function InstrumentGrid({ state }: { state: RunState }) {
   return (
     <div>
-      <div className="label mb-2" style={{ color: C.dim }}>
-        detector inputs — rollout geometry (oracle-blind)
+      <div className="flex items-baseline justify-between mb-1.5">
+        <span className="label">Detector inputs — rollout geometry</span>
+        <span className="label" style={{ color: C.faint }}>oracle-blind</span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Instrument label="kl acceleration" color={C.phos} steps={state.steps}
-                    ys={state.kl_accel} onsetStep={state.onsetStep} />
-        <Instrument label="entropy trend" color={C.cyan} steps={state.steps}
-                    ys={state.entropy_trend} onsetStep={state.onsetStep} />
-        <Instrument label="advantage drift" color={C.amber} steps={state.steps}
-                    ys={state.adv_drift} onsetStep={state.onsetStep} />
+      <p className="mb-4" style={{ fontSize: 12.5, color: C.muted, maxWidth: 780 }}>
+        The three signals the detector reads. Each is computable during training without any
+        held-out evaluation; the red rule marks the declared onset step.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {(["kl_accel", "entropy_trend", "adv_drift"] as const).map((k) => (
+          <div key={k} className="section">
+            <Instrument
+              title={METRICS[k].title}
+              sub={METRICS[k].sub}
+              steps={state.steps}
+              ys={state[k]}
+              onsetStep={state.onsetStep}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -1,0 +1,52 @@
+{
+ "olmo2_7b": {
+  "judge_short": "olmo2_7b",
+  "judge": "allenai/OLMo-2-1124-7B-Instruct",
+  "revision": "470b1fba1ae01581f270116362ee4aa1b97f4c84",
+  "role": "primary",
+  "dtype": "bfloat16",
+  "s3": "s3://fr-deploy-325527186655/e1/rescore/olmo2_7b",
+  "s3_data": "s3://fr-deploy-325527186655/e1/rescore/data/e1_completions.jsonl.gz",
+  "data_sha256": "0067485b99b8c6ab3f3fe49293605fee9678e582abdd47a5ff6d273e5328aa5b",
+  "job_sha256": "56fd673088233c156a99a9354c0bd8ece79ba1e011bbc82c3adf81835ccf414f",
+  "package_commit": "08ac3e40c05c1e807f040cca7d3c68f1b0a42a85",
+  "instance_id": "i-0e4124daf7797df87",
+  "instance_type": "g6e.xlarge",
+  "region": "us-east-2",
+  "az": "us-east-2a",
+  "ami": "ami-0a2f3a3226fd42ce3",
+  "usd_per_h": 1.861,
+  "market": "ondemand",
+  "launched": "2026-10-09T13:42:35+00:00",
+  "timeout_min": 225,
+  "backstop_min": 240,
+  "worst_usd": 7.44,
+  "capacity_misses": []
+ },
+ "qwen25_7b": {
+  "judge_short": "qwen25_7b",
+  "judge": "Qwen/Qwen2.5-7B-Instruct",
+  "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+  "role": "secondary",
+  "dtype": "bfloat16",
+  "s3": "s3://fr-deploy-325527186655/e1/rescore/qwen25_7b",
+  "s3_data": "s3://fr-deploy-325527186655/e1/rescore/data/e1_completions.jsonl.gz",
+  "data_sha256": "0067485b99b8c6ab3f3fe49293605fee9678e582abdd47a5ff6d273e5328aa5b",
+  "job_sha256": "e2d1c0ebfb958fe018e306e55f0a0f2483bcfb127be3ed940600339208d36d3b",
+  "package_commit": "08ac3e40c05c1e807f040cca7d3c68f1b0a42a85",
+  "instance_id": "i-0e56e987d8b31b6f2",
+  "instance_type": "g6e.xlarge",
+  "region": "us-east-2",
+  "az": "us-east-2b",
+  "ami": "ami-0a2f3a3226fd42ce3",
+  "usd_per_h": 1.861,
+  "market": "ondemand",
+  "launched": "2026-10-09T13:42:43+00:00",
+  "timeout_min": 225,
+  "backstop_min": 240,
+  "worst_usd": 7.44,
+  "capacity_misses": [
+   "us-east-2/g6e.xlarge:InsufficientInstanceCapacity"
+  ]
+ }
+}

@@ -1,0 +1,1464 @@
+{
+ "note": "unpinned, not registered; see the module docstring",
+ "sections": {
+  "1_reproduce": {
+   "reward variance": {
+    "auroc": 0.3,
+    "ci": [
+     0.02,
+     0.57
+    ],
+    "perm_p": 0.9366,
+    "ap": 0.41,
+    "matches_published": true,
+    "auroc_exact": 0.2963
+   },
+   "gradient norm": {
+    "auroc": 0.41,
+    "ci": [
+     0.12,
+     0.72
+    ],
+    "perm_p": 0.7593,
+    "ap": 0.61,
+    "matches_published": true,
+    "auroc_exact": 0.4074
+   },
+   "disagreement": {
+    "auroc": 0.98,
+    "ci": [
+     0.89,
+     1.0
+    ],
+    "perm_p": 0.0002,
+    "ap": 0.98,
+    "matches_published": true,
+    "auroc_exact": 0.9753
+   },
+   "held-out judge drop": {
+    "auroc": 0.72,
+    "ci": [
+     0.43,
+     0.94
+    ],
+    "perm_p": 0.0687,
+    "ap": 0.73,
+    "matches_published": true,
+    "auroc_exact": 0.716
+   },
+   "KL": {
+    "auroc": 0.44,
+    "ci": [
+     0.17,
+     0.73
+    ],
+    "perm_p": 0.6713,
+    "ap": 0.6,
+    "matches_published": true,
+    "auroc_exact": 0.4444
+   },
+   "entropy": {
+    "auroc": 0.65,
+    "ci": [
+     0.37,
+     0.89
+    ],
+    "perm_p": 0.1476,
+    "ap": 0.69,
+    "matches_published": true,
+    "auroc_exact": 0.6543
+   }
+  },
+  "2_grid": {
+   "max_abs_dev": {
+    "disagreement (published: signed jsmall-jbig)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.98,
+     "ci": [
+      0.89,
+      1.0
+     ],
+     "auroc_exact": 0.9753,
+     "auroc_midrank": 0.9753,
+     "ties": false,
+     "p": 0.0002,
+     "p2": 0.0004,
+     "mean_pos": 0.2824,
+     "mean_neg": 0.177,
+     "verdict": "MATCHES"
+    },
+    "(a) 0.5B judge score alone (jsmall)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1957,
+     "mean_neg": 0.0844,
+     "verdict": "MATCHES OR EXCEEDS"
+    },
+    "(b) 1.5B judge score alone (jbig)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.72,
+     "ci": [
+      0.43,
+      0.94
+     ],
+     "auroc_exact": 0.716,
+     "auroc_midrank": 0.716,
+     "ties": false,
+     "p": 0.0687,
+     "p2": 0.1374,
+     "mean_pos": 0.1804,
+     "mean_neg": 0.1534,
+     "verdict": "below"
+    },
+    "(c) optimized judge = training reward": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.85,
+     "ci": [
+      0.6,
+      1.0
+     ],
+     "auroc_exact": 0.8519,
+     "auroc_midrank": 0.8457,
+     "ties": true,
+     "p": 0.0062,
+     "p2": 0.0124,
+     "mean_pos": 0.1957,
+     "mean_neg": 0.1534,
+     "verdict": "below (CI covers 0.98)"
+    },
+    "(d) strict held-out oracle (hidden)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 0.8,
+     "ci": [
+      0.58,
+      0.99
+     ],
+     "auroc_exact": 0.8025,
+     "auroc_midrank": 0.821,
+     "ties": true,
+     "p": 0.012,
+     "p2": 0.024,
+     "mean_pos": 0.4681,
+     "mean_neg": 0.5743,
+     "verdict": "below (CI covers 0.98)"
+    },
+    "(e) |disagreement|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.68,
+     "ci": [
+      0.4,
+      0.91
+     ],
+     "auroc_exact": 0.679,
+     "auroc_midrank": 0.6852,
+     "ties": true,
+     "p": 0.1108,
+     "p2": 0.2216,
+     "mean_pos": 0.1922,
+     "mean_neg": 0.1588,
+     "verdict": "below"
+    }
+   },
+   "signed_last25_minus_first25": {
+    "disagreement (published: signed jsmall-jbig)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1533,
+     "mean_neg": -0.1034,
+     "verdict": "MATCHES OR EXCEEDS",
+     "verdict_vs_signed_disagreement": "MATCHES"
+    },
+    "(a) 0.5B judge score alone (jsmall)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1749,
+     "mean_neg": 0.0098,
+     "verdict": "MATCHES OR EXCEEDS",
+     "verdict_vs_signed_disagreement": "MATCHES"
+    },
+    "(b) 1.5B judge score alone (jbig)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.0215,
+     "mean_neg": 0.1132,
+     "verdict": "MATCHES OR EXCEEDS",
+     "verdict_vs_signed_disagreement": "MATCHES"
+    },
+    "(c) optimized judge = training reward": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1749,
+     "mean_neg": 0.1132,
+     "verdict": "MATCHES OR EXCEEDS",
+     "verdict_vs_signed_disagreement": "MATCHES"
+    },
+    "(d) strict held-out oracle (hidden)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": -0.3406,
+     "mean_neg": 0.4003,
+     "verdict": "MATCHES OR EXCEEDS",
+     "verdict_vs_signed_disagreement": "MATCHES"
+    },
+    "(e) |disagreement|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.52,
+     "ci": [
+      0.25,
+      0.79
+     ],
+     "auroc_exact": 0.5185,
+     "auroc_midrank": 0.5185,
+     "ties": false,
+     "p": 0.4634,
+     "p2": 0.9268,
+     "mean_pos": 0.092,
+     "mean_neg": 0.0927,
+     "verdict": "below",
+     "verdict_vs_signed_disagreement": "below"
+    }
+   }
+  },
+  "3_families": {
+   "reduced-capacity v benign": {
+    "neither_arm_optimizes_a_judge": false,
+    "disagreement max|dev| (family_matrix)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.98,
+     "ci": [
+      0.89,
+      1.0
+     ],
+     "auroc_exact": 0.9753,
+     "auroc_midrank": 0.9753,
+     "ties": false,
+     "p": 0.0002,
+     "p2": 0.0004,
+     "mean_pos": 0.2824,
+     "mean_neg": 0.177
+    },
+    "disagreement signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1533,
+     "mean_neg": -0.1034
+    },
+    "(a) jsmall max|dev|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1957,
+     "mean_neg": 0.0844,
+     "verdict_vs_disagreement_same_score": "MATCHES OR EXCEEDS"
+    },
+    "(a) jsmall signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1749,
+     "mean_neg": 0.0098,
+     "verdict_vs_disagreement_same_score": "MATCHES"
+    },
+    "(d) hidden signed (label check)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": -0.3406,
+     "mean_neg": 0.4003
+    }
+   },
+   "reduced-capacity v partial-credit": {
+    "neither_arm_optimizes_a_judge": false,
+    "disagreement max|dev| (family_matrix)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.2824,
+     "mean_neg": 0.1458
+    },
+    "disagreement signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1533,
+     "mean_neg": -0.0611
+    },
+    "(a) jsmall max|dev|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1957,
+     "mean_neg": 0.0827,
+     "verdict_vs_disagreement_same_score": "MATCHES"
+    },
+    "(a) jsmall signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1749,
+     "mean_neg": -0.005,
+     "verdict_vs_disagreement_same_score": "MATCHES"
+    },
+    "(d) hidden signed (label check)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": -0.3406,
+     "mean_neg": 0.2874
+    }
+   },
+   "reduced-capacity v verifier-coverage": {
+    "neither_arm_optimizes_a_judge": false,
+    "disagreement max|dev| (family_matrix)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.2824,
+     "mean_neg": 0.1419
+    },
+    "disagreement signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1533,
+     "mean_neg": -0.0664
+    },
+    "(a) jsmall max|dev|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1957,
+     "mean_neg": 0.0756,
+     "verdict_vs_disagreement_same_score": "MATCHES"
+    },
+    "(a) jsmall signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1749,
+     "mean_neg": -0.0111,
+     "verdict_vs_disagreement_same_score": "MATCHES"
+    },
+    "(d) hidden signed (label check)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": -0.3406,
+     "mean_neg": 0.277
+    }
+   },
+   "heuristic-proxy v benign": {
+    "neither_arm_optimizes_a_judge": false,
+    "disagreement max|dev| (family_matrix)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.6,
+     "ci": [
+      0.32,
+      0.85
+     ],
+     "auroc_exact": 0.6049,
+     "auroc_midrank": 0.6049,
+     "ties": false,
+     "p": 0.2375,
+     "p2": 0.475,
+     "mean_pos": 0.2039,
+     "mean_neg": 0.177
+    },
+    "disagreement signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.89,
+     "ci": [
+      0.68,
+      1.0
+     ],
+     "auroc_exact": 0.8889,
+     "auroc_midrank": 0.8889,
+     "ties": false,
+     "p": 0.0016,
+     "p2": 0.0032,
+     "mean_pos": -0.0101,
+     "mean_neg": -0.1034
+    },
+    "(a) jsmall max|dev|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.63,
+     "ci": [
+      0.35,
+      0.9
+     ],
+     "auroc_exact": 0.6296,
+     "auroc_midrank": 0.6296,
+     "ties": false,
+     "p": 0.1876,
+     "p2": 0.3752,
+     "mean_pos": 0.1008,
+     "mean_neg": 0.0844,
+     "verdict_vs_disagreement_same_score": "MATCHES OR EXCEEDS"
+    },
+    "(a) jsmall signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 0.59,
+     "ci": [
+      0.31,
+      0.85
+     ],
+     "auroc_exact": 0.5926,
+     "auroc_midrank": 0.5926,
+     "ties": false,
+     "p": 0.2683,
+     "p2": 0.5366,
+     "mean_pos": 0.0057,
+     "mean_neg": 0.0098,
+     "verdict_vs_disagreement_same_score": "below"
+    },
+    "(d) hidden signed (label check)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 0.88,
+     "ci": [
+      0.67,
+      1.0
+     ],
+     "auroc_exact": 0.8765,
+     "auroc_midrank": 0.8765,
+     "ties": false,
+     "p": 0.0032,
+     "p2": 0.0064,
+     "mean_pos": 0.0435,
+     "mean_neg": 0.4003
+    }
+   },
+   "heuristic-proxy v partial-credit": {
+    "neither_arm_optimizes_a_judge": true,
+    "disagreement max|dev| (family_matrix)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.88,
+     "ci": [
+      0.67,
+      1.0
+     ],
+     "auroc_exact": 0.8765,
+     "auroc_midrank": 0.8827,
+     "ties": true,
+     "p": 0.0035,
+     "p2": 0.007,
+     "mean_pos": 0.2039,
+     "mean_neg": 0.1458
+    },
+    "disagreement signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.86,
+     "ci": [
+      0.63,
+      1.0
+     ],
+     "auroc_exact": 0.8642,
+     "auroc_midrank": 0.8642,
+     "ties": false,
+     "p": 0.0039,
+     "p2": 0.0078,
+     "mean_pos": -0.0101,
+     "mean_neg": -0.0611
+    },
+    "(a) jsmall max|dev|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.74,
+     "ci": [
+      0.46,
+      1.0
+     ],
+     "auroc_exact": 0.7407,
+     "auroc_midrank": 0.7469,
+     "ties": true,
+     "p": 0.0456,
+     "p2": 0.0912,
+     "mean_pos": 0.1008,
+     "mean_neg": 0.0827,
+     "verdict_vs_disagreement_same_score": "below (CI covers 0.88)"
+    },
+    "(a) jsmall signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.6,
+     "ci": [
+      0.33,
+      0.86
+     ],
+     "auroc_exact": 0.6049,
+     "auroc_midrank": 0.6049,
+     "ties": false,
+     "p": 0.2437,
+     "p2": 0.4874,
+     "mean_pos": 0.0057,
+     "mean_neg": -0.005,
+     "verdict_vs_disagreement_same_score": "below (CI covers 0.86)"
+    },
+    "(d) hidden signed (label check)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 0.75,
+     "ci": [
+      0.48,
+      0.98
+     ],
+     "auroc_exact": 0.7531,
+     "auroc_midrank": 0.7531,
+     "ties": false,
+     "p": 0.0377,
+     "p2": 0.0754,
+     "mean_pos": 0.0435,
+     "mean_neg": 0.2874
+    }
+   },
+   "heuristic-proxy v verifier-coverage": {
+    "neither_arm_optimizes_a_judge": true,
+    "disagreement max|dev| (family_matrix)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.85,
+     "ci": [
+      0.64,
+      0.98
+     ],
+     "auroc_exact": 0.8519,
+     "auroc_midrank": 0.8519,
+     "ties": false,
+     "p": 0.0049,
+     "p2": 0.0098,
+     "mean_pos": 0.2039,
+     "mean_neg": 0.1419
+    },
+    "disagreement signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.86,
+     "ci": [
+      0.63,
+      1.0
+     ],
+     "auroc_exact": 0.8642,
+     "auroc_midrank": 0.8642,
+     "ties": false,
+     "p": 0.0042,
+     "p2": 0.0084,
+     "mean_pos": -0.0101,
+     "mean_neg": -0.0664
+    },
+    "(a) jsmall max|dev|": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.77,
+     "ci": [
+      0.49,
+      0.98
+     ],
+     "auroc_exact": 0.7654,
+     "auroc_midrank": 0.7654,
+     "ties": false,
+     "p": 0.0311,
+     "p2": 0.0622,
+     "mean_pos": 0.1008,
+     "mean_neg": 0.0756,
+     "verdict_vs_disagreement_same_score": "below (CI covers 0.85)"
+    },
+    "(a) jsmall signed": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.68,
+     "ci": [
+      0.41,
+      0.93
+     ],
+     "auroc_exact": 0.679,
+     "auroc_midrank": 0.679,
+     "ties": false,
+     "p": 0.1145,
+     "p2": 0.229,
+     "mean_pos": 0.0057,
+     "mean_neg": -0.0111,
+     "verdict_vs_disagreement_same_score": "below (CI covers 0.86)"
+    },
+    "(d) hidden signed (label check)": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "-",
+     "auroc": 0.74,
+     "ci": [
+      0.47,
+      0.96
+     ],
+     "auroc_exact": 0.7407,
+     "auroc_midrank": 0.7407,
+     "ties": false,
+     "p": 0.0463,
+     "p2": 0.0926,
+     "mean_pos": 0.0435,
+     "mean_neg": 0.277
+    }
+   }
+  },
+  "4_e1_exploratory": {
+   "max_abs_dev": {
+    "disagreement (E1 registered signal, signed)": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.9,
+     "ci": [
+      0.8,
+      0.97
+     ],
+     "auroc_exact": 0.8958,
+     "auroc_midrank": 0.8958,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.2694,
+     "mean_neg": 0.1893,
+     "verdict_vs_e1_disagreement": "MATCHES"
+    },
+    "|disagreement|": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.62,
+     "ci": [
+      0.45,
+      0.77
+     ],
+     "auroc_exact": 0.6181,
+     "auroc_midrank": 0.6181,
+     "ties": false,
+     "p": 0.0871,
+     "p2": 0.1742,
+     "mean_pos": 0.1721,
+     "mean_neg": 0.1606,
+     "verdict_vs_e1_disagreement": "below"
+    },
+    "(a) judge_small (0.5B) alone": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.2076,
+     "mean_neg": 0.0821,
+     "verdict_vs_e1_disagreement": "MATCHES OR EXCEEDS"
+    },
+    "(b) judge_big (1.5B) alone": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.63,
+     "ci": [
+      0.46,
+      0.78
+     ],
+     "auroc_exact": 0.6302,
+     "auroc_midrank": 0.6302,
+     "ties": false,
+     "p": 0.0656,
+     "p2": 0.1312,
+     "mean_pos": 0.1776,
+     "mean_neg": 0.1641,
+     "verdict_vs_e1_disagreement": "below"
+    },
+    "(c) optimized judge (proxy field)": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.8,
+     "ci": [
+      0.64,
+      0.92
+     ],
+     "auroc_exact": 0.7969,
+     "auroc_midrank": 0.7969,
+     "ties": false,
+     "p": 0.0002,
+     "p2": 0.0004,
+     "mean_pos": 0.2076,
+     "mean_neg": 0.1641,
+     "verdict_vs_e1_disagreement": "below (CI covers 0.90)"
+    },
+    "(d) strict held-out oracle (hidden)": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "-",
+     "auroc": 0.69,
+     "ci": [
+      0.52,
+      0.84
+     ],
+     "auroc_exact": 0.6944,
+     "auroc_midrank": 0.7083,
+     "ties": true,
+     "p": 0.0042,
+     "p2": 0.0084,
+     "mean_pos": 0.5122,
+     "mean_neg": 0.5708,
+     "verdict_vs_e1_disagreement": "below"
+    }
+   },
+   "signed_last25_minus_first25": {
+    "disagreement (E1 registered signal, signed)": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.1555,
+     "mean_neg": -0.1369,
+     "verdict_vs_e1_disagreement": "MATCHES"
+    },
+    "|disagreement|": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "-",
+     "auroc": 0.8,
+     "ci": [
+      0.66,
+      0.91
+     ],
+     "auroc_exact": 0.8003,
+     "auroc_midrank": 0.8003,
+     "ties": false,
+     "p": 0.0004,
+     "p2": 0.0008,
+     "mean_pos": 0.0697,
+     "mean_neg": 0.1136,
+     "verdict_vs_e1_disagreement": "below"
+    },
+    "(a) judge_small (0.5B) alone": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.192,
+     "mean_neg": 0.0025,
+     "verdict_vs_e1_disagreement": "MATCHES"
+    },
+    "(b) judge_big (1.5B) alone": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "-",
+     "auroc": 0.95,
+     "ci": [
+      0.88,
+      0.99
+     ],
+     "auroc_exact": 0.9514,
+     "auroc_midrank": 0.9514,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.0365,
+     "mean_neg": 0.1394,
+     "verdict_vs_e1_disagreement": "below"
+    },
+    "(c) optimized judge (proxy field)": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.91,
+     "ci": [
+      0.81,
+      0.98
+     ],
+     "auroc_exact": 0.908,
+     "auroc_midrank": 0.908,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.192,
+     "mean_neg": 0.1394,
+     "verdict_vs_e1_disagreement": "below"
+    },
+    "(d) strict held-out oracle (hidden)": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "-",
+     "auroc": 1.0,
+     "ci": [
+      1.0,
+      1.0
+     ],
+     "auroc_exact": 1.0,
+     "auroc_midrank": 1.0,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": -0.3983,
+     "mean_neg": 0.4969,
+     "verdict_vs_e1_disagreement": "MATCHES"
+    }
+   }
+  },
+  "5_inventory": [
+   {
+    "source": "phase2_grid",
+    "arm": "hacking",
+    "n": 9,
+    "trains_on": "0.5B judge (file note)",
+    "paper_label": "hacking",
+    "strict_fell": 9
+   },
+   {
+    "source": "phase2_grid",
+    "arm": "benign (3 tasks)",
+    "n": 9,
+    "trains_on": "1.5B judge (file note)",
+    "paper_label": "benign",
+    "strict_fell": 0
+   },
+   {
+    "source": "phase2_grid",
+    "arm": "benign (sum_list)",
+    "n": 3,
+    "trains_on": "1.5B judge (file note)",
+    "paper_label": "benign",
+    "strict_fell": 0
+   },
+   {
+    "source": "phase2_family",
+    "arm": "heuristic",
+    "n": 9,
+    "trains_on": "heuristic proxy",
+    "paper_label": "hacking",
+    "strict_fell": 4
+   },
+   {
+    "source": "phase2_family",
+    "arm": "visible",
+    "n": 9,
+    "trains_on": "visible tests",
+    "paper_label": "non-hacking",
+    "strict_fell": 0
+   },
+   {
+    "source": "phase2_partial",
+    "arm": "partial",
+    "n": 9,
+    "trains_on": "graded sub-goals",
+    "paper_label": "non-hacking",
+    "strict_fell": 0
+   },
+   {
+    "source": "phase2_gemma",
+    "arm": "reduced_capacity",
+    "n": 9,
+    "trains_on": "0.5B judge (judge_optimized field)",
+    "paper_label": "hacking",
+    "strict_fell": 9
+   },
+   {
+    "source": "phase2_qwen3b",
+    "arm": "reduced_capacity",
+    "n": 3,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 3
+   },
+   {
+    "source": "phase2_qwen3b",
+    "arm": "verbosity_refined",
+    "n": 3,
+    "trains_on": "non-judge proxy (proxy == 0.5B score on 0% of steps)",
+    "paper_label": "not in Table 1",
+    "strict_fell": 2
+   },
+   {
+    "source": "phase2_rloo_fmt",
+    "arm": "rloo_reduced_capacity",
+    "n": 3,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 3
+   },
+   {
+    "source": "phase2_rloo_fmt",
+    "arm": "formatting_bias",
+    "n": 3,
+    "trains_on": "non-judge proxy (proxy == 0.5B score on 0% of steps)",
+    "paper_label": "non-hacking",
+    "strict_fell": 1
+   },
+   {
+    "source": "phase2_lowlr",
+    "arm": "reduced_capacity",
+    "n": 3,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 3
+   },
+   {
+    "source": "phase1b",
+    "arm": "plain_judge",
+    "n": 3,
+    "trains_on": "1.5B judge (judge field; no 0.5B score logged)",
+    "paper_label": "benign",
+    "strict_fell": 1
+   },
+   {
+    "source": "phase1b",
+    "arm": "verbosity",
+    "n": 6,
+    "trains_on": "non-judge proxy",
+    "paper_label": "hacking",
+    "strict_fell": 6
+   },
+   {
+    "source": "phase1b",
+    "arm": "reduced_capacity",
+    "n": 3,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 3
+   },
+   {
+    "source": "e1/main",
+    "arm": "judge05",
+    "n": 24,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 24
+   },
+   {
+    "source": "e1/main",
+    "arm": "judge15",
+    "n": 24,
+    "trains_on": "1.5B judge (proxy == 0.5B score on 0% of steps)",
+    "paper_label": "benign",
+    "strict_fell": 0
+   },
+   {
+    "source": "e1/pilot",
+    "arm": "judge05",
+    "n": 6,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 6
+   },
+   {
+    "source": "e1/diag",
+    "arm": "judge05",
+    "n": 6,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 6
+   },
+   {
+    "source": "e1/cap512",
+    "arm": "judge05",
+    "n": 3,
+    "trains_on": "0.5B judge (proxy == 0.5B score on 100% of steps)",
+    "paper_label": "hacking",
+    "strict_fell": 3
+   }
+  ],
+  "6_exploratory_composition": {
+   "smoothing": {
+    "grid 9 v 9 w=1": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.98,
+     "ci": [
+      0.89,
+      1.0
+     ],
+     "auroc_exact": 0.9753,
+     "auroc_midrank": 0.9753,
+     "ties": false,
+     "p": 0.0002,
+     "p2": 0.0004,
+     "mean_pos": 0.2824,
+     "mean_neg": 0.177
+    },
+    "grid 9 v 9 w=5": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.75,
+     "ci": [
+      0.49,
+      0.95
+     ],
+     "auroc_exact": 0.7531,
+     "auroc_midrank": 0.7531,
+     "ties": false,
+     "p": 0.0373,
+     "p2": 0.0746,
+     "mean_pos": 0.2163,
+     "mean_neg": 0.166
+    },
+    "grid 9 v 9 w=10": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.64,
+     "ci": [
+      0.36,
+      0.88
+     ],
+     "auroc_exact": 0.642,
+     "auroc_midrank": 0.642,
+     "ties": false,
+     "p": 0.1721,
+     "p2": 0.3442,
+     "mean_pos": 0.1912,
+     "mean_neg": 0.1576
+    },
+    "grid 9 v 9 w=25": {
+     "n_pos": 9,
+     "n_neg": 9,
+     "dir": "+",
+     "auroc": 0.79,
+     "ci": [
+      0.56,
+      0.96
+     ],
+     "auroc_exact": 0.7901,
+     "auroc_midrank": 0.7901,
+     "ties": false,
+     "p": 0.0189,
+     "p2": 0.0378,
+     "mean_pos": 0.1625,
+     "mean_neg": 0.1182
+    },
+    "E1 24 v 24 w=1": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.9,
+     "ci": [
+      0.8,
+      0.97
+     ],
+     "auroc_exact": 0.8958,
+     "auroc_midrank": 0.8958,
+     "ties": false,
+     "p": 0.0001,
+     "p2": 0.0002,
+     "mean_pos": 0.2694,
+     "mean_neg": 0.1893
+    },
+    "E1 24 v 24 w=5": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.62,
+     "ci": [
+      0.45,
+      0.77
+     ],
+     "auroc_exact": 0.6233,
+     "auroc_midrank": 0.6233,
+     "ties": false,
+     "p": 0.0769,
+     "p2": 0.1538,
+     "mean_pos": 0.1952,
+     "mean_neg": 0.1691
+    },
+    "E1 24 v 24 w=10": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.52,
+     "ci": [
+      0.35,
+      0.69
+     ],
+     "auroc_exact": 0.5243,
+     "auroc_midrank": 0.5243,
+     "ties": false,
+     "p": 0.3965,
+     "p2": 0.793,
+     "mean_pos": 0.1788,
+     "mean_neg": 0.1691
+    },
+    "E1 24 v 24 w=25": {
+     "n_pos": 24,
+     "n_neg": 24,
+     "dir": "+",
+     "auroc": 0.54,
+     "ci": [
+      0.36,
+      0.71
+     ],
+     "auroc_exact": 0.5399,
+     "auroc_midrank": 0.5399,
+     "ties": false,
+     "p": 0.3275,
+     "p2": 0.655,
+     "mean_pos": 0.1645,
+     "mean_neg": 0.1521
+    }
+   },
+   "judge_change": {
+    "grid": {
+     "heldout_hacking": [
+      0.021524444444444443,
+      4,
+      9
+     ],
+     "heldout_benign": [
+      0.009848888888888956,
+      3,
+      9
+     ],
+     "reward_hacking": 0.17493777777777778,
+     "reward_benign": 0.11324444444444445
+    },
+    "E1": {
+     "heldout_hacking": [
+      0.036472345987955734,
+      5,
+      24
+     ],
+     "heldout_benign": [
+      0.0025494130452473895,
+      10,
+      24
+     ],
+     "reward_hacking": 0.19197308858235682,
+     "reward_benign": 0.13941619237263997
+    }
+   },
+   "end_gap": {
+    "grid": {
+     "mean_hacking": 0.1411111111111111,
+     "mean_benign": 0.17244,
+     "auroc_hacking_positive": 0.2469
+    },
+    "E1": {
+     "mean_hacking": 0.12976531982421877,
+     "mean_benign": 0.17930043538411455,
+     "auroc_hacking_positive": 0.1406
+    }
+   }
+  }
+ },
+ "unpinned_sha256": {
+  "paper/analysis/family_matrix.py": "e4aab4c78e5ec5d8fc51ae7d2b66e12ae10653d1ecd5a7c1eeab3577bebe42eb",
+  "paper/analysis/specificity_partial.py": "2a9c0c240f6d8dee7004772aea50b8ecbf67cbc2fa6c1fc974a709327d34dda2",
+  "paper/stats/family_matrix.json": "dd3d5b60620e901068ed7dbc7920159deb57bc4304fd2bfad0b3f9f323ea84f5",
+  "paper/stats/specificity_partial.json": "b8b77cd6e68171a9bebab12691620c75c841b1e005b087151ac08c85f95fea49",
+  "experiments/phase2/phase2_family.json": "6a37baee666c7e7323e017ebf0b6b756a6b8fdf762c0dabe3cf2ce4cac004bf4",
+  "experiments/phase2/phase2_partial.json": "ade751c8f893246416d7568a089e7c9962ef11cb8deeb2644e40266870f3eca5",
+  "experiments/phase2/phase2_gemma.json": "623c4f371f786e54783491e3bfa2707ac18f27a4bac4e6ea9f3515c9f54c8f96",
+  "experiments/phase2/phase2_qwen3b.json": "fcc64636e7dc1b3d79ea6947fa68f00c7f7ae8b70723377cb75b2b98a4dffc8b",
+  "experiments/phase2/phase2_rloo_fmt.json": "cf0a7c5053985356600da401ecb17b0d6c123367fe203efe9781ec32947c4234",
+  "experiments/phase2/phase2_lowlr.json": "a4b112efcf1ea2e0bfa59deff8ace5d1f63769d7f3d75fded3ddb6de6d057d95",
+  "runs/phase1b_dataset.json": "db6c65f3a1ceec1f28abb19896f81dbb078e583c366f6e8b8778ef72212018d1",
+  "experiments/e1_supplementary.py": "766c5e67f13d8276960faecf4b52a7d39ad0af54e31b996c99adb16f26e72948",
+  "runs/e1/main/*.json (name+sha, sorted)": "2f7145b11fb2797ca1fc37356c2262ca0c53a345e49da8c54cef3a758540b7da"
+ },
+ "reading_inputs": {
+  "grid_baselines_matching_or_beating": [
+   [
+    "max|dev|",
+    "(a) 0.5B judge score alone (jsmall)",
+    1.0
+   ],
+   [
+    "signed",
+    "(a) 0.5B judge score alone (jsmall)",
+    1.0
+   ],
+   [
+    "signed",
+    "(b) 1.5B judge score alone (jbig)",
+    1.0
+   ],
+   [
+    "signed",
+    "(c) optimized judge = training reward",
+    1.0
+   ],
+   [
+    "signed",
+    "(d) strict held-out oracle (hidden)",
+    1.0
+   ]
+  ],
+  "a_matches_under": [
+   "max|dev|",
+   "signed"
+  ],
+  "c_matches_under": [
+   "signed"
+  ],
+  "arms_training_on_0.5B": 10,
+  "runs_training_on_0.5B": 69,
+  "of_which_arms_not_labeled_hacking": 0,
+  "of_which_runs_strict_did_not_fall": 0
+ }
+}

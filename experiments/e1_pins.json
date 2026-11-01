@@ -1,0 +1,21 @@
+{
+ "_env": {
+  "numpy": "2.4.3",
+  "python": "3.13.14",
+  "scipy": "1.17.1"
+ },
+ "anticipatory/curvature_detectors.py": "476eae1c873035203035017608315d27fbbc31249f5f3aa7830080dd576be437",
+ "benchmark/harness.py": "fd51e7f55c51eddbbbb186dc15421893efc790f3165c709fdaacfddf6c9f74b6",
+ "benchmark/score_prime.py": "a2c9ecdae4c73c252126f10adfae2f409d8339a8ffa28593dba2bb46c2d5b104",
+ "experiments/e1_detectors.py": "11bf1003d5dc48819099a1793178b872a617a5d414e198a90949037527cfdfd9",
+ "experiments/e1_event.py": "e5f8c95dd3ecbe93ec996ace29c9496f3931484a3f5f40fc36f8280980e55af8",
+ "experiments/e1_power.py": "ecff452876df598566c184bed7b0d40152a5673d512aa3781e858b7e6b060fdf",
+ "experiments/event_candidates/sustained_drop_v2.py": "12a6d147c918f4d56f1cd17c5d10ad754188c215f0667a64b5f3cdbb58257dd0",
+ "experiments/phase2/phase2_grid.json": "cf452e89d5071ef18ab775373c80b1209fe2e404ce02ec2f630e0ec095256b8a",
+ "paper/analysis/_common.py": "c859c1228a4cf1afabc93b6a1ad71736b5f38bbc985e2c5c3c266b59d3218f34",
+ "paper/analysis/detection_metrics.py": "00d94f6e235a7564b496dc94c0d18358b119709edfadcc7200e526ee2ee0c197",
+ "paper/analysis/grid_benchmark.py": "420d395086c7998b056123dfee381476d42bc06d6a11dd3f5b6d9cf94a25f6f8",
+ "paper/analysis/threshold_sweep.py": "af5bf7dec678c5b0ebdeca8fa19867aa97c29f7d21365b00d2e490ea29ea96fd",
+ "paper/stats/detection_metrics.json": "a0010c90305a9da62bbda3e1171be488ff61e31af403cbe8092f1b0867054988",
+ "paper/stats/grid_benchmark.json": "c8160543803700202cb9789c43ce857e279e34ecea244ad3ad24a2f9a911c207"
+}

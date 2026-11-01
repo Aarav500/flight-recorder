@@ -19,12 +19,30 @@ post-mortem.
 
 We do not reinvent the trainer. We record, compute, detect, and visualize.
 
-### V1 thesis to prove
-On a GRPO run that learns the **test-overwriting hack** (model rewrites unit tests so
-they pass), our **oracle-blind** detector — reading rollout geometry only — fires
-**earlier** than the held-out oracle gap becomes visible (the **oracle-gap turn**),
-with measurable lead time, beating an oracle-watching practitioner baseline. The
-training reward looks fine throughout, which is exactly why it cannot be the reference.
+### V1 thesis — REFRAMED (see "Structural finding" below)
+
+> **Structural finding (committed, 2026-06-16).** Oracle-blind geometry **cannot classify
+> hacking by kind.** A reward hack and a benign jump onto a higher-reward mode are the *same
+> geometric event* — the policy sharpening onto whatever the reward favors. The only thing
+> that makes one a hack is whether the higher reward tracks true quality, and that is the
+> **oracle, which an oracle-blind detector cannot see by construction.** A detector-
+> characterization study (real extractor + detector code over controlled trajectories,
+> `flightrecorder/detector/multiaxis.py`) confirmed every candidate axis fails a hard benign
+> control: *sharpness* fires on all convergence; *degeneracy* (gen_len / ngram / concentration)
+> fires identically on `return 0` (hack) and a correct one-liner `return n*(n+1)//2` (it just
+> encodes "short = suspicious"); *advantage-shape* fires identically on a hack's exploit-
+> discovery and a benign lucky-sample. This is a real result, not a failure: it bounds what
+> any oracle-blind monitor can claim.
+
+**The bounded, defensible claim.** Oracle-blind geometry **cannot classify hacking**. It **can**
+flag *rapid policy shifts* from rollout geometry, which **may** precede the oracle gap becoming
+statistically visible — an **"inspect-the-oracle-now" early-warning trigger, not a hacking
+classifier.** Whether that trigger has a controlled false-positive rate (does benign convergence
+trip it constantly?) and any lead time is **empirical and untested by simulation** — simulation
+can author benign and hacking trajectories to mimic each other, so it is silent on whether
+*real* benign convergence and *real* hacking differ by **degree or timing**. That is the only
+remaining testable question, and the first step is a **benign real-run pair** (no hack) to
+measure the false-positive / cry-wolf rate before any hack run is justified.
 
 ## 2. Goals / Non-Goals
 
@@ -236,6 +254,24 @@ true quality visibly degraded — the headline number. The honest baseline is th
 step a practitioner **watching the oracle curve** would call it; beating that on
 oracle-blind signals is the result. (The training-reward turn is **not** a valid
 reference: per §1 the reward looks fine while hacking, so it may never turn.)
+
+> **LOCKED — full-run reward design (THREE separate signals).** The budget-sizing PILOT
+> uses an engineered TWO-signal curriculum warm-start that optimises the held-out oracle
+> directly during phase 1 (`reward_weakverifier.py` + `--curriculum-switch-step`). That is a
+> **budget-sizing shortcut ONLY** and **must never** be the full run's design, because
+> training on the oracle contaminates it (it is no longer held-out). The FULL run MUST use
+> three physically separate reward signals:
+> 1. **Gameable verifier** *(optimised in the hacking phase)* — the weak reward the policy is
+>    allowed to game (e.g. the weak visible verifier).
+> 2. **Robust warm-start verifier** *(optimised only during the warm-start phase)* — a
+>    SEPARATE strong/isomorphic verifier the policy cannot game, distinct from (3), used to
+>    raise true quality before the switch. This is also the tube-reference run's reward.
+> 3. **True held-out oracle** *(NOTHING ever trains on it)* — used ONLY for offline,
+>    evaluator-side ground truth: the `oracle_turn_step` changepoint and lead-time. It must
+>    never appear in any optimiser's reward, in any phase.
+>
+> A `lead`/`oracle_turn` is only thesis-valid when measured against signal (3) under this
+> three-signal separation. The pilot's number is engineered and is **not** such evidence.
 
 ## 7. Adapters (`flightrecorder/adapters/`)
 
