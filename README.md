@@ -1,5 +1,8 @@
 # Flight Recorder
 
+[![tests](https://github.com/Aarav500/flight-recorder/actions/workflows/tests.yml/badge.svg)](https://github.com/Aarav500/flight-recorder/actions/workflows/tests.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 Reward-hacking **onset detection** for RL post-training (GRPO). A diagnostics layer that
 hooks into existing trainers and streams the quantities theory says predict trouble
 *before* the reward curve looks wrong — then flags the **moment** a run starts hacking.
@@ -45,6 +48,17 @@ trainer (TRL/verl/OpenRLHF)
    └─ RolloutBatch ─► Recorder ─► RolloutFrame ─► Detector ─► onset event ─► sinks (JSONL/WS)
                                └► OracleFrame  ─► Evaluator (lead time, ground-truth onset)
 ```
+
+## Testing
+
+```bash
+pytest tests/ -q
+```
+
+68 tests covering the recorder/detector pipeline, oracle-blindness (a dedicated test
+asserts no oracle/ground-truth field can leak into the types the detector receives),
+the synthetic harness, the TRL adapter, and the CLI. CI runs the suite on Python
+3.10-3.12 on every push and pull request.
 
 ## Status
 
