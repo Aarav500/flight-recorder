@@ -53,3 +53,5 @@ experiments/e1_rescore/_work/
 runs/e1b/**/launch.lock
 runs/e1b/instance_hours.json.lock
 scripts/e1b_autorun.pid
+# the redacted CloudTrail copy still lists the instance role's temporary access key ids; keep it out of the public repo
+runs/e1b/audit/
