@@ -429,7 +429,7 @@ Approve the spend one stage at a time. Aarav approves each row in chat before it
 |---|---|---|---|---|
 | Calibration | Gate, power and analysis checks on E1's stored data, on CPU (twin, power and spec design passes) | 0 | 0 | No spend, so no approval asked. Done 2026-10-09 while drafting. |
 | Pilot | 6 runs (3 tasks × seed 299 × {H, T}), read only through the pilot gate P0-P5 | 15 | 30 (estimate USD 16) | Aarav, 2026-10-30: "Yes", asked "Do you accept the eleven edits as written, and do you approve the pilot at the USD 30 ceiling?" |
-| Primary | 96 runs (48 H + 48 T), seeds 300-315, plus up to 14 replacements from seed 316, AWS g6e | 153 | 285 (estimate USD 248 for 96 runs; USD 284 with all 14 replacements) | pending |
+| Primary | 96 runs (48 H + 48 T), seeds 300-315, plus up to 14 replacements from seed 316, AWS g6e | 153 | 285 (estimate USD 248 for 96 runs; USD 284 with all 14 replacements) | Aarav, 2026-11-15: "Yes go ahead", asked "Do you approve the primary spend at the USD 285 ceiling?" |
 | J3 scoring (Qwen2.5-7B-Instruct; branch A, decided 2026-10-09) | The third judge on every completion of every used E1b run, from the stored texts: at most 96 runs × 400 steps × 8 = 307,200 completions | 8 | 15 (estimate USD 4.4 at the E1 rescoring's measured USD 2.2 per 153,600 completions; worst case USD 14.88, twice the E1 job's USD 7.44 four-hour backstop) | pending approval |
 | Total | | 176 | 330 | |
 
