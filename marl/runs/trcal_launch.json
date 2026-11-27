@@ -1,0 +1,9 @@
+{
+ "stage": "trcal",
+ "instance_id": "i-094afd21a52caf074",
+ "instance_type": "g6e.xlarge",
+ "az": "us-east-1b",
+ "ami": "ami-041bfdc361a4a68ef",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/trcal",
+ "launched": "2026-10-31T00:13:13+00:00"
+}

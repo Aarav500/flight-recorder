@@ -1,0 +1,9 @@
+{
+ "stage": "jax2",
+ "instance_id": "i-00c86f37b70e8f4f9",
+ "instance_type": "c7i.16xlarge",
+ "az": "us-east-1a",
+ "ami": "ami-041bfdc361a4a68ef",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/jax2",
+ "launched": "2026-10-30T23:19:47+00:00"
+}

@@ -1,0 +1,26 @@
+{
+ "model": "Qwen/Qwen2.5-Coder-7B-Instruct",
+ "task": "csv_exchangeable",
+ "seed": 301,
+ "lr": 3e-05,
+ "steps": 400,
+ "sched_steps": 400,
+ "m": 8,
+ "beta": 0.02,
+ "lora_r": 32,
+ "design": "D3",
+ "score_timeout": 3.0,
+ "trainer": {
+  "temperature": 1.0,
+  "top_p": 1.0,
+  "top_k": 0,
+  "repetition_penalty": 1.0,
+  "loss_type": "dapo",
+  "max_grad_norm": 1.0,
+  "weight_decay": 0.0,
+  "adam_beta1": 0.9,
+  "adam_beta2": 0.999,
+  "adam_epsilon": 1e-08,
+  "source": "trl 1.14.2"
+ }
+}

@@ -1,0 +1,9 @@
+{
+ "stage": "tr_csv_narrow_s301",
+ "instance_id": "i-0d4b032b20d78a41a",
+ "instance_type": "g6e.2xlarge",
+ "az": "us-east-1c",
+ "ami": "ami-041bfdc361a4a68ef",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/tr_csv_narrow_s301",
+ "launched": "2026-10-31T01:07:07+00:00"
+}
