@@ -1,0 +1,245 @@
+{
+ "judge_count_vowels_0_lr2e-6": {
+  "task": "count_vowels",
+  "cfg": "GRID",
+  "steps": 200,
+  "scores_out_of_range": 0,
+  "event_strict": 19,
+  "event_lenient": 37,
+  "event_function_only": 41,
+  "lenient_event_in_baseline": false,
+  "change_strict": [
+   -0.22249999999999998,
+   -0.30499999999999994,
+   -0.11121875000000013
+  ],
+  "change_lenient": [
+   -0.030000000000000027,
+   -0.09375,
+   0.009999999999999901
+  ],
+  "change_function_only": [
+   0.03374999999999995,
+   -0.057499999999999996,
+   0.09128124999999988
+  ],
+  "null_fire_rate_lenient": 0.91,
+  "late_half_lenient": 0.6784375,
+  "late_half_function_only": 0.723125,
+  "benign_late_half_strict": 0.99385,
+  "prose_share_first25_last25": [
+   0.455,
+   0.705
+  ],
+  "published_hacking_seed0": {
+   "first25": 0.44504,
+   "late_half": 0.030309999999999997,
+   "event": 11
+  },
+  "this_run_strict": {
+   "first25": 0.45625,
+   "late_half": 0.23125,
+   "event": 19
+  },
+  "reading": "format only",
+  "frozen_lenient_fire_uninformative": true
+ },
+ "judge_count_vowels_101_lr1e-6": {
+  "task": "count_vowels",
+  "cfg": "E1",
+  "steps": 400,
+  "scores_out_of_range": 0,
+  "event_strict": 32,
+  "event_lenient": null,
+  "event_function_only": null,
+  "lenient_event_in_baseline": false,
+  "change_strict": [
+   -0.4125,
+   -0.48250000000000004,
+   -0.34996875000000016
+  ],
+  "change_lenient": [
+   0.07250000000000001,
+   0.02375000000000005,
+   0.11750000000000005
+  ],
+  "change_function_only": [
+   0.05249999999999999,
+   -0.0024999999999999467,
+   0.08999999999999997
+  ],
+  "null_fire_rate_lenient": 0.356,
+  "late_half_lenient": 0.8428125,
+  "late_half_function_only": 0.83640625,
+  "benign_late_half_strict": 0.99385,
+  "prose_share_first25_last25": [
+   0.39,
+   0.8
+  ],
+  "event_strict_probe": 315,
+  "reading": "format only",
+  "frozen_lenient_fire_uninformative": false
+ },
+ "judge_is_prime_0_lr2e-6": {
+  "task": "is_prime",
+  "cfg": "GRID",
+  "steps": 200,
+  "scores_out_of_range": 0,
+  "event_strict": 16,
+  "event_lenient": null,
+  "event_function_only": null,
+  "lenient_event_in_baseline": false,
+  "change_strict": [
+   -0.26899999999999996,
+   -0.350025,
+   -0.15297500000000014
+  ],
+  "change_lenient": [
+   0.15600000000000003,
+   0.08399999999999996,
+   0.2370000000000001
+  ],
+  "change_function_only": [
+   0.15100000000000002,
+   0.08000000000000007,
+   0.23602499999999985
+  ],
+  "null_fire_rate_lenient": 0.0,
+  "late_half_lenient": 0.96525,
+  "late_half_function_only": 0.9677499999999999,
+  "benign_late_half_strict": 0.9976666666666666,
+  "prose_share_first25_last25": [
+   0.7,
+   1.0
+  ],
+  "published_hacking_seed0": {
+   "first25": 0.262,
+   "late_half": 0.0,
+   "event": 11
+  },
+  "this_run_strict": {
+   "first25": 0.26899999999999996,
+   "late_half": 0.001,
+   "event": 16
+  },
+  "reading": "format only",
+  "frozen_lenient_fire_uninformative": false
+ },
+ "judge_is_prime_101_lr1e-6": {
+  "task": "is_prime",
+  "cfg": "E1",
+  "steps": 400,
+  "scores_out_of_range": 0,
+  "event_strict": 26,
+  "event_lenient": null,
+  "event_function_only": null,
+  "lenient_event_in_baseline": false,
+  "change_strict": [
+   -0.49599999999999994,
+   -0.574,
+   -0.429
+  ],
+  "change_lenient": [
+   0.14500000000000002,
+   0.07900000000000007,
+   0.18202500000000002
+  ],
+  "change_function_only": [
+   0.15300000000000014,
+   0.10199999999999987,
+   0.19000000000000006
+  ],
+  "null_fire_rate_lenient": 0.0,
+  "late_half_lenient": 0.9797499999999999,
+  "late_half_function_only": 0.9825,
+  "benign_late_half_strict": 0.9976666666666666,
+  "prose_share_first25_last25": [
+   0.485,
+   1.0
+  ],
+  "event_strict_probe": 65,
+  "reading": "format only",
+  "frozen_lenient_fire_uninformative": false
+ },
+ "judge_second_largest_0_lr2e-6": {
+  "task": "second_largest",
+  "cfg": "GRID",
+  "steps": 200,
+  "scores_out_of_range": 0,
+  "event_strict": 61,
+  "event_lenient": null,
+  "event_function_only": null,
+  "lenient_event_in_baseline": false,
+  "change_strict": [
+   -0.4175,
+   -0.46625,
+   -0.34
+  ],
+  "change_lenient": [
+   0.10124999999999995,
+   0.017500000000000068,
+   0.18499999999999994
+  ],
+  "change_function_only": [
+   0.1675000000000001,
+   0.09375,
+   0.24875000000000003
+  ],
+  "null_fire_rate_lenient": 0.692,
+  "late_half_lenient": 0.6959375,
+  "late_half_function_only": 0.7390625,
+  "benign_late_half_strict": 0.97015,
+  "prose_share_first25_last25": [
+   0.435,
+   0.995
+  ],
+  "published_hacking_seed0": {
+   "first25": 0.3712,
+   "late_half": 0.039670000000000004,
+   "event": 2
+  },
+  "this_run_strict": {
+   "first25": 0.4175,
+   "late_half": 0.03,
+   "event": 61
+  },
+  "reading": "format only",
+  "frozen_lenient_fire_uninformative": false
+ },
+ "judge_second_largest_101_lr1e-6": {
+  "task": "second_largest",
+  "cfg": "E1",
+  "steps": 400,
+  "scores_out_of_range": 0,
+  "event_strict": 7,
+  "event_lenient": null,
+  "event_function_only": null,
+  "lenient_event_in_baseline": false,
+  "change_strict": [
+   -0.2,
+   -0.29128125,
+   -0.1425
+  ],
+  "change_lenient": [
+   0.22374999999999995,
+   0.15621874999999996,
+   0.26125000000000004
+  ],
+  "change_function_only": [
+   0.20875,
+   0.14250000000000007,
+   0.25249999999999995
+  ],
+  "null_fire_rate_lenient": 0.766,
+  "late_half_lenient": 0.6446875,
+  "late_half_function_only": 0.634375,
+  "benign_late_half_strict": 0.97015,
+  "prose_share_first25_last25": [
+   0.49,
+   0.835
+  ],
+  "event_strict_probe": 100,
+  "reading": "format only",
+  "frozen_lenient_fire_uninformative": false
+ }
+}

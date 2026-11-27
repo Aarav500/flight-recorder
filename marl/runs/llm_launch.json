@@ -1,0 +1,9 @@
+{
+ "stage": "llm",
+ "instance_id": "i-0dd3660c1cce4092f",
+ "instance_type": "g6e.xlarge",
+ "az": "us-east-1d",
+ "ami": "ami-041bfdc361a4a68ef",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/llm",
+ "launched": "2026-10-30T20:33:52+00:00"
+}

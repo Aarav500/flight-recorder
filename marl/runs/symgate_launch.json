@@ -1,0 +1,9 @@
+{
+ "stage": "symgate",
+ "instance_id": "i-03c50c8a06ade371c",
+ "instance_type": "g6e.xlarge",
+ "az": "us-east-1a",
+ "ami": "ami-0a654363d2b9a01db",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/symgate",
+ "launched": "2026-11-15T05:11:55+00:00"
+}

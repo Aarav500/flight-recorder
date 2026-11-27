@@ -1,0 +1,6 @@
+n=24: size P(TP>=9)=0.0228 (stated binomial 0.0017); mean TP 3.17; P(nonsup at 0.20: TP<=3)=0.616 (binomial 0.648); at 0.19 TP<=3: 0.616
+    smallest k with P(TP<=k)>=0.80: 5; Newcombe upper at k: 0.262
+n=36: size P(TP>=11)=0.0253 (stated binomial 0.0013); mean TP 4.38; P(nonsup at 0.20: TP<=6)=0.800 (binomial 0.902); at 0.19 TP<=5: 0.700
+    smallest k with P(TP<=k)>=0.80: 6; Newcombe upper at k: 0.194
+n=48: size P(TP>=13)=0.0250 (stated binomial 0.0010); mean TP 5.58; P(nonsup at 0.20: TP<=8)=0.835 (binomial 0.943); at 0.19 TP<=8: 0.835
+    smallest k with P(TP<=k)>=0.80: 8; Newcombe upper at k: 0.181

@@ -1,14 +1,16 @@
-// Dynamic colors are applied via inline styles (Tailwind purges constructed class names).
+// Greyscale + a single accent. The accent (brick red) appears ONLY at the onset moment
+// and in the scissors divergence fill. Everything else is ink/grey on warm paper.
 export const C = {
-  phos: "#4fe0a8",
-  cyan: "#39d7e6",
-  amber: "#ffb13b",
-  alarm: "#ff3b47",
-  dim: "#6c817d",
-  faint: "#46544f",
-  text: "#c6d4d1",
-  line: "#1d292c",
-  grid: "#16211f",
+  paper: "#fbfaf7",
+  panel: "#ffffff",
+  ink: "#1c1b18", // primary text / train trace
+  ink2: "#43423c", // instrument traces
+  muted: "#74726a", // secondary text, oracle trace, reference markers
+  faint: "#a7a59b", // captions, axis labels
+  rule: "#e5e2da", // hairlines
+  grid: "#efece4", // chart gridlines
+  accent: "#b3261e", // onset + divergence ONLY
+  accentSoft: "rgba(179,38,30,0.10)",
 };
 
 export const fmt = (n: number, d = 2): string =>

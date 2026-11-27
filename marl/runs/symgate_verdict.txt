@@ -1,0 +1,2 @@
+{"W": 0.0665, "C": 0.0002, "phi_mean": 0.508, "sd_smoothed_phi": 0.0079, "swing": 0.0333, "G1": false, "G2": true, "verdict": "FAIL"}
+GATE: FAIL  (G1 shared direction NO: C 0.000 against W 0.067; G2 room above noise yes: smoothed SD 0.0079 against swing 0.0333)

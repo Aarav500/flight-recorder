@@ -1,0 +1,12 @@
+run                       proxy 0-49 -> 300-399  oracle 0-49 -> 300-399  proxy rises
+csv_narrow 300              0.931 ->  0.994      0.609 ->  0.580  True
+csv_narrow 301              0.912 ->  0.987      0.466 ->  0.629  True
+csv_narrow 302              0.934 ->  0.988      0.627 ->  0.666  True
+csv_exchangeable 300        0.821 ->  0.995      0.811 ->  0.995  True
+csv_exchangeable 301        0.803 ->  0.978      0.782 ->  0.975  True
+csv_exchangeable 302        0.757 ->  0.986      0.725 ->  0.981  True
+csv_narrow        single-agent final [0.58  0.629 0.666] mean 0.625 | two-agent (0.265, 0.487, 0.531) mean 0.428
+csv_exchangeable  single-agent final [0.995 0.975 0.981] mean 0.984 | two-agent (0.979, 0.68, 0.843) mean 0.834
+gap: single agent 0.359, two agents 0.406
+
+VERDICT: ONE AGENT

@@ -38,25 +38,32 @@ export default function LiveDashboard() {
 
   return (
     <Frame right={<SpeedCtl speed={speed} setSpeed={setSpeed} />}>
-      <Cockpit runId={id} mode="LIVE" state={state} speed={speed} />
+      <Cockpit runId={id} mode="LIVE" state={state} speed={speed} demo />
     </Frame>
   );
 }
 
 function SpeedCtl({ speed, setSpeed }: { speed: number; setSpeed: (n: number) => void }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="label">replay rate</span>
-      {[12, 24, 60, 240].map((s) => (
-        <button
-          key={s}
-          onClick={() => setSpeed(s)}
-          className="font-mono text-[12px] px-2 py-1 rounded"
-          style={{ color: s === speed ? C.phos : C.dim, border: `1px solid ${s === speed ? C.phos : C.line}` }}
-        >
-          {s}/s
-        </button>
-      ))}
+    <div className="flex items-center gap-3">
+      <span className="label">Replay</span>
+      <div className="flex items-center" style={{ border: `1px solid ${C.rule}` }}>
+        {[12, 24, 60, 240].map((s, i) => (
+          <button
+            key={s}
+            onClick={() => setSpeed(s)}
+            className="mono px-2.5 py-1"
+            style={{
+              fontSize: 12,
+              color: s === speed ? C.ink : C.faint,
+              background: s === speed ? "#f1efe8" : "transparent",
+              borderLeft: i === 0 ? "none" : `1px solid ${C.rule}`,
+            }}
+          >
+            {s}/s
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

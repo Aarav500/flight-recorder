@@ -1,0 +1,6 @@
+m8_ema_s902  FAIL  B weights: W +0.017 C +0.050 phi 0.456 SD 0.0278 swing 0.0084 G1 True G2 False
+             (all weights, decides nothing: W +0.017 C +0.050 phi 0.456 SD 0.0278 FAIL)
+m64_s903     FAIL  B weights: W +0.048 C -0.007 phi 0.497 SD 0.0064 swing 0.0240 G1 False G2 True
+             (all weights, decides nothing: W +0.049 C -0.006 phi 0.496 SD 0.0066 FAIL)
+
+GATE: FAIL, both configurations

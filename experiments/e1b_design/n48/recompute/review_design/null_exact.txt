@@ -1,0 +1,4 @@
+n=24 total=1.000000 size=0.0230 P(nonsup0.20, TP<=3)=0.6164 P(nonsup0.25)=0.7541
+n=32 total=1.000000 size=0.0171 P(nonsup0.20, TP<=5)=0.7517 P(nonsup0.25)=0.9028
+n=36 total=1.000000 size=0.0251 P(nonsup0.20, TP<=6)=0.8002 P(nonsup0.25)=0.8732
+n=48 total=1.000000 size=0.0251 P(nonsup0.20, TP<=8)=0.8339 P(nonsup0.25)=0.9576

@@ -1,0 +1,69 @@
+E1b PRIMARY POWER. One-sided Fisher, alpha 0.05, FP fixed by the time-matched 90th-percentile point.
+e1_primary helpers: fisher_one_sided, power_fixed_fp, newcombe, fixed_fp. Exact enumeration unless marked.
+
+check: frozen e1_primary.mde_fixed_fp(24,24,3) = 0.44 (prereg 0.44); power_fixed_fp(24,24,0.5,3) = 0.924 (prereg 0.92)
+check: binomial-FP margin at 80% (prereg section 5 convention): n=24 0.240 (prereg 0.24), n=36 0.190 (prereg 0.19)
+
+n = 24 per arm: FP fixed at 3/24 = 0.125; significance needs >= 9/24 strict hits; size at TPR = FPR 0.0017
+  power at TPR 0.5: 0.924   MDE at 80%: TPR 0.440 (frozen 0.01-step helper: 0.44)   MDE at 90%: 0.485
+  power curve: 0.104->0.000, 0.125->0.002, 0.200->0.036, 0.250->0.121, 0.300->0.275, 0.375->0.576, 0.400->0.672, 0.450->0.827, 0.500->0.924, 0.600->0.992
+  non-superiority at 0.25: shown iff TP <= 4/24; P(shown | TPR = FPR = 0.125) = 0.827
+  non-superiority at 0.20: TP <= 3 (P shown | uninformative 0.648); at 0.15: TP <= 2 (P 0.408)
+  achievable margin (upper 90% bound below it with prob 0.80 | 0.90 if uninformative, FP fixed): 0.220 | 0.265; binomial-FP convention 0.80: 0.240
+  upper 90% bound by TP count: 0:0.000, 1:0.062, 2:0.116, 3:0.167, 4:0.215, 5:0.262, 6:0.306, 7:0.350, 8:0.392, 9:0.433, 10:0.473, 11:0.512, 12:0.550
+  three-way outcome by true TPR (kill-test significant / non-superiority null / inconclusive):
+    TPR 0.104: 0.000 / 0.903 / 0.097
+    TPR 0.125: 0.002 / 0.827 / 0.171
+    TPR 0.200: 0.036 / 0.460 / 0.504
+    TPR 0.250: 0.121 / 0.247 / 0.632
+    TPR 0.300: 0.275 / 0.111 / 0.614
+    TPR 0.375: 0.576 / 0.024 / 0.399
+    TPR 0.400: 0.672 / 0.013 / 0.314
+    TPR 0.450: 0.827 / 0.004 / 0.169
+    TPR 0.500: 0.924 / 0.001 / 0.075
+    TPR 0.600: 0.992 / 0.000 / 0.007
+  conjuncts (task-stratified bootstrap of E1 hacking runs, 20000 draws): P(window >= 12) 1.000; P(median lead > 0) 0.888; P(generator ok) 1.000; P(all three) 0.888
+  kill power at TPR 0.5 ~ Fisher power x P(all three) = 0.820 (independence assumed; leads as in E1, where disagreement did not anticipate, so this is a floor under H1)
+
+n = 36 per arm: FP fixed at 4/36 = 0.111; significance needs >= 11/36 strict hits; size at TPR = FPR 0.0013
+  power at TPR 0.5: 0.994   MDE at 80%: TPR 0.360 (frozen 0.01-step helper: 0.36)   MDE at 90%: 0.400
+  power curve: 0.104->0.001, 0.125->0.003, 0.200->0.089, 0.250->0.275, 0.300->0.534, 0.375->0.849, 0.400->0.910, 0.450->0.974, 0.500->0.994, 0.600->1.000
+  non-superiority at 0.25: shown iff TP <= 7/36; P(shown | TPR = FPR = 0.111) = 0.959
+  non-superiority at 0.20: TP <= 6 (P shown | uninformative 0.902); at 0.15: TP <= 4 (P 0.629)
+  achievable margin (upper 90% bound below it with prob 0.80 | 0.90 if uninformative, FP fixed): 0.195 | 0.195; binomial-FP convention 0.80: 0.190
+  upper 90% bound by TP count: 0:-0.019, 1:0.023, 2:0.060, 3:0.096, 4:0.129, 5:0.162, 6:0.194, 7:0.225, 8:0.255, 9:0.285, 10:0.314, 11:0.343, 12:0.372, 13:0.400, 14:0.427, 15:0.455, 16:0.481, 17:0.508, 18:0.534
+  three-way outcome by true TPR (kill-test significant / non-superiority null / inconclusive):
+    TPR 0.104: 0.001 / 0.971 / 0.028
+    TPR 0.125: 0.003 / 0.927 / 0.069
+    TPR 0.200: 0.089 / 0.566 / 0.345
+    TPR 0.250: 0.275 / 0.290 / 0.435
+    TPR 0.300: 0.534 / 0.112 / 0.354
+    TPR 0.375: 0.849 / 0.016 / 0.134
+    TPR 0.400: 0.910 / 0.007 / 0.083
+    TPR 0.450: 0.974 / 0.001 / 0.025
+    TPR 0.500: 0.994 / 0.000 / 0.006
+    TPR 0.600: 1.000 / 0.000 / 0.000
+  conjuncts (task-stratified bootstrap of E1 hacking runs, 20000 draws): P(window >= 12) 1.000; P(median lead > 0) 0.939; P(generator ok) 1.000; P(all three) 0.939
+  kill power at TPR 0.5 ~ Fisher power x P(all three) = 0.934 (independence assumed; leads as in E1, where disagreement did not anticipate, so this is a floor under H1)
+
+n = 48 per arm: FP fixed at 5/48 = 0.104; significance needs >= 13/48 strict hits; size at TPR = FPR 0.0010
+  power at TPR 0.5: 1.000   MDE at 80%: TPR 0.320 (frozen 0.01-step helper: 0.32)   MDE at 90%: 0.350
+  power curve: 0.104->0.001, 0.125->0.005, 0.200->0.148, 0.250->0.423, 0.300->0.720, 0.375->0.952, 0.400->0.978, 0.450->0.997, 0.500->1.000, 0.600->1.000
+  non-superiority at 0.25: shown iff TP <= 11/48; P(shown | TPR = FPR = 0.104) = 0.997
+  non-superiority at 0.20: TP <= 8 (P shown | uninformative 0.943); at 0.15: TP <= 6 (P 0.771)
+  achievable margin (upper 90% bound below it with prob 0.80 | 0.90 if uninformative, FP fixed): 0.160 | 0.185; binomial-FP convention 0.80: 0.160
+  upper 90% bound by TP count: 0:-0.029, 1:0.002, 2:0.030, 3:0.057, 4:0.083, 5:0.108, 6:0.133, 7:0.157, 8:0.181, 9:0.204, 10:0.227, 11:0.249, 12:0.272, 13:0.294, 14:0.315, 15:0.337, 16:0.358, 17:0.380, 18:0.401, 19:0.421, 20:0.442, 21:0.462, 22:0.483, 23:0.503, 24:0.523
+  three-way outcome by true TPR (kill-test significant / non-superiority null / inconclusive):
+    TPR 0.104: 0.001 / 0.997 / 0.002
+    TPR 0.125: 0.005 / 0.987 / 0.008
+    TPR 0.200: 0.148 / 0.759 / 0.093
+    TPR 0.250: 0.423 / 0.445 / 0.132
+    TPR 0.300: 0.720 / 0.181 / 0.098
+    TPR 0.375: 0.952 / 0.024 / 0.024
+    TPR 0.400: 0.978 / 0.010 / 0.012
+    TPR 0.450: 0.997 / 0.001 / 0.002
+    TPR 0.500: 1.000 / 0.000 / 0.000
+    TPR 0.600: 1.000 / 0.000 / 0.000
+  conjuncts (task-stratified bootstrap of E1 hacking runs, 20000 draws): P(window >= 12) 1.000; P(median lead > 0) 0.963; P(generator ok) 1.000; P(all three) 0.963
+  kill power at TPR 0.5 ~ Fisher power x P(all three) = 0.963 (independence assumed; leads as in E1, where disagreement did not anticipate, so this is a floor under H1)
+

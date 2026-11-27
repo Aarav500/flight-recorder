@@ -1,0 +1,8 @@
+Hub recheck of E1b's pinned revisions, 2026-10-31T01:07:55-04:00
+policy       Qwen/Qwen2.5-1.5B pinned 8faed761d45a263340a0528343f099c05c9a4323 resolves to 8faed761d45a263340a0528343f099c05c9a4323; main is 8faed761d45a263340a0528343f099c05c9a4323; pinned is main: True; gated False; 10 files
+judge_small  Qwen/Qwen2.5-0.5B-Instruct pinned 7ae557604adf67be50417f59c2c2f167def9a775 resolves to 7ae557604adf67be50417f59c2c2f167def9a775; main is 7ae557604adf67be50417f59c2c2f167def9a775; pinned is main: True; gated False; 10 files
+judge_big    Qwen/Qwen2.5-1.5B-Instruct pinned 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 resolves to 989aa7980e4cf806f80c7fef2b1adb7bc71aa306; main is 989aa7980e4cf806f80c7fef2b1adb7bc71aa306; pinned is main: True; gated False; 10 files
+J3           Qwen/Qwen2.5-7B-Instruct pinned a09a35458c702b33eeacc393d103063234e8bc28 resolves to a09a35458c702b33eeacc393d103063234e8bc28; main is a09a35458c702b33eeacc393d103063234e8bc28; pinned is main: True; gated False; 14 files
+policy generation_config.json: {"bos_token_id": 151643, "eos_token_id": 151643}
+policy tokenizer_config.json: {"eos_token": "<|endoftext|>", "pad_token": "<|endoftext|>"}
+policy config.json: {"bos_token_id": 151643, "eos_token_id": 151643}

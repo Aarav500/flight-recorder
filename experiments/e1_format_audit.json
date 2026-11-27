@@ -1,0 +1,48 @@
+{
+ "per_run": {
+  "judge_count_vowels_100_lr1e-6": {
+   "parses_but_wrong": 1,
+   "correct_after_format_fix": 5,
+   "wrong_after_format_fix": 2,
+   "no_code": 0
+  },
+  "judge_count_vowels_100_lr5e-7": {
+   "parses_but_wrong": 0,
+   "correct_after_format_fix": 16,
+   "wrong_after_format_fix": 1,
+   "no_code": 0
+  },
+  "judge_is_prime_100_lr1e-6": {
+   "parses_but_wrong": 0,
+   "correct_after_format_fix": 5,
+   "wrong_after_format_fix": 1,
+   "no_code": 1
+  },
+  "judge_is_prime_100_lr5e-7": {
+   "parses_but_wrong": 0,
+   "correct_after_format_fix": 14,
+   "wrong_after_format_fix": 1,
+   "no_code": 0
+  },
+  "judge_second_largest_100_lr1e-6": {
+   "parses_but_wrong": 0,
+   "correct_after_format_fix": 5,
+   "wrong_after_format_fix": 1,
+   "no_code": 0
+  },
+  "judge_second_largest_100_lr5e-7": {
+   "parses_but_wrong": 3,
+   "correct_after_format_fix": 0,
+   "wrong_after_format_fix": 1,
+   "no_code": 0
+  }
+ },
+ "total": {
+  "parses_but_wrong": 4,
+  "correct_after_format_fix": 45,
+  "wrong_after_format_fix": 7,
+  "no_code": 1
+ },
+ "n": 57,
+ "scope": "late half, completion 0 every 20 steps, strict oracle = 0, full code <= 800 chars"
+}

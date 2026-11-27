@@ -1,0 +1,27 @@
+E1b PRIMARY POWER. One-sided Fisher, alpha 0.05, FP fixed by the time-matched 90th-percentile point.
+e1_primary helpers: fisher_one_sided, power_fixed_fp, newcombe, fixed_fp. Exact enumeration unless marked.
+
+check: frozen e1_primary.mde_fixed_fp(24,24,3) = 0.44 (prereg 0.44); power_fixed_fp(24,24,0.5,3) = 0.924 (prereg 0.92)
+check: binomial-FP margin at 80% (prereg section 5 convention): n=24 0.240 (prereg 0.24), n=36 0.190 (prereg 0.19)
+
+n = 32 per arm: FP fixed at 4/32 = 0.125; significance needs >= 11/32 strict hits; size at TPR = FPR 0.0012
+  power at TPR 0.5: 0.975   MDE at 80%: TPR 0.405 (frozen 0.01-step helper: 0.41)   MDE at 90%: 0.440
+  power curve: 0.104->0.000, 0.125->0.001, 0.200->0.041, 0.250->0.154, 0.300->0.356, 0.375->0.704, 0.400->0.795, 0.450->0.918, 0.500->0.975, 0.600->0.999
+  non-superiority at 0.25: shown iff TP <= 7/32; P(shown | TPR = FPR = 0.125) = 0.960
+  non-superiority at 0.20: TP <= 5 (P shown | uninformative 0.796); at 0.15: TP <= 4 (P 0.629)
+  achievable margin (upper 90% bound below it with prob 0.80 | 0.90 if uninformative, FP fixed): 0.215 | 0.215; binomial-FP convention 0.80: 0.200
+  upper 90% bound by TP count: 0:-0.022, 1:0.025, 2:0.066, 3:0.106, 4:0.143, 5:0.179, 6:0.214, 7:0.249, 8:0.282, 9:0.315, 10:0.347, 11:0.379, 12:0.410, 13:0.441, 14:0.471, 15:0.501, 16:0.530
+  three-way outcome by true TPR (kill-test significant / non-superiority null / inconclusive):
+    TPR 0.104: 0.000 / 0.985 / 0.014
+    TPR 0.125: 0.001 / 0.960 / 0.038
+    TPR 0.200: 0.041 / 0.698 / 0.261
+    TPR 0.250: 0.154 / 0.432 / 0.414
+    TPR 0.300: 0.356 / 0.212 / 0.432
+    TPR 0.375: 0.704 / 0.046 / 0.250
+    TPR 0.400: 0.795 / 0.025 / 0.180
+    TPR 0.450: 0.918 / 0.006 / 0.076
+    TPR 0.500: 0.975 / 0.001 / 0.024
+    TPR 0.600: 0.999 / 0.000 / 0.001
+  conjuncts (task-stratified bootstrap of E1 hacking runs, 20000 draws): P(window >= 12) 1.000; P(median lead > 0) 0.914; P(generator ok) 1.000; P(all three) 0.914
+  kill power at TPR 0.5 ~ Fisher power x P(all three) = 0.891 (independence assumed; leads as in E1, where disagreement did not anticipate, so this is a floor under H1)
+

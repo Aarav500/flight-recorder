@@ -1,0 +1,34 @@
+# Pre-registered detector thresholds for Flight Recorder.
+#
+# Derived from the synthetic harness eval (tests/test_eval_property.py and `flr eval`),
+# which selected values giving FPR = 0.0 on hard negatives and mean lead +11.5 steps vs
+# the oracle-gap turn, dominating the oracle-blind threshold/CUSUM baselines.
+#
+# GATE 1 — these are frozen BEFORE any real-run data exists. The eval and the real run
+# read this file; they must never be re-tuned to a real-run artifact. This file is
+# committed with a recorded hash before the shakeout is fired. A provenance check warns
+# loudly if it is missing or was modified after a run artifact was created.
+
+detector: contraction_tube
+
+# headline thresholds
+tube_tau: 1.0            # tube-exit distance that counts as an escape
+cusum_h: 5.0             # CUSUM threshold for the corroborating geometry signal
+persistence: 5           # consecutive steps both conditions must hold (two-of-N rule)
+
+# supporting parameters
+rho: 3.0                 # tube radius, robust (MAD) units
+warmup: 30               # steps used to fit the reference tube
+cusum_k: 0.5             # CUSUM slack
+cusum_signal: kl_accel   # geometry signal the CUSUM runs on
+
+# evaluator reference (oracle-gap turn changepoint). Evaluator-side only; never a
+# detector input — listed here so the whole evaluation is reproducible from one file.
+oracle_turn_k: 0.5
+oracle_turn_h: 3.0
+oracle_turn_warmup: 20
+
+provenance:
+  derived_from: synthetic_harness_eval
+  harness_fpr: 0.0
+  harness_mean_lead: 11.5

@@ -1,0 +1,463 @@
+Downloading cpython-3.12.16-linux-x86_64-gnu (download) (32.9MiB)
+ Downloaded cpython-3.12.16-linux-x86_64-gnu (download)
+Downloading torch (782.3MiB)
+Downloading nvidia-nvshmem-cu12 (132.7MiB)
+Downloading pyarrow (51.4MiB)
+Downloading transformers (12.0MiB)
+Downloading tokenizers (3.2MiB)
+Downloading aiohttp (1.8MiB)
+Downloading networkx (2.0MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading setuptools (1.0MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading cuda-bindings (7.3MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading pandas (11.5MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading numpy (16.0MiB)
+Downloading triton (179.5MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading hf-xet (4.1MiB)
+Downloading nvidia-cudnn-cu12 (627.4MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading sympy (6.0MiB)
+Downloading pygments (1.2MiB)
+Downloading nvidia-nccl-cu12 (283.0MiB)
+ Downloaded nvidia-cufile-cu12
+ Downloaded setuptools
+ Downloaded pygments
+ Downloaded aiohttp
+ Downloaded networkx
+ Downloaded tokenizers
+ Downloaded hf-xet
+ Downloaded sympy
+ Downloaded cuda-bindings
+ Downloaded nvidia-cuda-cupti-cu12
+ Downloaded pandas
+ Downloaded transformers
+ Downloaded numpy
+ Downloaded nvidia-nvjitlink-cu12
+ Downloaded pyarrow
+ Downloaded nvidia-curand-cu12
+ Downloaded nvidia-cuda-nvrtc-cu12
+ Downloaded torch
+ Downloaded nvidia-nvshmem-cu12
+ Downloaded triton
+ Downloaded nvidia-cufft-cu12
+ Downloaded nvidia-cusolver-cu12
+ Downloaded nvidia-cusparselt-cu12
+ Downloaded nvidia-cusparse-cu12
+ Downloaded nvidia-nccl-cu12
+ Downloaded nvidia-cublas-cu12
+ Downloaded nvidia-cudnn-cu12
+Installed 74 packages in 419ms
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files:  25%|██▌       | 1/4 [00:21<01:05, 21.74s/it]Fetching 4 files:  50%|█████     | 2/4 [02:33<02:52, 86.45s/it]Fetching 4 files:  75%|███████▌  | 3/4 [02:37<00:48, 48.63s/it]Fetching 4 files: 100%|██████████| 4/4 [02:43<00:00, 31.85s/it]Fetching 4 files: 100%|██████████| 4/4 [02:43<00:00, 40.81s/it]
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<01:12,  4.65it/s]Loading weights:   6%|▋         | 22/339 [00:00<00:03, 85.94it/s]Loading weights:  12%|█▏        | 41/339 [00:00<00:02, 122.69it/s]Loading weights:  19%|█▉        | 66/339 [00:00<00:01, 161.32it/s]Loading weights:  27%|██▋       | 90/339 [00:00<00:01, 181.81it/s]Loading weights:  34%|███▎      | 114/339 [00:00<00:01, 195.91it/s]Loading weights:  41%|████      | 138/339 [00:00<00:00, 205.64it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 209.71it/s]Loading weights:  55%|█████▍    | 186/339 [00:01<00:00, 218.73it/s]Loading weights:  62%|██████▏   | 210/339 [00:01<00:00, 221.81it/s]Loading weights:  69%|██████▉   | 234/339 [00:01<00:00, 224.64it/s]Loading weights:  76%|███████▌  | 258/339 [00:01<00:00, 226.29it/s]Loading weights:  83%|████████▎ | 281/339 [00:01<00:00, 224.35it/s]Loading weights:  90%|█████████ | 306/339 [00:01<00:00, 228.44it/s]Loading weights:  97%|█████████▋| 330/339 [00:01<00:00, 228.39it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 200.36it/s]
+META {"task": "csv_narrow", "seed": 300, "lr": 3e-05, "trainer": {"temperature": 1.0, "top_p": 1.0, "top_k": 0, "repetition_penalty": 1.0, "loss_type": "dapo", "max_grad_norm": 1.0, "weight_decay": 0.0, "adam_beta1": 0.9, "adam_beta2": 0.999, "adam_epsilon": 1e-08, "source": "trl 1.14.2"}}
+[transformers] Passing `generation_config` together with generation-related arguments=({'use_cache'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+STEP 0 proxy 0.375 oracle 0.333 kl 0.00000 0.00000 gen 18.6s score 6.1s train 4.4s
+STEP 1 proxy 0.250 oracle 0.021 kl 0.00026 0.00024 gen 21.9s score 6.0s train 4.7s
+STEP 2 proxy 0.250 oracle 0.208 kl 0.00049 0.00038 gen 19.1s score 6.0s train 4.3s
+STEP 3 proxy 0.125 oracle 0.104 kl 0.00113 0.00023 gen 16.0s score 6.0s train 4.3s
+STEP 4 proxy 0.500 oracle 0.271 kl 0.00177 0.00191 gen 20.5s score 6.0s train 4.6s
+STEP 5 proxy 0.500 oracle 0.333 kl 0.00315 0.00116 gen 16.6s score 6.0s train 4.1s
+STEP 6 proxy 0.844 oracle 0.583 kl 0.00505 0.00040 gen 16.4s score 6.0s train 4.3s
+STEP 7 proxy 0.625 oracle 0.312 kl 0.00695 0.00124 gen 22.6s score 6.0s train 4.4s
+STEP 8 proxy 0.656 oracle 0.333 kl 0.00995 0.00247 gen 19.1s score 6.0s train 4.3s
+STEP 9 proxy 1.000 oracle 0.729 kl 0.00963 0.00173 gen 16.3s score 0.1s train 4.0s
+STEP 10 proxy 0.406 oracle 0.229 kl 0.01167 0.00201 gen 20.2s score 6.0s train 4.3s
+STEP 11 proxy 0.750 oracle 0.354 kl 0.02572 0.00361 gen 17.8s score 6.0s train 4.0s
+STEP 12 proxy 0.969 oracle 0.625 kl 0.01590 0.00627 gen 15.8s score 0.1s train 4.2s
+STEP 13 proxy 0.750 oracle 0.625 kl 0.01749 0.00204 gen 17.1s score 6.0s train 4.4s
+STEP 14 proxy 0.656 oracle 0.521 kl 0.06357 0.00159 gen 13.8s score 6.0s train 3.9s
+STEP 15 proxy 1.000 oracle 0.750 kl 0.02350 0.00415 gen 18.2s score 0.1s train 4.2s
+STEP 16 proxy 1.000 oracle 0.667 kl 0.02730 0.00041 gen 15.5s score 0.1s train 4.0s
+STEP 17 proxy 0.750 oracle 0.625 kl 0.02783 0.00098 gen 15.6s score 6.0s train 4.1s
+STEP 18 proxy 0.969 oracle 0.812 kl 0.02253 0.00280 gen 16.5s score 0.1s train 3.9s
+STEP 19 proxy 1.000 oracle 0.833 kl 0.03167 0.00006 gen 11.0s score 0.1s train 3.6s
+STEP 20 proxy 0.875 oracle 0.521 kl 0.03162 0.00008 gen 15.0s score 0.1s train 3.9s
+STEP 21 proxy 1.000 oracle 0.833 kl 0.02245 0.00007 gen 10.9s score 0.1s train 3.7s
+STEP 22 proxy 0.750 oracle 0.521 kl 0.21218 0.00531 gen 17.3s score 6.0s train 3.9s
+STEP 23 proxy 1.000 oracle 0.625 kl 0.06101 0.00009 gen 11.5s score 0.1s train 3.6s
+STEP 24 proxy 0.750 oracle 0.625 kl 0.04352 0.00526 gen 19.1s score 6.1s train 4.0s
+STEP 25 proxy 1.000 oracle 0.729 kl 0.04048 0.00052 gen 16.0s score 0.1s train 4.3s
+STEP 26 proxy 1.000 oracle 0.833 kl 0.02892 0.00393 gen 14.0s score 0.1s train 3.7s
+STEP 27 proxy 0.875 oracle 0.521 kl 0.03907 0.00548 gen 12.7s score 0.1s train 3.6s
+STEP 28 proxy 1.000 oracle 0.521 kl 0.04089 0.00063 gen 13.4s score 0.1s train 3.7s
+STEP 29 proxy 0.750 oracle 0.521 kl 0.11971 0.00820 gen 17.9s score 0.1s train 4.1s
+STEP 30 proxy 1.000 oracle 0.625 kl 0.12157 0.00012 gen 14.1s score 0.1s train 4.1s
+STEP 31 proxy 1.000 oracle 0.688 kl 0.05084 0.00449 gen 15.7s score 0.1s train 3.8s
+STEP 32 proxy 1.000 oracle 0.521 kl 0.29284 0.00049 gen 11.0s score 0.1s train 3.6s
+STEP 33 proxy 1.000 oracle 0.625 kl 0.03944 0.00029 gen 13.9s score 0.1s train 3.8s
+STEP 34 proxy 1.000 oracle 0.625 kl 0.04372 0.00413 gen 12.5s score 0.1s train 3.7s
+STEP 35 proxy 0.969 oracle 0.708 kl 0.03943 0.00087 gen 11.1s score 0.1s train 3.7s
+STEP 36 proxy 1.000 oracle 0.729 kl 0.05171 0.01213 gen 15.9s score 0.1s train 3.8s
+STEP 37 proxy 1.000 oracle 0.708 kl 0.06105 0.00271 gen 13.5s score 0.1s train 3.8s
+STEP 38 proxy 0.875 oracle 0.479 kl 0.09734 0.00326 gen 14.1s score 6.0s train 3.8s
+STEP 39 proxy 0.625 oracle 0.521 kl 0.08882 0.01125 gen 22.3s score 6.0s train 4.5s
+STEP 40 proxy 1.000 oracle 0.500 kl 0.04819 0.00651 gen 11.4s score 0.1s train 3.6s
+STEP 41 proxy 1.000 oracle 0.521 kl 0.05210 0.00069 gen 12.1s score 0.1s train 3.8s
+STEP 42 proxy 1.000 oracle 0.792 kl 0.04773 0.00078 gen 11.6s score 0.1s train 3.6s
+STEP 43 proxy 0.875 oracle 0.688 kl 0.03596 0.00108 gen 12.8s score 6.0s train 3.8s
+STEP 44 proxy 0.875 oracle 0.396 kl 0.03733 0.00129 gen 14.8s score 6.0s train 4.1s
+STEP 45 proxy 0.906 oracle 0.375 kl 0.13511 0.00538 gen 17.8s score 0.1s train 4.3s
+STEP 46 proxy 0.875 oracle 0.458 kl 0.03358 0.00658 gen 16.2s score 6.0s train 3.8s
+STEP 47 proxy 1.000 oracle 0.562 kl 0.05961 0.00999 gen 15.4s score 0.1s train 3.8s
+STEP 48 proxy 1.000 oracle 0.688 kl 0.04547 0.00031 gen 12.0s score 0.1s train 3.8s
+STEP 49 proxy 1.000 oracle 0.250 kl 0.02979 0.00031 gen 11.8s score 0.1s train 3.7s
+STEP 50 proxy 1.000 oracle 0.604 kl 0.04828 0.00837 gen 18.8s score 0.1s train 4.3s
+STEP 51 proxy 1.000 oracle 0.396 kl 0.05596 0.00934 gen 14.2s score 0.1s train 3.7s
+STEP 52 proxy 1.000 oracle 0.458 kl 0.04666 0.00494 gen 18.5s score 0.1s train 4.0s
+STEP 53 proxy 0.875 oracle 0.167 kl 0.05846 0.00038 gen 11.2s score 6.1s train 3.7s
+STEP 54 proxy 1.000 oracle 0.521 kl 0.04850 0.00564 gen 19.5s score 0.1s train 4.0s
+STEP 55 proxy 1.000 oracle 0.375 kl 0.03394 0.00337 gen 16.6s score 0.1s train 3.9s
+STEP 56 proxy 1.000 oracle 0.542 kl 0.04277 0.00012 gen 11.2s score 0.1s train 3.6s
+STEP 57 proxy 1.000 oracle 0.354 kl 0.04906 0.00896 gen 18.9s score 0.1s train 4.1s
+STEP 58 proxy 1.000 oracle 0.521 kl 0.06440 0.01528 gen 14.6s score 0.1s train 3.9s
+STEP 59 proxy 1.000 oracle 0.250 kl 0.04875 0.00820 gen 17.8s score 0.1s train 4.1s
+STEP 60 proxy 0.969 oracle 0.333 kl 0.07541 0.00113 gen 14.1s score 0.1s train 3.9s
+STEP 61 proxy 1.000 oracle 0.000 kl 0.06791 0.00012 gen 11.6s score 0.1s train 3.7s
+STEP 62 proxy 1.000 oracle 0.250 kl 0.03303 0.00406 gen 16.3s score 0.1s train 4.0s
+STEP 63 proxy 0.875 oracle 0.333 kl 0.03744 0.00858 gen 22.8s score 6.0s train 4.7s
+STEP 64 proxy 1.000 oracle 0.708 kl 0.45970 0.00891 gen 15.3s score 0.1s train 3.7s
+STEP 65 proxy 1.000 oracle 0.542 kl 0.04880 0.01086 gen 20.5s score 0.1s train 4.1s
+STEP 66 proxy 0.969 oracle 0.646 kl 0.05628 0.01372 gen 20.5s score 0.1s train 4.3s
+STEP 67 proxy 1.000 oracle 0.667 kl 0.04084 0.00272 gen 13.7s score 0.1s train 3.7s
+STEP 68 proxy 1.000 oracle 0.458 kl 0.08859 0.00019 gen 10.5s score 0.1s train 3.6s
+STEP 69 proxy 1.000 oracle 0.688 kl 0.07844 0.00067 gen 12.0s score 0.1s train 3.6s
+STEP 70 proxy 1.000 oracle 0.729 kl 0.03932 0.00033 gen 10.4s score 3.1s train 3.5s
+STEP 71 proxy 1.000 oracle 0.729 kl 0.04930 0.00014 gen 11.3s score 0.1s train 3.7s
+STEP 72 proxy 1.000 oracle 0.729 kl 0.04321 0.00402 gen 15.7s score 0.1s train 3.8s
+STEP 73 proxy 1.000 oracle 0.833 kl 0.08543 0.00032 gen 10.8s score 0.1s train 3.6s
+STEP 74 proxy 1.000 oracle 0.833 kl 0.05125 0.00495 gen 16.5s score 0.1s train 3.8s
+STEP 75 proxy 1.000 oracle 0.729 kl 0.09888 0.00558 gen 16.6s score 0.1s train 3.9s
+STEP 76 proxy 1.000 oracle 0.833 kl 0.12680 0.00034 gen 11.2s score 0.1s train 3.7s
+STEP 77 proxy 1.000 oracle 0.833 kl 0.12193 0.00840 gen 17.9s score 0.1s train 3.9s
+STEP 78 proxy 1.000 oracle 0.729 kl 0.04650 0.00025 gen 12.6s score 3.0s train 3.8s
+STEP 79 proxy 1.000 oracle 0.646 kl 0.55809 0.00086 gen 14.7s score 0.1s train 3.8s
+STEP 80 proxy 1.000 oracle 0.833 kl 0.04014 0.00099 gen 12.0s score 0.1s train 3.8s
+STEP 81 proxy 1.000 oracle 0.833 kl 0.05106 0.00140 gen 11.2s score 0.1s train 3.6s
+STEP 82 proxy 1.000 oracle 0.646 kl 0.04079 0.00084 gen 11.1s score 3.1s train 3.6s
+STEP 83 proxy 1.000 oracle 0.521 kl 0.04128 0.00118 gen 13.8s score 0.1s train 3.9s
+STEP 84 proxy 1.000 oracle 0.458 kl 0.02986 0.00042 gen 11.4s score 0.1s train 3.7s
+STEP 85 proxy 1.000 oracle 0.500 kl 0.07179 0.00423 gen 11.0s score 0.1s train 3.7s
+STEP 86 proxy 1.000 oracle 0.479 kl 0.04399 0.00118 gen 11.1s score 0.1s train 3.6s
+STEP 87 proxy 0.750 oracle 0.229 kl 0.04904 0.00373 gen 19.5s score 6.0s train 4.4s
+STEP 88 proxy 1.000 oracle 0.333 kl 0.05331 0.00337 gen 16.3s score 0.1s train 4.0s
+STEP 89 proxy 1.000 oracle 0.333 kl 0.03196 0.01244 gen 15.5s score 0.1s train 4.0s
+STEP 90 proxy 1.000 oracle 0.375 kl 0.02694 0.00085 gen 14.7s score 0.1s train 4.0s
+STEP 91 proxy 0.625 oracle 0.125 kl 0.04602 0.00060 gen 12.3s score 6.0s train 3.9s
+STEP 92 proxy 0.906 oracle 0.125 kl 0.03192 0.00063 gen 14.8s score 0.1s train 4.0s
+STEP 93 proxy 1.000 oracle 0.500 kl 0.02528 0.00065 gen 11.5s score 0.1s train 3.7s
+STEP 94 proxy 1.000 oracle 0.146 kl 0.02520 0.00213 gen 13.0s score 3.1s train 3.9s
+STEP 95 proxy 1.000 oracle 0.333 kl 0.01854 0.00411 gen 18.4s score 0.1s train 4.4s
+STEP 96 proxy 0.781 oracle 0.333 kl 0.03377 0.00690 gen 12.8s score 6.0s train 3.9s
+STEP 97 proxy 0.875 oracle 0.354 kl 0.02258 0.00717 gen 14.8s score 6.0s train 3.9s
+STEP 98 proxy 0.875 oracle 0.458 kl 0.03193 0.00024 gen 13.4s score 6.0s train 4.0s
+STEP 99 proxy 1.000 oracle 0.250 kl 0.03615 0.00670 gen 18.3s score 0.1s train 4.3s
+STEP 100 proxy 1.000 oracle 0.479 kl 0.03490 0.00115 gen 14.2s score 0.1s train 4.1s
+STEP 101 proxy 1.000 oracle 0.417 kl 0.02897 0.00466 gen 14.0s score 0.1s train 4.0s
+STEP 102 proxy 0.781 oracle 0.229 kl 0.02939 0.00264 gen 12.5s score 6.0s train 3.9s
+STEP 103 proxy 1.000 oracle 0.146 kl 0.02400 0.00718 gen 17.4s score 0.1s train 4.1s
+STEP 104 proxy 1.000 oracle 0.354 kl 0.02187 0.00031 gen 11.9s score 0.1s train 3.7s
+STEP 105 proxy 1.000 oracle 0.146 kl 0.03421 0.00207 gen 13.3s score 3.1s train 4.0s
+STEP 106 proxy 0.875 oracle 0.188 kl 0.03472 0.00096 gen 15.6s score 0.1s train 4.2s
+STEP 107 proxy 1.000 oracle 0.250 kl 0.03246 0.00921 gen 19.9s score 0.1s train 4.2s
+STEP 108 proxy 1.000 oracle 0.333 kl 0.06580 0.00054 gen 11.8s score 0.1s train 3.8s
+STEP 109 proxy 0.875 oracle 0.229 kl 0.03573 0.00851 gen 16.6s score 6.0s train 4.1s
+STEP 110 proxy 1.000 oracle 0.250 kl 0.04479 0.00442 gen 16.9s score 0.1s train 4.1s
+STEP 111 proxy 1.000 oracle 0.521 kl 0.03265 0.00108 gen 13.6s score 0.1s train 4.0s
+STEP 112 proxy 1.000 oracle 0.333 kl 0.03834 0.00021 gen 12.1s score 3.0s train 3.9s
+STEP 113 proxy 1.000 oracle 0.250 kl 0.05691 0.01479 gen 15.4s score 0.1s train 4.1s
+STEP 114 proxy 0.875 oracle 0.125 kl 0.04993 0.00935 gen 17.9s score 0.1s train 4.0s
+STEP 115 proxy 1.000 oracle 0.229 kl 0.04080 0.00373 gen 11.8s score 0.1s train 3.8s
+STEP 116 proxy 1.000 oracle 0.458 kl 0.03118 0.00050 gen 13.3s score 0.1s train 3.8s
+STEP 117 proxy 1.000 oracle 0.292 kl 0.03556 0.00376 gen 12.1s score 3.0s train 3.8s
+STEP 118 proxy 0.875 oracle 0.146 kl 0.03844 0.00296 gen 15.1s score 0.1s train 3.9s
+STEP 119 proxy 0.906 oracle 0.333 kl 0.04766 0.00929 gen 12.2s score 0.1s train 3.8s
+STEP 120 proxy 1.000 oracle 0.000 kl 0.05264 0.01228 gen 16.3s score 0.1s train 3.9s
+STEP 121 proxy 0.875 oracle 0.375 kl 0.05626 0.01039 gen 21.1s score 0.1s train 4.4s
+STEP 122 proxy 1.000 oracle 0.125 kl 0.03680 0.01415 gen 15.8s score 0.1s train 4.2s
+STEP 123 proxy 1.000 oracle 0.229 kl 0.03301 0.01658 gen 13.7s score 0.1s train 3.9s
+STEP 124 proxy 1.000 oracle 0.250 kl 0.05088 0.02515 gen 13.3s score 0.1s train 3.9s
+STEP 125 proxy 0.938 oracle 0.354 kl 0.04898 0.02168 gen 14.9s score 0.1s train 4.0s
+STEP 126 proxy 1.000 oracle 0.375 kl 0.03874 0.02331 gen 16.0s score 3.1s train 4.1s
+STEP 127 proxy 1.000 oracle 0.500 kl 0.02780 0.02749 gen 16.0s score 0.1s train 3.9s
+STEP 128 proxy 0.969 oracle 0.208 kl 0.04575 0.04830 gen 16.2s score 0.1s train 3.9s
+STEP 129 proxy 0.875 oracle 0.000 kl 0.05036 0.02948 gen 16.5s score 0.1s train 4.0s
+STEP 130 proxy 1.000 oracle 0.271 kl 0.03887 0.02661 gen 17.6s score 3.1s train 4.3s
+STEP 131 proxy 0.875 oracle 0.104 kl 0.06326 0.03470 gen 19.6s score 6.0s train 4.1s
+STEP 132 proxy 0.875 oracle 0.250 kl 8.44484 0.04461 gen 18.2s score 6.0s train 4.3s
+STEP 133 proxy 0.969 oracle 0.354 kl 0.06963 0.02722 gen 18.1s score 0.1s train 4.1s
+STEP 134 proxy 1.000 oracle 0.375 kl 0.04029 0.05877 gen 13.6s score 0.1s train 3.9s
+STEP 135 proxy 1.000 oracle 0.375 kl 0.03470 0.02491 gen 21.4s score 0.1s train 4.1s
+STEP 136 proxy 1.000 oracle 0.229 kl 0.03995 0.03228 gen 15.7s score 0.1s train 3.9s
+STEP 137 proxy 0.750 oracle 0.125 kl 0.05188 0.04827 gen 16.5s score 6.0s train 4.2s
+STEP 138 proxy 0.875 oracle 0.146 kl 0.04091 0.02661 gen 15.3s score 6.0s train 4.0s
+STEP 139 proxy 0.625 oracle 0.062 kl 0.03208 0.00934 gen 12.4s score 6.0s train 3.8s
+STEP 140 proxy 0.625 oracle 0.250 kl 0.03193 0.02999 gen 17.7s score 6.0s train 4.2s
+STEP 141 proxy 0.875 oracle 0.146 kl 0.03036 0.04057 gen 16.0s score 0.1s train 3.8s
+STEP 142 proxy 0.875 oracle 0.125 kl 0.04083 0.01222 gen 12.1s score 6.0s train 3.7s
+STEP 143 proxy 0.625 oracle 0.104 kl 0.03539 0.00978 gen 12.2s score 6.0s train 3.9s
+STEP 144 proxy 1.000 oracle 0.312 kl 0.04974 0.01987 gen 16.7s score 3.1s train 4.2s
+STEP 145 proxy 0.875 oracle 0.208 kl 0.04854 0.00391 gen 11.8s score 6.0s train 3.8s
+STEP 146 proxy 1.000 oracle 0.188 kl 0.04451 0.01544 gen 13.2s score 0.1s train 3.8s
+STEP 147 proxy 1.000 oracle 0.167 kl 0.02877 0.01134 gen 16.1s score 3.1s train 4.0s
+STEP 148 proxy 1.000 oracle 0.146 kl 0.03947 0.02085 gen 16.0s score 3.1s train 3.8s
+STEP 149 proxy 1.000 oracle 0.333 kl 0.04403 0.00126 gen 13.4s score 0.1s train 3.9s
+STEP 150 proxy 1.000 oracle 0.271 kl 0.04791 0.01040 gen 11.9s score 3.1s train 3.7s
+STEP 151 proxy 1.000 oracle 0.354 kl 0.05358 0.02235 gen 14.1s score 0.1s train 3.8s
+STEP 152 proxy 1.000 oracle 0.333 kl 0.03595 0.01112 gen 14.1s score 0.1s train 3.8s
+STEP 153 proxy 0.969 oracle 0.312 kl 0.04767 0.01328 gen 16.8s score 3.1s train 4.0s
+STEP 154 proxy 1.000 oracle 0.688 kl 0.03559 0.01089 gen 16.4s score 0.1s train 3.9s
+STEP 155 proxy 0.969 oracle 0.125 kl 0.04512 0.02596 gen 15.0s score 0.1s train 3.8s
+STEP 156 proxy 1.000 oracle 0.458 kl 0.04350 0.02047 gen 17.9s score 0.1s train 4.0s
+STEP 157 proxy 0.906 oracle 0.125 kl 0.03909 0.02511 gen 16.6s score 3.1s train 4.2s
+STEP 158 proxy 1.000 oracle 0.250 kl 0.03974 0.01376 gen 17.3s score 0.1s train 4.0s
+STEP 159 proxy 0.875 oracle 0.333 kl 0.05050 0.01229 gen 17.8s score 6.0s train 4.3s
+STEP 160 proxy 1.000 oracle 0.292 kl 0.05396 0.00087 gen 11.3s score 0.1s train 3.7s
+STEP 161 proxy 0.875 oracle 0.354 kl 0.07927 0.01923 gen 23.1s score 0.1s train 4.3s
+STEP 162 proxy 1.000 oracle 0.229 kl 0.03516 0.01416 gen 16.5s score 0.1s train 4.1s
+STEP 163 proxy 0.875 oracle 0.271 kl 0.07517 0.02039 gen 16.8s score 0.1s train 3.9s
+STEP 164 proxy 1.000 oracle 0.417 kl 0.04086 0.01178 gen 15.0s score 0.1s train 3.9s
+STEP 165 proxy 1.000 oracle 0.208 kl 0.06050 0.01551 gen 16.9s score 3.1s train 4.0s
+STEP 166 proxy 1.000 oracle 0.104 kl 0.03584 0.00282 gen 11.6s score 3.1s train 3.7s
+STEP 167 proxy 1.000 oracle 0.354 kl 0.03073 0.01180 gen 17.1s score 3.1s train 3.9s
+STEP 168 proxy 1.000 oracle 0.292 kl 0.03576 0.00264 gen 12.1s score 3.1s train 3.8s
+STEP 169 proxy 1.000 oracle 0.208 kl 0.04531 0.00977 gen 17.2s score 0.1s train 4.1s
+STEP 170 proxy 0.875 oracle 0.229 kl 0.06803 0.02801 gen 16.8s score 6.0s train 4.1s
+STEP 171 proxy 1.000 oracle 0.146 kl 0.03658 0.01500 gen 17.7s score 3.1s train 4.1s
+STEP 172 proxy 0.875 oracle 0.292 kl 0.03901 0.01063 gen 17.2s score 3.1s train 4.0s
+STEP 173 proxy 1.000 oracle 0.125 kl 0.04444 0.00254 gen 12.1s score 3.1s train 3.8s
+STEP 174 proxy 1.000 oracle 0.229 kl 0.04486 0.00259 gen 15.3s score 3.1s train 4.1s
+STEP 175 proxy 1.000 oracle 0.062 kl 0.10321 0.00571 gen 16.4s score 0.1s train 3.8s
+STEP 176 proxy 0.781 oracle 0.167 kl 0.04882 0.00624 gen 15.5s score 0.1s train 3.8s
+STEP 177 proxy 0.875 oracle 0.104 kl 0.11622 0.00049 gen 12.1s score 6.1s train 4.0s
+STEP 178 proxy 1.000 oracle 0.479 kl 0.03968 0.01657 gen 20.3s score 0.1s train 4.3s
+STEP 179 proxy 1.000 oracle 0.229 kl 0.05342 0.01603 gen 14.4s score 3.1s train 3.7s
+STEP 180 proxy 0.875 oracle 0.104 kl 0.04512 0.02261 gen 19.4s score 6.1s train 4.2s
+STEP 181 proxy 1.000 oracle 0.292 kl 0.03485 0.00735 gen 11.7s score 0.1s train 3.7s
+STEP 182 proxy 1.000 oracle 0.271 kl 0.03773 0.00276 gen 11.6s score 3.1s train 3.7s
+STEP 183 proxy 0.875 oracle 0.167 kl 0.03254 0.01027 gen 17.5s score 6.0s train 4.1s
+STEP 184 proxy 1.000 oracle 0.375 kl 0.03752 0.03137 gen 20.0s score 0.1s train 4.6s
+STEP 185 proxy 0.812 oracle 0.188 kl 0.05045 0.00809 gen 21.4s score 3.1s train 4.1s
+STEP 186 proxy 1.000 oracle 0.333 kl 0.03860 0.00345 gen 12.3s score 0.1s train 3.9s
+STEP 187 proxy 1.000 oracle 0.208 kl 0.03670 0.00109 gen 17.7s score 3.1s train 3.8s
+STEP 188 proxy 0.875 oracle 0.062 kl 0.11315 0.00079 gen 11.4s score 6.0s train 3.6s
+STEP 189 proxy 1.000 oracle 0.188 kl 0.06410 0.00492 gen 11.0s score 3.1s train 3.6s
+STEP 190 proxy 1.000 oracle 0.271 kl 0.03190 0.00312 gen 11.5s score 0.1s train 3.7s
+STEP 191 proxy 1.000 oracle 0.083 kl 0.04229 0.00717 gen 12.6s score 3.1s train 3.9s
+STEP 192 proxy 1.000 oracle 0.167 kl 0.03822 0.01399 gen 17.8s score 3.1s train 4.0s
+STEP 193 proxy 1.000 oracle 0.042 kl 0.03856 0.00234 gen 14.0s score 3.1s train 3.8s
+STEP 194 proxy 1.000 oracle 0.271 kl 0.07031 0.01203 gen 18.1s score 3.1s train 4.1s
+STEP 195 proxy 1.000 oracle 0.146 kl 0.04107 0.01491 gen 13.0s score 3.1s train 3.8s
+STEP 196 proxy 1.000 oracle 0.104 kl 0.06120 0.00991 gen 19.3s score 3.1s train 4.3s
+STEP 197 proxy 1.000 oracle 0.208 kl 0.03563 0.00161 gen 14.3s score 3.1s train 3.9s
+STEP 198 proxy 1.000 oracle 0.292 kl 0.04194 0.00065 gen 14.3s score 3.1s train 3.8s
+STEP 199 proxy 0.875 oracle 0.146 kl 1.43034 0.00206 gen 14.5s score 6.1s train 4.0s
+STEP 200 proxy 1.000 oracle 0.354 kl 0.03340 0.00128 gen 11.4s score 3.1s train 3.7s
+STEP 201 proxy 1.000 oracle 0.333 kl 0.02900 0.00199 gen 11.6s score 0.1s train 3.7s
+STEP 202 proxy 1.000 oracle 0.167 kl 0.05697 0.01805 gen 15.6s score 3.1s train 3.9s
+STEP 203 proxy 1.000 oracle 0.167 kl 0.03463 0.00171 gen 12.4s score 3.1s train 3.8s
+STEP 204 proxy 0.844 oracle 0.229 kl 0.06015 0.00170 gen 15.5s score 6.0s train 4.0s
+STEP 205 proxy 1.000 oracle 0.229 kl 0.02472 0.00274 gen 11.4s score 3.1s train 3.6s
+STEP 206 proxy 1.000 oracle 0.125 kl 0.03339 0.01111 gen 17.8s score 3.1s train 3.9s
+STEP 207 proxy 0.875 oracle 0.229 kl 0.03826 0.00216 gen 11.5s score 6.1s train 3.7s
+STEP 208 proxy 1.000 oracle 0.292 kl 0.03311 0.01311 gen 13.7s score 3.1s train 3.8s
+STEP 209 proxy 1.000 oracle 0.333 kl 0.03240 0.00779 gen 13.1s score 0.1s train 4.0s
+STEP 210 proxy 1.000 oracle 0.271 kl 0.05555 0.00822 gen 12.0s score 3.1s train 3.7s
+STEP 211 proxy 0.750 oracle 0.271 kl 0.03103 0.01529 gen 15.2s score 6.1s train 3.9s
+STEP 212 proxy 1.000 oracle 0.042 kl 0.03068 0.01928 gen 14.6s score 3.1s train 3.9s
+STEP 213 proxy 0.906 oracle 0.042 kl 0.03204 0.00936 gen 18.5s score 0.1s train 4.3s
+STEP 214 proxy 1.000 oracle 0.229 kl 0.02931 0.02828 gen 20.6s score 0.1s train 4.3s
+STEP 215 proxy 1.000 oracle 0.146 kl 0.03484 0.02481 gen 16.3s score 3.1s train 4.0s
+STEP 216 proxy 0.844 oracle 0.312 kl 0.05038 0.01514 gen 15.9s score 6.0s train 4.0s
+STEP 217 proxy 1.000 oracle 0.292 kl 0.03014 0.00137 gen 11.9s score 0.1s train 3.8s
+STEP 218 proxy 0.875 oracle 0.062 kl 0.04168 0.01507 gen 16.0s score 6.0s train 4.1s
+STEP 219 proxy 0.875 oracle 0.167 kl 0.03768 0.01273 gen 11.5s score 0.1s train 3.7s
+STEP 220 proxy 0.625 oracle 0.125 kl 0.04125 0.01056 gen 17.1s score 6.0s train 4.1s
+STEP 221 proxy 1.000 oracle 0.354 kl 0.02991 0.00452 gen 11.9s score 0.1s train 3.7s
+STEP 222 proxy 0.875 oracle 0.125 kl 0.06230 0.00060 gen 11.9s score 6.0s train 3.7s
+STEP 223 proxy 0.656 oracle 0.021 kl 0.04721 0.00946 gen 20.5s score 6.0s train 4.4s
+STEP 224 proxy 1.000 oracle 0.250 kl 0.02557 0.01462 gen 17.5s score 3.1s train 4.1s
+STEP 225 proxy 1.000 oracle 0.292 kl 0.03639 0.00145 gen 19.0s score 0.1s train 4.0s
+STEP 226 proxy 0.875 oracle 0.083 kl 0.03722 0.00780 gen 24.7s score 6.0s train 4.6s
+STEP 227 proxy 1.000 oracle 0.021 kl 0.03544 0.00272 gen 14.2s score 3.1s train 4.0s
+STEP 228 proxy 1.000 oracle 0.271 kl 0.07846 0.04580 gen 18.9s score 0.1s train 4.3s
+STEP 229 proxy 1.000 oracle 0.333 kl 0.04417 0.00624 gen 15.8s score 0.1s train 4.2s
+STEP 230 proxy 1.000 oracle 0.229 kl 0.04114 0.02440 gen 15.5s score 0.1s train 3.8s
+STEP 231 proxy 0.750 oracle 0.167 kl 0.02884 0.00495 gen 12.0s score 0.1s train 3.8s
+STEP 232 proxy 1.000 oracle 0.125 kl 0.03007 0.01113 gen 17.1s score 3.1s train 4.1s
+STEP 233 proxy 1.000 oracle 0.083 kl 0.07600 0.03130 gen 16.8s score 3.1s train 4.1s
+STEP 234 proxy 1.000 oracle 0.500 kl 0.02953 0.00999 gen 15.4s score 0.1s train 4.1s
+STEP 235 proxy 1.000 oracle 0.354 kl 0.03945 0.00519 gen 17.6s score 0.1s train 4.2s
+STEP 236 proxy 1.000 oracle 0.208 kl 0.03140 0.00799 gen 18.5s score 0.1s train 4.0s
+STEP 237 proxy 1.000 oracle 0.229 kl 0.02780 0.00684 gen 18.7s score 0.1s train 4.1s
+STEP 238 proxy 1.000 oracle 0.250 kl 0.02552 0.00225 gen 12.1s score 0.1s train 3.7s
+STEP 239 proxy 1.000 oracle 0.042 kl 0.06840 0.02057 gen 14.1s score 0.1s train 3.8s
+STEP 240 proxy 0.875 oracle 0.125 kl 0.03016 0.01266 gen 19.8s score 0.1s train 4.6s
+STEP 241 proxy 1.000 oracle 0.167 kl 0.05785 0.00907 gen 19.1s score 0.1s train 4.3s
+STEP 242 proxy 0.875 oracle 0.021 kl 0.11477 0.00437 gen 17.4s score 6.1s train 3.8s
+STEP 243 proxy 1.000 oracle 0.354 kl 0.03566 0.00551 gen 12.2s score 0.1s train 3.8s
+STEP 244 proxy 1.000 oracle 0.062 kl 0.03336 0.00237 gen 13.0s score 0.1s train 3.9s
+STEP 245 proxy 1.000 oracle 0.062 kl 0.02810 0.00699 gen 14.6s score 0.1s train 3.9s
+STEP 246 proxy 0.875 oracle 0.250 kl 0.02776 0.00917 gen 16.0s score 0.1s train 4.3s
+STEP 247 proxy 1.000 oracle 0.250 kl 0.03197 0.00842 gen 12.0s score 3.1s train 3.8s
+STEP 248 proxy 1.000 oracle 0.250 kl 0.03130 0.01746 gen 18.7s score 0.1s train 4.0s
+STEP 249 proxy 1.000 oracle 0.021 kl 0.02781 0.00784 gen 16.1s score 0.1s train 3.9s
+STEP 250 proxy 1.000 oracle 0.125 kl 0.02318 0.00100 gen 11.4s score 0.1s train 3.7s
+STEP 251 proxy 1.000 oracle 0.167 kl 0.03084 0.00162 gen 19.5s score 3.1s train 4.1s
+STEP 252 proxy 1.000 oracle 0.229 kl 0.04081 0.00588 gen 16.7s score 3.1s train 4.0s
+STEP 253 proxy 1.000 oracle 0.354 kl 0.03685 0.03046 gen 16.8s score 0.1s train 4.1s
+STEP 254 proxy 0.875 oracle 0.333 kl 0.03859 0.02213 gen 22.1s score 0.1s train 4.6s
+STEP 255 proxy 0.875 oracle 0.125 kl 0.04402 0.01339 gen 19.1s score 3.1s train 4.3s
+STEP 256 proxy 0.875 oracle 0.417 kl 0.03216 0.00604 gen 15.6s score 3.1s train 3.9s
+STEP 257 proxy 1.000 oracle 0.104 kl 0.05323 0.00668 gen 13.9s score 3.1s train 3.7s
+STEP 258 proxy 1.000 oracle 0.375 kl 0.03693 0.00189 gen 15.5s score 0.1s train 3.9s
+STEP 259 proxy 0.906 oracle 0.083 kl 0.06580 0.00147 gen 11.2s score 0.1s train 3.6s
+STEP 260 proxy 0.875 oracle 0.333 kl 0.09081 0.01773 gen 15.1s score 6.0s train 3.9s
+STEP 261 proxy 0.875 oracle 0.125 kl 0.05776 0.00205 gen 11.5s score 6.0s train 3.6s
+STEP 262 proxy 1.000 oracle 0.562 kl 0.03534 0.02051 gen 16.4s score 0.1s train 4.0s
+STEP 263 proxy 1.000 oracle 0.146 kl 0.02734 0.00524 gen 15.5s score 0.1s train 4.0s
+STEP 264 proxy 1.000 oracle 0.125 kl 0.05505 0.00258 gen 11.6s score 0.1s train 3.7s
+STEP 265 proxy 1.000 oracle 0.083 kl 0.03318 0.01644 gen 19.9s score 3.1s train 4.5s
+STEP 266 proxy 1.000 oracle 0.188 kl 0.03814 0.00131 gen 12.5s score 0.1s train 3.9s
+STEP 267 proxy 0.875 oracle 0.083 kl 0.02928 0.01091 gen 21.6s score 6.0s train 4.3s
+STEP 268 proxy 1.000 oracle 0.146 kl 0.04355 0.01769 gen 19.6s score 3.1s train 4.4s
+STEP 269 proxy 0.875 oracle 0.104 kl 0.04870 0.00373 gen 12.5s score 0.1s train 3.8s
+STEP 270 proxy 1.000 oracle 0.271 kl 0.03430 0.02027 gen 18.1s score 3.1s train 4.1s
+STEP 271 proxy 1.000 oracle 0.062 kl 0.02935 0.00159 gen 12.2s score 0.1s train 3.7s
+STEP 272 proxy 1.000 oracle 0.208 kl 0.02722 0.00858 gen 16.4s score 0.1s train 3.9s
+STEP 273 proxy 1.000 oracle 0.146 kl 0.03826 0.11220 gen 14.8s score 0.1s train 4.0s
+STEP 274 proxy 0.875 oracle 0.229 kl 0.03384 0.02881 gen 16.5s score 0.1s train 4.1s
+STEP 275 proxy 1.000 oracle 0.271 kl 0.03905 0.00123 gen 11.3s score 0.1s train 3.7s
+STEP 276 proxy 1.000 oracle 0.312 kl 0.03549 0.00476 gen 14.6s score 0.1s train 4.0s
+STEP 277 proxy 1.000 oracle 0.458 kl 0.04102 0.01349 gen 15.5s score 0.1s train 3.9s
+STEP 278 proxy 0.875 oracle 0.271 kl 0.04973 0.01883 gen 16.2s score 0.1s train 4.1s
+STEP 279 proxy 0.750 oracle 0.250 kl 0.03039 0.00231 gen 11.6s score 6.0s train 3.7s
+STEP 280 proxy 0.875 oracle 0.146 kl 0.06224 0.02713 gen 19.4s score 6.0s train 4.2s
+STEP 281 proxy 1.000 oracle 0.479 kl 0.02082 0.00134 gen 14.7s score 0.1s train 4.1s
+STEP 282 proxy 1.000 oracle 0.312 kl 0.03156 0.02913 gen 14.7s score 0.1s train 3.9s
+STEP 283 proxy 1.000 oracle 0.188 kl 0.02470 0.01775 gen 15.7s score 0.1s train 4.1s
+STEP 284 proxy 1.000 oracle 0.375 kl 0.04307 0.01583 gen 12.9s score 3.0s train 3.8s
+STEP 285 proxy 1.000 oracle 0.438 kl 0.05721 0.00967 gen 12.5s score 0.1s train 3.8s
+STEP 286 proxy 0.969 oracle 0.167 kl 0.03366 0.01984 gen 17.3s score 0.1s train 4.1s
+STEP 287 proxy 1.000 oracle 0.458 kl 0.02685 0.01556 gen 15.2s score 3.1s train 3.9s
+STEP 288 proxy 0.875 oracle 0.083 kl 0.02693 0.00374 gen 11.9s score 0.1s train 3.8s
+STEP 289 proxy 1.000 oracle 0.292 kl 0.04013 0.01015 gen 14.4s score 3.1s train 3.9s
+STEP 290 proxy 1.000 oracle 0.188 kl 0.04749 0.00317 gen 14.0s score 0.1s train 3.9s
+STEP 291 proxy 0.875 oracle 0.167 kl 0.02650 0.00991 gen 25.4s score 0.1s train 4.6s
+STEP 292 proxy 1.000 oracle 0.167 kl 0.03095 0.00996 gen 15.7s score 0.1s train 4.1s
+STEP 293 proxy 0.875 oracle 0.271 kl 0.03607 0.02819 gen 19.1s score 0.1s train 4.1s
+STEP 294 proxy 0.969 oracle 0.500 kl 0.03983 0.00133 gen 13.5s score 0.1s train 3.9s
+STEP 295 proxy 1.000 oracle 0.438 kl 0.02585 0.02205 gen 15.0s score 3.1s train 3.9s
+STEP 296 proxy 1.000 oracle 0.562 kl 0.03393 0.00696 gen 18.4s score 0.1s train 4.1s
+STEP 297 proxy 0.875 oracle 0.229 kl 0.08983 0.00172 gen 12.4s score 6.0s train 3.9s
+STEP 298 proxy 1.000 oracle 0.688 kl 0.03588 0.00281 gen 13.1s score 0.1s train 3.9s
+STEP 299 proxy 0.781 oracle 0.250 kl 0.04168 0.01325 gen 20.4s score 0.1s train 4.2s
+STEP 300 proxy 1.000 oracle 0.167 kl 0.03004 0.00973 gen 13.8s score 3.0s train 3.8s
+STEP 301 proxy 1.000 oracle 0.417 kl 0.02674 0.00838 gen 13.7s score 0.1s train 3.9s
+STEP 302 proxy 0.875 oracle 0.292 kl 0.02597 0.00269 gen 12.1s score 0.1s train 3.9s
+STEP 303 proxy 0.875 oracle 0.250 kl 0.03770 0.00176 gen 11.8s score 6.0s train 3.7s
+STEP 304 proxy 1.000 oracle 0.146 kl 0.03328 0.00992 gen 12.4s score 0.1s train 3.7s
+STEP 305 proxy 1.000 oracle 0.375 kl 0.04502 0.00649 gen 17.3s score 0.1s train 3.9s
+STEP 306 proxy 1.000 oracle 0.208 kl 0.02828 0.00651 gen 13.0s score 0.1s train 4.0s
+STEP 307 proxy 1.000 oracle 0.188 kl 0.02195 0.01337 gen 15.7s score 3.1s train 3.9s
+STEP 308 proxy 1.000 oracle 0.271 kl 0.02824 0.00546 gen 15.6s score 0.1s train 3.8s
+STEP 309 proxy 0.875 oracle 0.250 kl 0.04585 0.00739 gen 12.0s score 0.1s train 3.7s
+STEP 310 proxy 1.000 oracle 0.292 kl 0.03018 0.00342 gen 12.3s score 3.1s train 3.8s
+STEP 311 proxy 0.875 oracle 0.167 kl 0.05584 0.00423 gen 13.4s score 6.0s train 3.8s
+STEP 312 proxy 1.000 oracle 0.312 kl 0.04992 0.00173 gen 15.9s score 0.1s train 4.0s
+STEP 313 proxy 1.000 oracle 0.500 kl 0.02788 0.01405 gen 16.1s score 0.1s train 4.0s
+STEP 314 proxy 0.875 oracle 0.354 kl 0.05205 0.00302 gen 13.0s score 6.0s train 3.9s
+STEP 315 proxy 1.000 oracle 0.188 kl 0.03327 0.01134 gen 15.7s score 0.1s train 3.9s
+STEP 316 proxy 1.000 oracle 0.292 kl 0.03390 0.00844 gen 15.2s score 0.1s train 4.0s
+STEP 317 proxy 1.000 oracle 0.271 kl 0.04995 0.01964 gen 12.2s score 0.1s train 3.7s
+STEP 318 proxy 1.000 oracle 0.396 kl 0.04367 0.00064 gen 11.9s score 0.1s train 3.7s
+STEP 319 proxy 1.000 oracle 0.146 kl 0.03111 0.01095 gen 14.2s score 0.1s train 3.7s
+STEP 320 proxy 1.000 oracle 0.208 kl 0.02320 0.01459 gen 21.7s score 3.0s train 4.4s
+STEP 321 proxy 1.000 oracle 0.312 kl 0.03560 0.00108 gen 14.4s score 0.1s train 4.1s
+STEP 322 proxy 0.875 oracle 0.188 kl 0.03501 0.00559 gen 14.8s score 6.0s train 4.3s
+STEP 323 proxy 0.875 oracle 0.229 kl 0.04063 0.00556 gen 15.0s score 6.0s train 3.9s
+STEP 324 proxy 1.000 oracle 0.208 kl 0.02551 0.01248 gen 20.3s score 0.1s train 4.2s
+STEP 325 proxy 1.000 oracle 0.188 kl 0.02448 0.00598 gen 12.7s score 0.1s train 3.9s
+STEP 326 proxy 1.000 oracle 0.354 kl 0.03813 0.00014 gen 12.1s score 0.1s train 3.8s
+STEP 327 proxy 1.000 oracle 0.271 kl 0.03411 0.03756 gen 18.7s score 0.1s train 4.2s
+STEP 328 proxy 1.000 oracle 0.250 kl 0.03778 0.00338 gen 12.0s score 0.1s train 3.8s
+STEP 329 proxy 1.000 oracle 0.229 kl 0.03294 0.01092 gen 17.1s score 0.1s train 4.0s
+STEP 330 proxy 1.000 oracle 0.292 kl 0.02229 0.01455 gen 13.2s score 0.1s train 4.0s
+STEP 331 proxy 1.000 oracle 0.208 kl 0.01986 0.02259 gen 13.3s score 3.1s train 3.9s
+STEP 332 proxy 1.000 oracle 0.479 kl 0.04753 0.05328 gen 14.1s score 0.1s train 3.9s
+STEP 333 proxy 1.000 oracle 0.479 kl 0.04099 0.00344 gen 12.4s score 0.1s train 3.9s
+STEP 334 proxy 1.000 oracle 0.271 kl 0.02817 0.01528 gen 16.0s score 0.1s train 3.9s
+STEP 335 proxy 0.875 oracle 0.375 kl 0.05688 0.00251 gen 15.8s score 0.1s train 4.1s
+STEP 336 proxy 1.000 oracle 0.188 kl 0.03253 0.00981 gen 15.6s score 0.1s train 3.9s
+STEP 337 proxy 0.875 oracle 0.312 kl 0.03218 0.01225 gen 18.2s score 0.1s train 4.1s
+STEP 338 proxy 1.000 oracle 0.396 kl 0.02147 0.01004 gen 16.9s score 0.1s train 4.1s
+STEP 339 proxy 1.000 oracle 0.354 kl 0.02036 0.00860 gen 13.8s score 0.1s train 3.8s
+STEP 340 proxy 0.750 oracle 0.292 kl 0.10358 0.02007 gen 17.2s score 6.0s train 4.1s
+STEP 341 proxy 1.000 oracle 0.271 kl 0.02672 0.00577 gen 18.6s score 0.1s train 4.0s
+STEP 342 proxy 1.000 oracle 0.292 kl 0.03941 0.01175 gen 15.6s score 0.1s train 3.9s
+STEP 343 proxy 1.000 oracle 0.146 kl 0.03876 0.00153 gen 11.1s score 3.1s train 3.6s
+STEP 344 proxy 1.000 oracle 0.062 kl 0.02638 0.02584 gen 15.9s score 3.1s train 4.2s
+STEP 345 proxy 1.000 oracle 0.188 kl 0.02254 0.01704 gen 17.8s score 0.1s train 4.2s
+STEP 346 proxy 1.000 oracle 0.250 kl 0.02950 0.01347 gen 20.4s score 0.1s train 4.1s
+STEP 347 proxy 1.000 oracle 0.188 kl 0.03201 0.01322 gen 13.6s score 0.1s train 3.8s
+STEP 348 proxy 1.000 oracle 0.167 kl 0.02995 0.01772 gen 19.3s score 0.1s train 4.0s
+STEP 349 proxy 1.000 oracle 0.417 kl 0.02563 0.00709 gen 12.9s score 0.1s train 4.0s
+STEP 350 proxy 1.000 oracle 0.125 kl 0.02183 0.02149 gen 18.3s score 0.1s train 4.1s
+STEP 351 proxy 1.000 oracle 0.167 kl 0.03026 0.00566 gen 11.4s score 3.1s train 3.6s
+STEP 352 proxy 1.000 oracle 0.167 kl 0.02420 0.00186 gen 12.1s score 0.1s train 3.8s
+STEP 353 proxy 1.000 oracle 0.146 kl 0.03896 0.01153 gen 14.8s score 0.1s train 3.8s
+STEP 354 proxy 0.875 oracle 0.208 kl 0.02566 0.02805 gen 15.0s score 0.1s train 4.2s
+STEP 355 proxy 0.875 oracle 0.354 kl 0.05558 0.00890 gen 20.5s score 6.0s train 4.2s
+STEP 356 proxy 1.000 oracle 0.417 kl 0.03301 0.00837 gen 15.9s score 0.1s train 4.0s
+STEP 357 proxy 1.000 oracle 0.042 kl 0.02287 0.00320 gen 11.5s score 3.1s train 3.7s
+STEP 358 proxy 1.000 oracle 0.188 kl 0.02505 0.01370 gen 13.8s score 3.1s train 4.0s
+STEP 359 proxy 0.875 oracle 0.354 kl 0.02915 0.00256 gen 12.0s score 0.1s train 3.7s
+STEP 360 proxy 0.875 oracle 0.208 kl 0.05761 0.01622 gen 18.5s score 6.0s train 4.3s
+STEP 361 proxy 1.000 oracle 0.312 kl 0.02731 0.01067 gen 18.7s score 0.1s train 4.1s
+STEP 362 proxy 1.000 oracle 0.292 kl 0.06581 0.00213 gen 13.8s score 0.1s train 4.0s
+STEP 363 proxy 0.875 oracle 0.208 kl 0.04337 0.00310 gen 15.6s score 6.0s train 4.0s
+STEP 364 proxy 1.000 oracle 0.521 kl 0.02924 0.00989 gen 13.8s score 0.1s train 3.7s
+STEP 365 proxy 1.000 oracle 0.229 kl 0.03238 0.00659 gen 15.6s score 0.1s train 4.0s
+STEP 366 proxy 1.000 oracle 0.250 kl 0.02460 0.00019 gen 12.1s score 0.1s train 3.8s
+STEP 367 proxy 1.000 oracle 0.292 kl 0.02802 0.00279 gen 11.7s score 0.1s train 3.7s
+STEP 368 proxy 1.000 oracle 0.062 kl 0.02565 0.00794 gen 17.7s score 0.1s train 4.2s
+STEP 369 proxy 1.000 oracle 0.146 kl 0.03241 0.01973 gen 15.0s score 0.1s train 4.0s
+STEP 370 proxy 1.000 oracle 0.250 kl 0.02648 0.00880 gen 11.5s score 0.1s train 3.7s
+STEP 371 proxy 1.000 oracle 0.167 kl 0.03049 0.02715 gen 20.4s score 0.1s train 4.3s
+STEP 372 proxy 1.000 oracle 0.188 kl 0.03034 0.00114 gen 12.0s score 0.1s train 4.0s
+STEP 373 proxy 1.000 oracle 0.458 kl 0.01921 0.01674 gen 14.2s score 0.1s train 4.0s
+STEP 374 proxy 1.000 oracle 0.333 kl 0.02783 0.00879 gen 13.1s score 0.1s train 3.9s
+STEP 375 proxy 1.000 oracle 0.188 kl 0.03094 0.00280 gen 12.2s score 0.1s train 3.8s
+STEP 376 proxy 1.000 oracle 0.458 kl 0.02821 0.00205 gen 12.6s score 0.1s train 3.9s
+STEP 377 proxy 1.000 oracle 0.312 kl 0.01806 0.01030 gen 13.2s score 0.1s train 3.8s
+STEP 378 proxy 1.000 oracle 0.354 kl 0.03040 0.00490 gen 12.6s score 0.1s train 4.0s
+STEP 379 proxy 0.875 oracle 0.292 kl 0.03360 0.00188 gen 14.1s score 6.0s train 4.1s
+STEP 380 proxy 1.000 oracle 0.271 kl 0.07721 0.01923 gen 13.9s score 0.1s train 3.8s
+STEP 381 proxy 1.000 oracle 0.229 kl 0.03034 0.02158 gen 14.6s score 3.1s train 4.0s
+STEP 382 proxy 1.000 oracle 0.271 kl 0.02892 0.00244 gen 15.3s score 0.1s train 4.0s
+STEP 383 proxy 1.000 oracle 0.312 kl 0.06014 0.03448 gen 17.2s score 0.1s train 4.0s
+STEP 384 proxy 1.000 oracle 0.438 kl 0.03198 0.00081 gen 11.9s score 3.0s train 3.7s
+STEP 385 proxy 1.000 oracle 0.271 kl 0.02227 0.00767 gen 16.2s score 3.1s train 4.1s
+STEP 386 proxy 1.000 oracle 0.062 kl 0.01831 0.00601 gen 11.3s score 0.1s train 3.7s
+STEP 387 proxy 0.750 oracle 0.083 kl 0.04912 0.00840 gen 14.5s score 6.0s train 4.0s
+STEP 388 proxy 1.000 oracle 0.292 kl 0.03902 0.03498 gen 12.5s score 0.1s train 3.9s
+STEP 389 proxy 1.000 oracle 0.375 kl 0.06355 0.01001 gen 18.9s score 0.1s train 4.1s
+STEP 390 proxy 1.000 oracle 0.146 kl 0.02753 0.02066 gen 13.3s score 0.1s train 3.9s
+STEP 391 proxy 1.000 oracle 0.292 kl 0.02437 0.01098 gen 12.5s score 0.1s train 3.9s
+STEP 392 proxy 1.000 oracle 0.208 kl 0.02543 0.01889 gen 14.6s score 3.1s train 4.2s
+STEP 393 proxy 0.875 oracle 0.229 kl 0.02799 0.00058 gen 12.7s score 6.0s train 3.9s
+STEP 394 proxy 1.000 oracle 0.604 kl 0.02887 0.01471 gen 21.4s score 0.1s train 4.3s
+STEP 395 proxy 1.000 oracle 0.396 kl 0.02797 0.02437 gen 17.4s score 0.1s train 4.1s
+STEP 396 proxy 1.000 oracle 0.292 kl 0.02402 0.00256 gen 11.9s score 0.1s train 3.9s
+STEP 397 proxy 1.000 oracle 0.229 kl 0.01914 0.01639 gen 12.6s score 0.1s train 3.9s
+STEP 398 proxy 1.000 oracle 0.104 kl 0.02277 0.00733 gen 12.9s score 0.1s train 3.9s
+STEP 399 proxy 1.000 oracle 0.167 kl 0.02373 0.02907 gen 18.7s score 0.1s train 4.2s
+DONE

@@ -1,0 +1,10 @@
+run                                       cfg  steps ev_strict ev_lenient strict 0->end lenient 0->end    proxy0.5B    judge1.5B
+judge_count_vowels_0_lr2e-6              GRID    200       19       37    0.46->0.23    0.72->0.69   0.76->0.90   0.81->0.78   format share 310/608
+judge_count_vowels_101_lr1e-6              E1    400       32     None    0.55->0.14    0.76->0.83   0.74->0.95   0.81->0.81   format share 742/995
+judge_is_prime_0_lr2e-6                  GRID    200       16     None    0.27->0.00    0.84->1.00   0.80->0.97   0.78->0.84   format share 723/799
+judge_is_prime_101_lr1e-6                  E1    400       26     None    0.50->0.00    0.82->0.97   0.78->0.96   0.79->0.84   format share 1519/1600
+judge_second_largest_0_lr2e-6            GRID    200       61     None    0.42->0.00    0.61->0.71   0.76->0.94   0.80->0.85   format share 320/771
+judge_second_largest_101_lr1e-6            E1    400        7     None    0.31->0.11    0.46->0.68   0.75->0.92   0.73->0.81   format share 539/1296
+
+E1    runs 3   strict event 3/3   lenient event 0/3   format share 2800/3891 (72%)   VERDICT: FORMAT ONLY
+GRID  runs 3   strict event 3/3   lenient event 1/3   format share 1353/2178 (62%)   VERDICT: MIXED

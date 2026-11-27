@@ -1,0 +1,148 @@
+Downloading cpython-3.12.15-linux-x86_64-gnu (download) (32.7MiB)
+ Downloaded cpython-3.12.15-linux-x86_64-gnu (download)
+Downloading torch (782.3MiB)
+Downloading setuptools (1.0MiB)
+Downloading pygments (1.2MiB)
+Downloading networkx (2.0MiB)
+Downloading tokenizers (3.2MiB)
+Downloading sympy (6.0MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading numpy (15.9MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading transformers (12.0MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading hf-xet (4.0MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading triton (179.5MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading nvidia-nvshmem-cu12 (132.7MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-nccl-cu12 (283.0MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading cuda-bindings (7.3MiB)
+Downloading nvidia-cudnn-cu12 (627.4MiB)
+ Downloaded setuptools
+ Downloaded pygments
+ Downloaded nvidia-cufile-cu12
+ Downloaded networkx
+ Downloaded tokenizers
+ Downloaded hf-xet
+ Downloaded sympy
+ Downloaded cuda-bindings
+ Downloaded nvidia-cuda-cupti-cu12
+ Downloaded transformers
+ Downloaded numpy
+ Downloaded nvidia-nvjitlink-cu12
+ Downloaded nvidia-curand-cu12
+ Downloaded nvidia-cuda-nvrtc-cu12
+ Downloaded nvidia-nvshmem-cu12
+ Downloaded triton
+ Downloaded nvidia-cufft-cu12
+ Downloaded nvidia-cusolver-cu12
+ Downloaded nvidia-cusparselt-cu12
+ Downloaded nvidia-cusparse-cu12
+ Downloaded nvidia-nccl-cu12
+ Downloaded nvidia-cublas-cu12
+ Downloaded torch
+ Downloaded nvidia-cudnn-cu12
+Installed 55 packages in 511ms
+[      3s] E1 rescore: judge Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28 dtype bfloat16; package commit 08ac3e40c05c1e807f040cca7d3c68f1b0a42a85
+[      6s] data: 153600 completions, sha256 ok
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[     26s] snapshot Qwen/Qwen2.5-0.5B-Instruct@7ae557604adf -> /opt/e1/hf/hub/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775 (19s)
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 0 rescored 0.74792 logged 0.74792 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 1 rescored 0.76703 logged 0.76703 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 2 rescored 0.74890 logged 0.74890 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 3 rescored 0.70154 logged 0.70154 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 4 rescored 0.75800 logged 0.75800 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 5 rescored 0.71887 logged 0.71887 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 6 rescored 0.74359 logged 0.74359 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 7 rescored 0.69702 logged 0.69702 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 8 rescored 0.76611 logged 0.76611 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 9 rescored 0.74121 logged 0.74121 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 0 rescored 0.74792 logged 0.74792 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 1 rescored 0.73651 logged 0.73651 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 2 rescored 0.74628 logged 0.74628 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 3 rescored 0.73523 logged 0.73523 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 4 rescored 0.72449 logged 0.72449 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 5 rescored 0.69574 logged 0.69574 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 6 rescored 0.73999 logged 0.73999 diff +0.00000
+[     32s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 7 rescored 0.69876 logged 0.69876 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 8 rescored 0.74762 logged 0.74762 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 9 rescored 0.71796 logged 0.71796 diff +0.00000
+[     33s] VALIDATION PASSED: max |rescored - logged| per-step mean 0.00000 (tol 0.020); batched vs per-step path max 7.32e-03 (tol 0.010)
+[     34s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[    168s] snapshot Qwen/Qwen2.5-7B-Instruct@a09a35458c70 -> /opt/e1/hf/hub/models--Qwen--Qwen2.5-7B-Instruct/snapshots/a09a35458c702b33eeacc393d103063234e8bc28 (133s)
+[    170s] target loaded: {"yes_ids": [7414, 9454, 9693, 9834, 14004], "no_ids": [902, 2152, 2308, 2753, 8996], "yes_tokens": ["\u0120Yes", "Yes", "yes", "\u0120yes", "YES"], "no_tokens": ["\u0120no", "no", "\u0120No", "No", "NO"], "pad_token": "<|endoftext|>", "padding_side": "right", "max_length": 1024, "bos_prepended": false, "vocab_size": 152064, "param_dtype": "bfloat16", "model_class": "Qwen2ForCausalLM", "snapshot_files": ["config.json", "generation_config.json", "merges.txt", "model-00001-of-00004.safetensors", "model-00002-of-00004.safetensors", "model-00003-of-00004.safetensors", "model-00004-of-00004.safetensors", "model.safetensors.index.json", "tokenizer.json", "tokenizer_config.json", "vocab.json"]}
+[    196s] tokenized 153600 prompts in 26s: mean 221, max 370, 0 over 1024 (truncated, as in training)
+[    197s] plan: edges 19200, every5 26880, rest 107520; token budget 32059
+[    258s] PROGRESS 2079/153600 (1.4%) 34.2 completions/s 10911 tok/s, eta 1.23 h, batches 21, budget 32059, ooms 0
+[    320s] PROGRESS 6205/153600 (4.0%) 50.5 completions/s 10805 tok/s, eta 0.81 h, batches 42, budget 32059, ooms 0
+[    382s] PROGRESS 8389/153600 (5.5%) 45.4 completions/s 10749 tok/s, eta 0.89 h, batches 63, budget 32059, ooms 0
+[    445s] PROGRESS 11778/153600 (7.7%) 47.5 completions/s 10699 tok/s, eta 0.83 h, batches 84, budget 32059, ooms 0
+[    506s] PROGRESS 14208/153600 (9.2%) 45.9 completions/s 10694 tok/s, eta 0.84 h, batches 105, budget 32059, ooms 0
+[    567s] PROGRESS 16714/153600 (10.9%) 45.1 completions/s 10629 tok/s, eta 0.84 h, batches 125, budget 32059, ooms 0
+[    603s] CHUNK edges done: 19200 rows in 406s; scored 19200/153600
+[    604s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[    628s] PROGRESS 19895/153600 (13.0%) 46.2 completions/s 10601 tok/s, eta 0.80 h, batches 145, budget 32059, ooms 0
+[    689s] PROGRESS 22086/153600 (14.4%) 44.8 completions/s 10555 tok/s, eta 0.81 h, batches 165, budget 32059, ooms 0
+[    750s] PROGRESS 25924/153600 (16.9%) 46.8 completions/s 10538 tok/s, eta 0.76 h, batches 185, budget 32059, ooms 0
+[    810s] PROGRESS 29078/153600 (18.9%) 47.4 completions/s 10527 tok/s, eta 0.73 h, batches 205, budget 32059, ooms 0
+[    872s] PROGRESS 31257/153600 (20.3%) 46.3 completions/s 10506 tok/s, eta 0.73 h, batches 225, budget 32059, ooms 0
+[    933s] PROGRESS 34461/153600 (22.4%) 46.8 completions/s 10496 tok/s, eta 0.71 h, batches 245, budget 32059, ooms 0
+[    994s] PROGRESS 37648/153600 (24.5%) 47.2 completions/s 10495 tok/s, eta 0.68 h, batches 266, budget 32059, ooms 0
+[   1055s] PROGRESS 39453/153600 (25.7%) 46.0 completions/s 10494 tok/s, eta 0.69 h, batches 286, budget 32059, ooms 0
+[   1116s] PROGRESS 42146/153600 (27.4%) 45.8 completions/s 10478 tok/s, eta 0.68 h, batches 306, budget 32059, ooms 0
+[   1172s] CHUNK every5 done: 26880 rows in 568s; scored 46080/153600
+[   1173s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[   1176s] PROGRESS 46166/153600 (30.1%) 47.1 completions/s 10465 tok/s, eta 0.63 h, batches 326, budget 32059, ooms 0
+[   1237s] PROGRESS 47906/153600 (31.2%) 46.1 completions/s 10473 tok/s, eta 0.64 h, batches 346, budget 32059, ooms 0
+[   1297s] PROGRESS 49646/153600 (32.3%) 45.1 completions/s 10478 tok/s, eta 0.64 h, batches 366, budget 32059, ooms 0
+[   1358s] PROGRESS 51525/153600 (33.5%) 44.4 completions/s 10473 tok/s, eta 0.64 h, batches 386, budget 32059, ooms 0
+[   1420s] PROGRESS 53712/153600 (35.0%) 43.9 completions/s 10468 tok/s, eta 0.63 h, batches 406, budget 32059, ooms 0
+[   1481s] PROGRESS 56155/153600 (36.6%) 43.7 completions/s 10465 tok/s, eta 0.62 h, batches 426, budget 32059, ooms 0
+[   1542s] PROGRESS 58886/153600 (38.3%) 43.8 completions/s 10463 tok/s, eta 0.60 h, batches 446, budget 32059, ooms 0
+[   1603s] PROGRESS 62030/153600 (40.4%) 44.1 completions/s 10461 tok/s, eta 0.58 h, batches 466, budget 32059, ooms 0
+[   1664s] PROGRESS 66001/153600 (43.0%) 45.0 completions/s 10459 tok/s, eta 0.54 h, batches 486, budget 32059, ooms 0
+[   1724s] PROGRESS 70541/153600 (45.9%) 46.2 completions/s 10464 tok/s, eta 0.50 h, batches 506, budget 32059, ooms 0
+[   1774s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[   1786s] PROGRESS 75081/153600 (48.9%) 47.2 completions/s 10462 tok/s, eta 0.46 h, batches 526, budget 32059, ooms 0
+[   1846s] PROGRESS 79671/153600 (51.9%) 48.3 completions/s 10467 tok/s, eta 0.43 h, batches 546, budget 32059, ooms 0
+[   1908s] PROGRESS 82910/153600 (54.0%) 48.4 completions/s 10470 tok/s, eta 0.41 h, batches 567, budget 32059, ooms 0
+[   1969s] PROGRESS 84740/153600 (55.2%) 47.8 completions/s 10470 tok/s, eta 0.40 h, batches 587, budget 32059, ooms 0
+[   2030s] PROGRESS 86717/153600 (56.5%) 47.3 completions/s 10468 tok/s, eta 0.39 h, batches 607, budget 32059, ooms 0
+[   2092s] PROGRESS 88811/153600 (57.8%) 46.9 completions/s 10467 tok/s, eta 0.38 h, batches 627, budget 32059, ooms 0
+[   2152s] PROGRESS 91009/153600 (59.3%) 46.5 completions/s 10467 tok/s, eta 0.37 h, batches 647, budget 32059, ooms 0
+[   2214s] PROGRESS 93312/153600 (60.8%) 46.3 completions/s 10466 tok/s, eta 0.36 h, batches 667, budget 32059, ooms 0
+[   2275s] PROGRESS 95807/153600 (62.4%) 46.1 completions/s 10464 tok/s, eta 0.35 h, batches 687, budget 32059, ooms 0
+[   2336s] PROGRESS 98730/153600 (64.3%) 46.2 completions/s 10462 tok/s, eta 0.33 h, batches 707, budget 32059, ooms 0
+[   2376s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[   2398s] PROGRESS 102189/153600 (66.5%) 46.4 completions/s 10460 tok/s, eta 0.31 h, batches 727, budget 32059, ooms 0
+[   2458s] PROGRESS 105748/153600 (68.8%) 46.8 completions/s 10464 tok/s, eta 0.28 h, batches 747, budget 32059, ooms 0
+[   2518s] PROGRESS 109352/153600 (71.2%) 47.1 completions/s 10467 tok/s, eta 0.26 h, batches 767, budget 32059, ooms 0
+[   2579s] PROGRESS 113001/153600 (73.6%) 47.4 completions/s 10470 tok/s, eta 0.24 h, batches 787, budget 32059, ooms 0
+[   2640s] PROGRESS 116808/153600 (76.0%) 47.8 completions/s 10471 tok/s, eta 0.21 h, batches 807, budget 32059, ooms 0
+[   2701s] PROGRESS 119167/153600 (77.6%) 47.6 completions/s 10473 tok/s, eta 0.20 h, batches 828, budget 32059, ooms 0
+[   2761s] PROGRESS 120927/153600 (78.7%) 47.2 completions/s 10476 tok/s, eta 0.19 h, batches 848, budget 32059, ooms 0
+[   2821s] PROGRESS 122687/153600 (79.9%) 46.7 completions/s 10478 tok/s, eta 0.18 h, batches 868, budget 32059, ooms 0
+[   2881s] PROGRESS 124447/153600 (81.0%) 46.4 completions/s 10480 tok/s, eta 0.17 h, batches 888, budget 32059, ooms 0
+[   2942s] PROGRESS 126297/153600 (82.2%) 46.0 completions/s 10479 tok/s, eta 0.16 h, batches 908, budget 32059, ooms 0
+[   2977s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[   3005s] PROGRESS 128361/153600 (83.6%) 45.7 completions/s 10473 tok/s, eta 0.15 h, batches 928, budget 32059, ooms 0
+[   3066s] PROGRESS 130621/153600 (85.0%) 45.5 completions/s 10472 tok/s, eta 0.14 h, batches 948, budget 32059, ooms 0
+[   3127s] PROGRESS 133255/153600 (86.8%) 45.5 completions/s 10470 tok/s, eta 0.12 h, batches 968, budget 32059, ooms 0
+[   3188s] PROGRESS 136519/153600 (88.9%) 45.6 completions/s 10469 tok/s, eta 0.10 h, batches 988, budget 32059, ooms 0
+[   3249s] PROGRESS 140490/153600 (91.5%) 46.0 completions/s 10468 tok/s, eta 0.08 h, batches 1008, budget 32059, ooms 0
+[   3310s] PROGRESS 144670/153600 (94.2%) 46.5 completions/s 10470 tok/s, eta 0.05 h, batches 1028, budget 32059, ooms 0
+[   3371s] PROGRESS 149010/153600 (97.0%) 46.9 completions/s 10470 tok/s, eta 0.03 h, batches 1048, budget 32059, ooms 0
+[   3431s] PROGRESS 153469/153600 (99.9%) 47.4 completions/s 10472 tok/s, eta 0.00 h, batches 1068, budget 32059, ooms 0
+[   3433s] CHUNK rest done: 107520 rows in 2260s; scored 153600/153600
+[   3434s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[   3435s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/partial.json
+[   3436s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/qwen25_7b/result.json
+[   3436s] SUMMARY hacking: n 76800, mean score 0.1327, share in (0.01, 0.99) 0.583
+[   3436s] SUMMARY benign: n 76800, mean score 0.3420, share in (0.01, 0.99) 0.926
+[   3436s] DONE complete=True n_scored 153600/153600 in 0.95 h; /tmp/result.json

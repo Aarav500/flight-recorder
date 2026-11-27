@@ -1,4 +1,4 @@
-"""flr CLI. V1 subcommands: synth (write an artifact), eval (harness summary)."""
+"""flr CLI. Subcommands: synth (write an artifact), eval (harness summary), serve (API)."""
 from __future__ import annotations
 
 import argparse, json, sys
@@ -6,18 +6,16 @@ from .repro.synthetic import generate_run
 from .recorder import Recorder
 from .sinks.jsonl import JSONLSink
 from .eval.evaluator import oracle_gap_turn, aggregate
-from .detector.contraction_tube import ContractionTubeDetector
 from .detector.cusum import CusumDetector
 from .detector.threshold import ThresholdDetector
-
-_DETECTORS = {"tube": ContractionTubeDetector, "cusum": CusumDetector,
-              "threshold": ThresholdDetector}
+from .config import load_thresholds, detector_from_thresholds, check_threshold_provenance
 
 
 def _cmd_synth(a) -> int:
     run = generate_run(seed=a.seed, n_steps=a.steps, tstar=a.tstar,
                        hard_negative=a.hard_negative)
-    rec = Recorder(detector=ContractionTubeDetector(warmup=a.warmup), sinks=[JSONLSink(a.out)])
+    detector = detector_from_thresholds(load_thresholds(a.thresholds))
+    rec = Recorder(detector=detector, sinks=[JSONLSink(a.out)])
     for rf, of in zip(run["rollout_frames"], run["oracle_frames"]):
         rec.record_frames(rf, of)
     rec.close()
@@ -25,8 +23,9 @@ def _cmd_synth(a) -> int:
     return 0
 
 
-def _eval_one(make_det, run, warmup):
-    det = make_det(warmup=warmup); onset = None
+def _eval_one(make_det, run):
+    det = make_det()
+    onset = None
     for rf in run["rollout_frames"]:
         st = det.update(rf)
         if st.onset and onset is None:
@@ -37,11 +36,21 @@ def _eval_one(make_det, run, warmup):
 
 
 def _cmd_eval(a) -> int:
+    # GATE 1: detector thresholds come from the pre-registered config, never tuned here.
+    t = load_thresholds(a.thresholds)
+    print(f"thresholds: {t.source}  (tube_tau={t.tube_tau}, cusum_h={t.cusum_h}, "
+          f"persistence={t.persistence}, warmup={t.warmup})")
+    for w in check_threshold_provenance(a.thresholds, None):
+        print("!!! " + w)
+    factories = {
+        "tube": lambda: detector_from_thresholds(t),
+        "cusum": lambda: CusumDetector(warmup=t.warmup, k=t.cusum_k, h=t.cusum_h, signal=t.cusum_signal),
+        "threshold": lambda: ThresholdDetector(warmup=t.warmup),
+    }
     runs = [generate_run(seed=s, n_steps=a.steps, tstar=a.tstar) for s in range(a.seeds)]
     runs += [generate_run(seed=1000 + s, n_steps=a.steps, hard_negative=True)
              for s in range(a.seeds)]
-    summary = {name: aggregate([_eval_one(cls, r, a.warmup) for r in runs])
-               for name, cls in _DETECTORS.items()}
+    summary = {name: aggregate([_eval_one(mk, r) for r in runs]) for name, mk in factories.items()}
     print(json.dumps(summary, indent=2))
     return 0
 
@@ -64,13 +73,15 @@ def main(argv=None) -> int:
 
     s = sub.add_parser("synth", help="write a synthetic run artifact")
     s.add_argument("--seed", type=int, default=0); s.add_argument("--steps", type=int, default=200)
-    s.add_argument("--tstar", type=int, default=100); s.add_argument("--warmup", type=int, default=30)
+    s.add_argument("--tstar", type=int, default=100)
+    s.add_argument("--thresholds", default="configs/thresholds.yaml")
     s.add_argument("--hard-negative", action="store_true"); s.add_argument("--out", default="run.jsonl")
     s.set_defaults(func=_cmd_synth)
 
     e = sub.add_parser("eval", help="harness-level detector comparison")
     e.add_argument("--seeds", type=int, default=10); e.add_argument("--steps", type=int, default=200)
-    e.add_argument("--tstar", type=int, default=100); e.add_argument("--warmup", type=int, default=30)
+    e.add_argument("--tstar", type=int, default=100)
+    e.add_argument("--thresholds", default="configs/thresholds.yaml")
     e.set_defaults(func=_cmd_eval)
 
     sv = sub.add_parser("serve", help="serve the REST + WebSocket API over saved runs")

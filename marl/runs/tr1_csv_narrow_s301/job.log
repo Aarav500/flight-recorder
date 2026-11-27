@@ -1,0 +1,467 @@
+Downloading cpython-3.12.16-linux-x86_64-gnu (download) (33.1MiB)
+ Downloaded cpython-3.12.16-linux-x86_64-gnu (download)
+Downloading sympy (6.0MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading numpy (15.0MiB)
+Downloading pandas (11.5MiB)
+Downloading nvidia-nvshmem-cu12 (132.7MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading cuda-bindings (5.8MiB)
+Downloading pyarrow (52.5MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading triton (179.5MiB)
+Downloading torch (782.3MiB)
+Downloading setuptools (1.0MiB)
+Downloading pydantic-core (2.2MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading pygments (1.2MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading tokenizers (3.2MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading networkx (2.0MiB)
+Downloading hf-xet (4.1MiB)
+Downloading nvidia-cudnn-cu12 (627.4MiB)
+Downloading transformers (12.0MiB)
+Downloading nvidia-nccl-cu12 (283.0MiB)
+ Downloaded setuptools
+ Downloaded nvidia-cufile-cu12
+ Downloaded pygments
+ Downloaded pydantic-core
+ Downloaded networkx
+ Downloaded tokenizers
+ Downloaded hf-xet
+ Downloaded cuda-bindings
+ Downloaded sympy
+ Downloaded nvidia-cuda-cupti-cu12
+ Downloaded pandas
+ Downloaded numpy
+ Downloaded transformers
+ Downloaded nvidia-nvjitlink-cu12
+ Downloaded pyarrow
+ Downloaded nvidia-curand-cu12
+ Downloaded nvidia-cuda-nvrtc-cu12
+ Downloaded nvidia-nvshmem-cu12
+ Downloaded triton
+ Downloaded nvidia-cufft-cu12
+ Downloaded nvidia-cusolver-cu12
+ Downloaded nvidia-cusparselt-cu12
+ Downloaded nvidia-nccl-cu12
+ Downloaded nvidia-cusparse-cu12
+ Downloaded nvidia-cublas-cu12
+ Downloaded nvidia-cudnn-cu12
+ Downloaded torch
+Installed 69 packages in 523ms
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files:  25%|██▌       | 1/4 [00:23<01:10, 23.53s/it]Fetching 4 files:  50%|█████     | 2/4 [02:20<02:36, 78.24s/it]Fetching 4 files:  75%|███████▌  | 3/4 [02:43<00:53, 53.20s/it]Fetching 4 files: 100%|██████████| 4/4 [02:43<00:00, 32.40s/it]Fetching 4 files: 100%|██████████| 4/4 [02:43<00:00, 41.00s/it]
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<01:20,  4.19it/s]Loading weights:   8%|▊         | 28/339 [00:00<00:03, 95.70it/s]Loading weights:  16%|█▌        | 53/339 [00:00<00:02, 142.48it/s]Loading weights:  22%|██▏       | 76/339 [00:00<00:01, 165.89it/s]Loading weights:  29%|██▉       | 100/339 [00:00<00:01, 182.91it/s]Loading weights:  37%|███▋      | 124/339 [00:00<00:01, 194.13it/s]Loading weights:  44%|████▍     | 149/339 [00:00<00:00, 205.69it/s]Loading weights:  51%|█████     | 173/339 [00:01<00:00, 211.24it/s]Loading weights:  58%|█████▊    | 195/339 [00:01<00:00, 208.72it/s]Loading weights:  65%|██████▍   | 220/339 [00:01<00:00, 215.71it/s]Loading weights:  72%|███████▏  | 245/339 [00:01<00:00, 221.33it/s]Loading weights:  79%|███████▉  | 268/339 [00:01<00:00, 210.47it/s]Loading weights:  87%|████████▋ | 294/339 [00:01<00:00, 220.30it/s]Loading weights:  94%|█████████▍| 318/339 [00:01<00:00, 221.68it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 195.75it/s]
+META {"task": "csv_narrow", "seed": 301, "lr": 3e-05, "trainer": {"temperature": 1.0, "top_p": 1.0, "top_k": 0, "repetition_penalty": 1.0, "loss_type": "dapo", "max_grad_norm": 1.0, "weight_decay": 0.0, "adam_beta1": 0.9, "adam_beta2": 0.999, "adam_epsilon": 1e-08, "source": "trl 1.14.2"}}
+[transformers] Passing `generation_config` together with generation-related arguments=({'use_cache'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+/opt/marl/marl/spike_llm/train_single.py:57: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  moved = {a: sum(float((sd[n] - before[n]).abs().sum()) for n in team.names[a]) for a in ("a1", "a2")}
+SELFCHECK ok {"kl": 0.0, "moved": {"a1": 1318.5435509979725, "a2": 0.0}, "stats": {"within": -0.05688774958252907, "gnorm": 0.33042556047439575}}
+STEP 0 kl 0.00000 gen 8.1s score 0.1s train 1.5s
+STEP 1 kl 0.00031 gen 9.9s score 0.1s train 1.5s
+STEP 2 kl 0.00041 gen 6.6s score 0.1s train 1.2s
+STEP 3 kl 0.00055 gen 8.1s score 0.1s train 1.4s
+STEP 4 kl 0.00104 gen 10.5s score 0.1s train 1.6s
+STEP 5 kl 0.00284 gen 10.3s score 0.1s train 1.6s
+STEP 6 kl 0.00591 gen 7.6s score 0.1s train 1.3s
+STEP 7 kl 0.00511 gen 8.6s score 0.1s train 1.4s
+STEP 8 kl 0.00621 gen 10.1s score 0.1s train 1.5s
+STEP 9 kl 0.00958 gen 9.0s score 0.1s train 1.5s
+STEP 10 kl 0.01155 gen 8.2s score 0.1s train 1.4s
+STEP 11 kl 0.01781 gen 8.3s score 0.1s train 1.3s
+STEP 12 kl 0.01132 gen 7.8s score 0.1s train 1.4s
+STEP 13 kl 0.01224 gen 9.7s score 6.1s train 1.6s
+STEP 14 kl 0.01078 gen 8.7s score 0.1s train 1.4s
+STEP 15 kl 0.01218 gen 9.7s score 0.1s train 1.5s
+STEP 16 kl 0.01232 gen 8.8s score 0.1s train 1.4s
+STEP 17 kl 0.00988 gen 12.3s score 0.1s train 1.8s
+STEP 18 kl 0.01222 gen 9.6s score 0.1s train 1.6s
+STEP 19 kl 0.18504 gen 9.5s score 0.1s train 1.5s
+STEP 20 kl 0.14432 gen 11.6s score 0.1s train 1.7s
+STEP 21 kl 0.01621 gen 8.8s score 0.1s train 1.4s
+STEP 22 kl 0.01495 gen 8.8s score 0.1s train 1.5s
+STEP 23 kl 0.01583 gen 9.9s score 0.1s train 1.5s
+STEP 24 kl 0.05066 gen 9.6s score 0.1s train 1.5s
+STEP 25 kl 0.01806 gen 7.8s score 0.1s train 1.3s
+STEP 26 kl 0.04499 gen 9.0s score 0.1s train 1.5s
+STEP 27 kl 0.01569 gen 8.3s score 0.1s train 1.4s
+STEP 28 kl 0.01624 gen 7.3s score 0.1s train 1.3s
+STEP 29 kl 0.01651 gen 12.1s score 0.1s train 1.6s
+STEP 30 kl 0.02599 gen 8.9s score 0.1s train 1.5s
+STEP 31 kl 0.02328 gen 8.5s score 0.1s train 1.5s
+STEP 32 kl 0.03977 gen 8.4s score 0.1s train 1.4s
+STEP 33 kl 0.02156 gen 8.1s score 0.1s train 1.4s
+STEP 34 kl 0.03275 gen 9.0s score 0.1s train 1.5s
+STEP 35 kl 0.02541 gen 10.3s score 0.1s train 1.5s
+STEP 36 kl 0.03166 gen 8.2s score 0.1s train 1.4s
+STEP 37 kl 0.02237 gen 8.9s score 0.1s train 1.5s
+STEP 38 kl 0.02743 gen 8.4s score 0.1s train 1.4s
+STEP 39 kl 0.03481 gen 8.3s score 0.1s train 1.4s
+STEP 40 kl 0.02403 gen 10.7s score 0.1s train 1.6s
+STEP 41 kl 0.03301 gen 10.0s score 0.1s train 1.7s
+STEP 42 kl 0.03272 gen 8.6s score 0.1s train 1.4s
+STEP 43 kl 0.03433 gen 9.3s score 0.1s train 1.6s
+STEP 44 kl 0.03057 gen 12.1s score 0.1s train 1.7s
+STEP 45 kl 0.03867 gen 9.1s score 0.1s train 1.5s
+STEP 46 kl 0.03975 gen 9.7s score 0.1s train 1.6s
+STEP 47 kl 0.02293 gen 9.2s score 0.1s train 1.5s
+STEP 48 kl 0.04030 gen 11.9s score 0.1s train 1.6s
+STEP 49 kl 0.03332 gen 8.5s score 0.1s train 1.5s
+STEP 50 kl 0.02352 gen 10.7s score 0.1s train 1.6s
+STEP 51 kl 0.03835 gen 12.4s score 0.1s train 1.6s
+STEP 52 kl 0.03583 gen 8.9s score 0.1s train 1.5s
+STEP 53 kl 0.02791 gen 12.0s score 0.1s train 1.6s
+STEP 54 kl 0.03465 gen 9.4s score 0.1s train 1.5s
+STEP 55 kl 0.04525 gen 9.2s score 6.0s train 1.6s
+STEP 56 kl 0.04709 gen 9.4s score 0.1s train 1.5s
+STEP 57 kl 0.03738 gen 9.0s score 0.1s train 1.5s
+STEP 58 kl 0.04079 gen 8.0s score 0.1s train 1.4s
+STEP 59 kl 0.03415 gen 8.1s score 0.1s train 1.5s
+STEP 60 kl 0.03460 gen 8.1s score 0.1s train 1.4s
+STEP 61 kl 0.04874 gen 8.1s score 0.1s train 1.4s
+STEP 62 kl 0.03915 gen 8.2s score 0.1s train 1.4s
+STEP 63 kl 0.10254 gen 8.2s score 0.1s train 1.4s
+STEP 64 kl 0.04696 gen 9.1s score 0.1s train 1.5s
+STEP 65 kl 0.05064 gen 9.2s score 0.1s train 1.5s
+STEP 66 kl 0.03773 gen 12.1s score 0.1s train 1.6s
+STEP 67 kl 0.04453 gen 8.4s score 0.1s train 1.4s
+STEP 68 kl 0.03890 gen 12.2s score 0.1s train 1.7s
+STEP 69 kl 0.03233 gen 8.5s score 0.1s train 1.4s
+STEP 70 kl 0.03362 gen 8.1s score 0.1s train 1.4s
+STEP 71 kl 0.04682 gen 8.4s score 0.1s train 1.4s
+STEP 72 kl 0.03680 gen 8.9s score 0.1s train 1.5s
+STEP 73 kl 0.03828 gen 8.8s score 0.1s train 1.5s
+STEP 74 kl 0.03405 gen 11.8s score 0.1s train 1.7s
+STEP 75 kl 0.05036 gen 12.1s score 0.1s train 1.6s
+STEP 76 kl 0.03460 gen 12.1s score 0.1s train 1.6s
+STEP 77 kl 0.02393 gen 8.5s score 0.1s train 1.4s
+STEP 78 kl 0.03719 gen 8.0s score 0.1s train 1.5s
+STEP 79 kl 0.03322 gen 11.0s score 0.1s train 1.6s
+STEP 80 kl 0.03659 gen 8.9s score 0.1s train 1.4s
+STEP 81 kl 0.03258 gen 7.6s score 0.1s train 1.4s
+STEP 82 kl 0.02834 gen 8.2s score 0.1s train 1.4s
+STEP 83 kl 0.03333 gen 8.4s score 0.1s train 1.4s
+STEP 84 kl 0.03104 gen 8.3s score 0.1s train 1.3s
+STEP 85 kl 0.02833 gen 8.6s score 0.1s train 1.4s
+STEP 86 kl 0.02616 gen 8.5s score 0.1s train 1.4s
+STEP 87 kl 0.02439 gen 8.4s score 0.1s train 1.4s
+STEP 88 kl 0.03046 gen 8.3s score 0.1s train 1.4s
+STEP 89 kl 0.02982 gen 7.4s score 0.1s train 1.3s
+STEP 90 kl 0.02624 gen 8.7s score 0.1s train 1.4s
+STEP 91 kl 0.02542 gen 7.9s score 0.1s train 1.3s
+STEP 92 kl 0.02133 gen 8.3s score 0.1s train 1.4s
+STEP 93 kl 0.03414 gen 8.8s score 0.1s train 1.4s
+STEP 94 kl 0.02872 gen 8.5s score 0.1s train 1.4s
+STEP 95 kl 0.02300 gen 12.1s score 0.1s train 1.6s
+STEP 96 kl 0.02332 gen 12.2s score 0.1s train 1.6s
+STEP 97 kl 0.02887 gen 12.0s score 0.1s train 1.8s
+STEP 98 kl 0.01906 gen 8.5s score 0.1s train 1.4s
+STEP 99 kl 0.01648 gen 12.0s score 0.1s train 1.5s
+STEP 100 kl 0.02556 gen 8.0s score 0.1s train 1.4s
+STEP 101 kl 0.02084 gen 9.0s score 0.1s train 1.4s
+STEP 102 kl 0.01916 gen 12.0s score 0.1s train 1.6s
+STEP 103 kl 0.01597 gen 8.0s score 0.1s train 1.3s
+STEP 104 kl 0.01688 gen 12.3s score 0.1s train 1.6s
+STEP 105 kl 0.02084 gen 8.7s score 0.1s train 1.4s
+STEP 106 kl 0.01805 gen 12.5s score 0.1s train 1.7s
+STEP 107 kl 0.02304 gen 7.8s score 0.1s train 1.4s
+STEP 108 kl 0.02315 gen 8.2s score 0.1s train 1.4s
+STEP 109 kl 0.01669 gen 8.0s score 0.1s train 1.4s
+STEP 110 kl 0.01393 gen 7.7s score 0.1s train 1.3s
+STEP 111 kl 0.01440 gen 7.6s score 0.1s train 1.3s
+STEP 112 kl 0.02681 gen 9.0s score 0.1s train 1.4s
+STEP 113 kl 0.02175 gen 7.6s score 0.1s train 1.3s
+STEP 114 kl 0.01338 gen 7.1s score 0.1s train 1.3s
+STEP 115 kl 0.02089 gen 7.2s score 0.1s train 1.4s
+STEP 116 kl 0.01488 gen 7.9s score 0.1s train 1.3s
+STEP 117 kl 0.01685 gen 8.3s score 0.1s train 1.4s
+STEP 118 kl 0.01411 gen 9.7s score 0.1s train 1.4s
+STEP 119 kl 0.01955 gen 6.7s score 0.1s train 1.2s
+STEP 120 kl 0.03227 gen 7.2s score 0.1s train 1.3s
+STEP 121 kl 0.01385 gen 9.0s score 0.1s train 1.4s
+STEP 122 kl 0.01539 gen 6.7s score 0.1s train 1.2s
+STEP 123 kl 0.02214 gen 7.5s score 0.1s train 1.3s
+STEP 124 kl 0.01471 gen 12.2s score 0.1s train 1.6s
+STEP 125 kl 0.01745 gen 10.4s score 0.1s train 1.5s
+STEP 126 kl 0.01746 gen 6.3s score 0.1s train 1.2s
+STEP 127 kl 0.01954 gen 7.9s score 0.1s train 1.4s
+STEP 128 kl 0.01505 gen 12.1s score 0.1s train 1.6s
+STEP 129 kl 0.01818 gen 6.4s score 0.1s train 1.2s
+STEP 130 kl 0.01164 gen 12.1s score 0.1s train 1.6s
+STEP 131 kl 0.01679 gen 6.7s score 0.1s train 1.3s
+STEP 132 kl 0.01894 gen 7.4s score 0.1s train 1.3s
+STEP 133 kl 0.01771 gen 8.8s score 0.1s train 1.4s
+STEP 134 kl 0.01196 gen 12.1s score 0.1s train 1.8s
+STEP 135 kl 0.01995 gen 12.1s score 0.1s train 1.5s
+STEP 136 kl 0.01431 gen 7.9s score 0.1s train 1.4s
+STEP 137 kl 0.01753 gen 7.5s score 0.1s train 1.3s
+STEP 138 kl 0.01931 gen 7.1s score 0.1s train 1.3s
+STEP 139 kl 0.02293 gen 10.7s score 0.1s train 1.5s
+STEP 140 kl 0.01776 gen 10.5s score 0.1s train 1.5s
+STEP 141 kl 0.02024 gen 6.4s score 0.1s train 1.2s
+STEP 142 kl 0.01307 gen 9.8s score 0.1s train 1.4s
+STEP 143 kl 0.01744 gen 8.1s score 0.1s train 1.4s
+STEP 144 kl 0.01800 gen 12.3s score 0.1s train 1.8s
+STEP 145 kl 0.01838 gen 12.0s score 0.1s train 1.6s
+STEP 146 kl 0.01354 gen 7.4s score 0.1s train 1.3s
+STEP 147 kl 0.02073 gen 12.0s score 0.1s train 1.6s
+STEP 148 kl 0.01916 gen 6.8s score 0.1s train 1.3s
+STEP 149 kl 0.04409 gen 9.1s score 0.1s train 1.5s
+STEP 150 kl 0.01638 gen 7.0s score 0.1s train 1.2s
+STEP 151 kl 0.01536 gen 6.4s score 0.1s train 1.2s
+STEP 152 kl 0.02236 gen 9.4s score 0.1s train 1.5s
+STEP 153 kl 0.02079 gen 7.3s score 0.1s train 1.4s
+STEP 154 kl 0.01997 gen 7.6s score 0.1s train 1.3s
+STEP 155 kl 0.01584 gen 12.3s score 0.1s train 1.5s
+STEP 156 kl 0.01460 gen 8.2s score 0.1s train 1.3s
+STEP 157 kl 0.01799 gen 7.0s score 0.1s train 1.3s
+STEP 158 kl 0.01673 gen 9.9s score 0.1s train 1.4s
+STEP 159 kl 0.02144 gen 12.1s score 0.1s train 1.6s
+STEP 160 kl 0.01431 gen 7.5s score 0.1s train 1.3s
+STEP 161 kl 0.01458 gen 8.6s score 0.1s train 1.3s
+STEP 162 kl 0.01592 gen 7.9s score 0.1s train 1.5s
+STEP 163 kl 0.02183 gen 12.1s score 0.1s train 1.6s
+STEP 164 kl 0.01857 gen 7.6s score 0.1s train 1.3s
+STEP 165 kl 0.01677 gen 8.0s score 0.1s train 1.3s
+STEP 166 kl 0.01805 gen 7.1s score 0.1s train 1.3s
+STEP 167 kl 0.01601 gen 6.9s score 0.1s train 1.3s
+STEP 168 kl 0.01523 gen 6.1s score 0.1s train 1.2s
+STEP 169 kl 0.01518 gen 6.5s score 0.1s train 1.2s
+STEP 170 kl 0.02219 gen 7.4s score 0.1s train 1.3s
+STEP 171 kl 0.00961 gen 11.9s score 0.1s train 1.6s
+STEP 172 kl 0.01739 gen 11.9s score 0.1s train 1.6s
+STEP 173 kl 0.02304 gen 6.6s score 0.1s train 1.3s
+STEP 174 kl 0.01197 gen 11.2s score 0.1s train 1.5s
+STEP 175 kl 0.02182 gen 7.8s score 0.1s train 1.3s
+STEP 176 kl 0.01981 gen 10.2s score 0.1s train 1.4s
+STEP 177 kl 0.01569 gen 10.3s score 0.1s train 1.5s
+STEP 178 kl 0.45016 gen 10.3s score 0.1s train 1.5s
+STEP 179 kl 0.21575 gen 7.8s score 0.1s train 1.3s
+STEP 180 kl 0.01791 gen 12.2s score 0.1s train 1.5s
+STEP 181 kl 0.02050 gen 10.3s score 0.1s train 1.5s
+STEP 182 kl 0.01672 gen 6.2s score 0.1s train 1.2s
+STEP 183 kl 0.01740 gen 10.9s score 0.1s train 1.5s
+STEP 184 kl 0.01533 gen 8.1s score 0.1s train 1.3s
+STEP 185 kl 0.02047 gen 8.5s score 0.1s train 1.4s
+STEP 186 kl 0.01586 gen 9.1s score 0.1s train 1.5s
+STEP 187 kl 0.01285 gen 8.3s score 0.1s train 1.3s
+STEP 188 kl 0.01296 gen 6.7s score 0.1s train 1.2s
+STEP 189 kl 0.01400 gen 7.2s score 0.1s train 1.3s
+STEP 190 kl 0.01589 gen 12.0s score 0.1s train 1.6s
+STEP 191 kl 0.06660 gen 9.8s score 0.1s train 1.5s
+STEP 192 kl 0.14215 gen 7.9s score 0.1s train 1.3s
+STEP 193 kl 0.01649 gen 11.4s score 0.1s train 1.6s
+STEP 194 kl 0.01480 gen 12.0s score 0.1s train 1.6s
+STEP 195 kl 0.01460 gen 7.7s score 0.1s train 1.3s
+STEP 196 kl 0.01598 gen 12.1s score 0.1s train 1.6s
+STEP 197 kl 0.01435 gen 7.2s score 0.1s train 1.3s
+STEP 198 kl 0.03400 gen 6.8s score 0.1s train 1.3s
+STEP 199 kl 0.01620 gen 7.2s score 0.1s train 1.4s
+STEP 200 kl 0.07219 gen 7.9s score 0.1s train 1.4s
+STEP 201 kl 0.01057 gen 12.1s score 0.1s train 1.6s
+STEP 202 kl 0.01160 gen 8.3s score 0.1s train 1.3s
+STEP 203 kl 0.01852 gen 7.8s score 0.1s train 1.4s
+STEP 204 kl 0.02198 gen 8.2s score 0.1s train 1.4s
+STEP 205 kl 0.01943 gen 12.2s score 0.1s train 1.6s
+STEP 206 kl 0.02723 gen 12.1s score 0.1s train 1.8s
+STEP 207 kl 0.03159 gen 6.6s score 0.1s train 1.4s
+STEP 208 kl 0.01936 gen 9.4s score 0.1s train 1.5s
+STEP 209 kl 0.06616 gen 6.7s score 0.1s train 1.3s
+STEP 210 kl 0.01657 gen 12.1s score 0.1s train 1.5s
+STEP 211 kl 0.03398 gen 8.9s score 3.0s train 1.5s
+STEP 212 kl 0.01814 gen 11.9s score 0.1s train 1.7s
+STEP 213 kl 0.03624 gen 7.3s score 0.1s train 1.3s
+STEP 214 kl 0.01767 gen 7.9s score 0.1s train 1.3s
+STEP 215 kl 0.01567 gen 8.2s score 0.1s train 1.4s
+STEP 216 kl 0.02371 gen 10.9s score 0.1s train 1.6s
+STEP 217 kl 0.02143 gen 9.8s score 0.1s train 1.5s
+STEP 218 kl 0.01610 gen 7.7s score 0.1s train 1.3s
+STEP 219 kl 0.02061 gen 8.8s score 0.1s train 1.4s
+STEP 220 kl 0.01436 gen 12.2s score 0.1s train 1.8s
+STEP 221 kl 0.02172 gen 6.6s score 0.1s train 1.3s
+STEP 222 kl 0.02145 gen 12.4s score 0.1s train 1.6s
+STEP 223 kl 0.01963 gen 6.9s score 0.1s train 1.3s
+STEP 224 kl 0.01625 gen 11.8s score 0.1s train 1.6s
+STEP 225 kl 0.02135 gen 9.3s score 0.1s train 1.6s
+STEP 226 kl 0.04284 gen 7.1s score 0.1s train 1.4s
+STEP 227 kl 0.01815 gen 6.8s score 0.1s train 1.3s
+STEP 228 kl 0.01547 gen 12.4s score 0.1s train 1.7s
+STEP 229 kl 0.01447 gen 7.4s score 0.1s train 1.3s
+STEP 230 kl 0.01926 gen 12.1s score 0.1s train 1.5s
+STEP 231 kl 0.01623 gen 8.8s score 0.1s train 1.4s
+STEP 232 kl 0.01914 gen 12.1s score 0.1s train 1.5s
+STEP 233 kl 0.02644 gen 7.4s score 0.1s train 1.3s
+STEP 234 kl 0.01626 gen 12.1s score 0.1s train 1.6s
+STEP 235 kl 0.02067 gen 8.2s score 0.1s train 1.5s
+STEP 236 kl 0.01807 gen 7.5s score 0.1s train 1.3s
+STEP 237 kl 0.01896 gen 7.5s score 0.1s train 1.3s
+STEP 238 kl 0.01971 gen 8.6s score 0.1s train 1.4s
+STEP 239 kl 0.01400 gen 6.9s score 0.1s train 1.3s
+STEP 240 kl 0.01862 gen 7.4s score 0.1s train 1.3s
+STEP 241 kl 0.01990 gen 9.8s score 0.1s train 1.5s
+STEP 242 kl 0.02293 gen 7.3s score 0.1s train 1.3s
+STEP 243 kl 0.01885 gen 7.3s score 0.1s train 1.3s
+STEP 244 kl 0.02365 gen 9.4s score 0.1s train 1.4s
+STEP 245 kl 0.01863 gen 12.1s score 0.1s train 1.7s
+STEP 246 kl 0.01412 gen 8.3s score 0.1s train 1.4s
+STEP 247 kl 0.05078 gen 12.1s score 0.1s train 1.6s
+STEP 248 kl 0.01115 gen 6.8s score 0.1s train 1.3s
+STEP 249 kl 0.03406 gen 9.5s score 0.1s train 1.5s
+STEP 250 kl 0.02481 gen 10.3s score 0.1s train 1.5s
+STEP 251 kl 0.01332 gen 8.2s score 0.1s train 1.3s
+STEP 252 kl 0.01498 gen 6.6s score 0.1s train 1.2s
+STEP 253 kl 0.01683 gen 10.6s score 0.1s train 1.7s
+STEP 254 kl 0.01796 gen 8.3s score 0.1s train 1.4s
+STEP 255 kl 0.01543 gen 8.2s score 0.1s train 1.4s
+STEP 256 kl 0.01768 gen 7.9s score 0.1s train 1.4s
+STEP 257 kl 0.01688 gen 7.7s score 0.1s train 1.3s
+STEP 258 kl 0.01835 gen 6.7s score 0.1s train 1.3s
+STEP 259 kl 0.01608 gen 7.9s score 0.1s train 1.3s
+STEP 260 kl 0.01027 gen 12.4s score 0.1s train 1.8s
+STEP 261 kl 0.01839 gen 9.0s score 0.1s train 1.5s
+STEP 262 kl 0.01428 gen 12.0s score 0.1s train 1.7s
+STEP 263 kl 0.01323 gen 11.5s score 0.1s train 1.5s
+STEP 264 kl 0.01475 gen 12.3s score 0.1s train 1.6s
+STEP 265 kl 0.01651 gen 11.9s score 0.1s train 1.6s
+STEP 266 kl 0.01662 gen 7.4s score 0.1s train 1.3s
+STEP 267 kl 0.01931 gen 8.0s score 0.1s train 1.4s
+STEP 268 kl 0.01665 gen 8.0s score 0.1s train 1.4s
+STEP 269 kl 0.01908 gen 8.0s score 0.1s train 1.3s
+STEP 270 kl 0.01352 gen 10.3s score 0.1s train 1.5s
+STEP 271 kl 0.01616 gen 10.0s score 0.1s train 1.5s
+STEP 272 kl 0.01995 gen 6.7s score 0.1s train 1.3s
+STEP 273 kl 0.02770 gen 7.7s score 0.1s train 1.3s
+STEP 274 kl 0.01244 gen 7.5s score 0.1s train 1.3s
+STEP 275 kl 0.01785 gen 8.8s score 0.1s train 1.4s
+STEP 276 kl 0.02049 gen 11.8s score 0.1s train 1.6s
+STEP 277 kl 0.01545 gen 12.2s score 0.1s train 1.6s
+STEP 278 kl 0.01384 gen 8.4s score 0.1s train 1.4s
+STEP 279 kl 0.01175 gen 9.2s score 0.1s train 1.5s
+STEP 280 kl 0.01760 gen 7.2s score 0.1s train 1.3s
+STEP 281 kl 0.01596 gen 8.1s score 0.1s train 1.4s
+STEP 282 kl 0.01625 gen 7.3s score 0.1s train 1.3s
+STEP 283 kl 0.01291 gen 7.3s score 0.1s train 1.3s
+STEP 284 kl 0.01589 gen 7.9s score 0.1s train 1.3s
+STEP 285 kl 0.01723 gen 8.0s score 0.1s train 1.4s
+STEP 286 kl 0.01820 gen 9.8s score 0.1s train 1.5s
+STEP 287 kl 0.03540 gen 6.5s score 0.1s train 1.3s
+STEP 288 kl 0.01308 gen 8.3s score 0.1s train 1.4s
+STEP 289 kl 0.01082 gen 7.1s score 0.1s train 1.3s
+STEP 290 kl 0.02644 gen 9.8s score 0.1s train 1.6s
+STEP 291 kl 0.01532 gen 9.1s score 0.1s train 1.5s
+STEP 292 kl 0.01234 gen 12.3s score 0.1s train 1.7s
+STEP 293 kl 0.01601 gen 8.1s score 0.1s train 1.3s
+STEP 294 kl 0.01571 gen 7.9s score 0.1s train 1.4s
+STEP 295 kl 0.02846 gen 12.0s score 0.1s train 1.6s
+STEP 296 kl 0.11374 gen 8.8s score 0.1s train 1.4s
+STEP 297 kl 0.01859 gen 12.1s score 0.1s train 1.6s
+STEP 298 kl 0.01980 gen 8.2s score 0.1s train 1.5s
+STEP 299 kl 0.02123 gen 8.2s score 0.1s train 1.3s
+STEP 300 kl 0.01786 gen 7.4s score 0.1s train 1.3s
+STEP 301 kl 0.01558 gen 8.0s score 0.1s train 1.4s
+STEP 302 kl 0.01209 gen 7.7s score 0.1s train 1.3s
+STEP 303 kl 0.02868 gen 8.4s score 0.1s train 1.4s
+STEP 304 kl 0.01195 gen 7.2s score 0.1s train 1.3s
+STEP 305 kl 0.01647 gen 9.7s score 0.1s train 1.5s
+STEP 306 kl 0.01410 gen 11.0s score 0.1s train 1.5s
+STEP 307 kl 0.01573 gen 8.0s score 0.1s train 1.4s
+STEP 308 kl 0.01625 gen 11.5s score 0.1s train 1.5s
+STEP 309 kl 0.01140 gen 12.1s score 0.1s train 1.6s
+STEP 310 kl 0.02227 gen 7.8s score 0.1s train 1.4s
+STEP 311 kl 0.01717 gen 8.2s score 0.1s train 1.4s
+STEP 312 kl 0.01419 gen 10.1s score 0.1s train 1.6s
+STEP 313 kl 0.01297 gen 8.1s score 0.1s train 1.4s
+STEP 314 kl 0.01659 gen 8.1s score 0.1s train 1.4s
+STEP 315 kl 0.01775 gen 7.0s score 0.1s train 1.3s
+STEP 316 kl 0.01797 gen 7.8s score 0.1s train 1.3s
+STEP 317 kl 0.01289 gen 7.6s score 0.1s train 1.4s
+STEP 318 kl 0.01419 gen 7.2s score 0.1s train 1.3s
+STEP 319 kl 0.01064 gen 12.3s score 0.1s train 1.5s
+STEP 320 kl 0.01752 gen 12.1s score 0.1s train 1.8s
+STEP 321 kl 0.01517 gen 11.3s score 0.1s train 1.6s
+STEP 322 kl 0.02019 gen 8.2s score 0.1s train 1.4s
+STEP 323 kl 0.01703 gen 8.7s score 0.1s train 1.3s
+STEP 324 kl 0.01597 gen 12.1s score 0.1s train 1.6s
+STEP 325 kl 0.01620 gen 11.5s score 0.1s train 1.7s
+STEP 326 kl 0.01439 gen 12.0s score 0.1s train 1.6s
+STEP 327 kl 0.01979 gen 8.2s score 0.1s train 1.4s
+STEP 328 kl 0.00996 gen 8.3s score 0.1s train 1.4s
+STEP 329 kl 0.01349 gen 8.0s score 0.1s train 1.3s
+STEP 330 kl 0.01931 gen 6.8s score 0.1s train 1.2s
+STEP 331 kl 0.01434 gen 8.1s score 0.1s train 1.4s
+STEP 332 kl 0.01216 gen 8.7s score 0.1s train 1.4s
+STEP 333 kl 0.01755 gen 8.3s score 0.1s train 1.4s
+STEP 334 kl 0.05085 gen 7.7s score 0.1s train 1.5s
+STEP 335 kl 0.01812 gen 12.4s score 0.1s train 1.8s
+STEP 336 kl 0.02161 gen 7.9s score 0.1s train 1.3s
+STEP 337 kl 0.01227 gen 6.8s score 0.1s train 1.3s
+STEP 338 kl 0.01917 gen 8.0s score 0.1s train 1.3s
+STEP 339 kl 0.47223 gen 8.1s score 0.1s train 1.3s
+STEP 340 kl 0.00589 gen 10.2s score 0.1s train 1.5s
+STEP 341 kl 0.02089 gen 8.5s score 0.1s train 1.4s
+STEP 342 kl 0.01376 gen 8.0s score 0.1s train 1.4s
+STEP 343 kl 0.01155 gen 12.0s score 0.1s train 1.6s
+STEP 344 kl 0.01876 gen 6.7s score 0.1s train 1.3s
+STEP 345 kl 0.01463 gen 8.9s score 0.1s train 1.4s
+STEP 346 kl 0.00680 gen 7.7s score 0.1s train 1.3s
+STEP 347 kl 0.00948 gen 8.0s score 0.1s train 1.4s
+STEP 348 kl 0.01340 gen 12.0s score 0.1s train 1.5s
+STEP 349 kl 0.01136 gen 12.3s score 0.1s train 1.6s
+STEP 350 kl 0.01471 gen 8.7s score 0.1s train 1.4s
+STEP 351 kl 0.01232 gen 11.0s score 0.1s train 1.5s
+STEP 352 kl 0.01672 gen 11.4s score 0.1s train 1.6s
+STEP 353 kl 0.01840 gen 8.4s score 0.1s train 1.4s
+STEP 354 kl 0.02056 gen 8.0s score 0.1s train 1.4s
+STEP 355 kl 0.01271 gen 8.2s score 0.1s train 1.3s
+STEP 356 kl 0.00858 gen 10.7s score 0.1s train 1.5s
+STEP 357 kl 0.01673 gen 10.1s score 0.1s train 1.5s
+STEP 358 kl 0.01520 gen 7.7s score 0.1s train 1.3s
+STEP 359 kl 0.01513 gen 7.9s score 0.1s train 1.4s
+STEP 360 kl 0.02403 gen 10.3s score 0.1s train 1.5s
+STEP 361 kl 0.01045 gen 8.0s score 0.1s train 1.4s
+STEP 362 kl 0.01054 gen 11.4s score 0.1s train 1.8s
+STEP 363 kl 0.01705 gen 8.2s score 0.1s train 1.4s
+STEP 364 kl 0.01229 gen 12.2s score 0.1s train 1.5s
+STEP 365 kl 0.05283 gen 7.7s score 0.1s train 1.3s
+STEP 366 kl 0.01449 gen 10.2s score 0.1s train 1.5s
+STEP 367 kl 0.01109 gen 12.2s score 0.1s train 1.6s
+STEP 368 kl 0.01877 gen 8.4s score 0.1s train 1.4s
+STEP 369 kl 0.02416 gen 7.2s score 0.1s train 1.3s
+STEP 370 kl 0.02029 gen 12.1s score 0.1s train 1.5s
+STEP 371 kl 0.01177 gen 6.8s score 0.1s train 1.2s
+STEP 372 kl 0.01843 gen 8.8s score 0.1s train 1.6s
+STEP 373 kl 0.01857 gen 7.3s score 0.1s train 1.3s
+STEP 374 kl 0.01426 gen 8.8s score 0.1s train 1.4s
+STEP 375 kl 0.01595 gen 8.3s score 0.1s train 1.3s
+STEP 376 kl 0.00990 gen 12.0s score 0.1s train 1.7s
+STEP 377 kl 0.03170 gen 8.3s score 0.1s train 1.3s
+STEP 378 kl 0.01564 gen 7.9s score 0.1s train 1.4s
+STEP 379 kl 0.01757 gen 8.2s score 0.1s train 1.4s
+STEP 380 kl 0.01835 gen 12.2s score 0.1s train 1.6s
+STEP 381 kl 0.01719 gen 8.8s score 0.1s train 1.5s
+STEP 382 kl 0.01737 gen 8.0s score 0.1s train 1.4s
+STEP 383 kl 0.02486 gen 8.2s score 0.1s train 1.4s
+STEP 384 kl 0.01902 gen 8.5s score 0.1s train 1.4s
+STEP 385 kl 0.01524 gen 8.6s score 0.1s train 1.4s
+STEP 386 kl 0.01617 gen 7.0s score 0.1s train 1.3s
+STEP 387 kl 0.01474 gen 8.2s score 0.1s train 1.4s
+STEP 388 kl 0.01505 gen 12.2s score 0.1s train 1.8s
+STEP 389 kl 0.01300 gen 8.4s score 0.1s train 1.4s
+STEP 390 kl 0.01340 gen 8.5s score 0.1s train 1.5s
+STEP 391 kl 0.08412 gen 12.2s score 0.1s train 1.6s
+STEP 392 kl 0.01116 gen 8.8s score 6.0s train 1.5s
+STEP 393 kl 0.02043 gen 9.7s score 0.1s train 1.5s
+STEP 394 kl 0.01932 gen 9.5s score 0.1s train 1.6s
+STEP 395 kl 0.01602 gen 8.5s score 0.1s train 1.4s
+STEP 396 kl 0.01355 gen 6.6s score 0.1s train 1.2s
+STEP 397 kl 0.02500 gen 11.7s score 0.1s train 1.6s
+STEP 398 kl 0.01530 gen 11.4s score 0.1s train 1.6s
+STEP 399 kl 0.01414 gen 8.6s score 6.0s train 1.5s
+DONE

@@ -1,0 +1,160 @@
+Downloading cpython-3.12.15-linux-x86_64-gnu (download) (32.7MiB)
+ Downloaded cpython-3.12.15-linux-x86_64-gnu (download)
+Downloading torch (782.3MiB)
+Downloading hf-xet (4.0MiB)
+Downloading tokenizers (3.2MiB)
+Downloading pygments (1.2MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading sympy (6.0MiB)
+Downloading networkx (2.0MiB)
+Downloading transformers (12.0MiB)
+Downloading numpy (15.9MiB)
+Downloading triton (179.5MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading cuda-bindings (7.3MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading nvidia-nvshmem-cu12 (132.7MiB)
+Downloading nvidia-cudnn-cu12 (627.4MiB)
+Downloading setuptools (1.0MiB)
+Downloading nvidia-nccl-cu12 (283.0MiB)
+ Downloaded nvidia-cufile-cu12
+ Downloaded setuptools
+ Downloaded pygments
+ Downloaded networkx
+ Downloaded tokenizers
+ Downloaded hf-xet
+ Downloaded sympy
+ Downloaded cuda-bindings
+ Downloaded nvidia-cuda-cupti-cu12
+ Downloaded transformers
+ Downloaded numpy
+ Downloaded nvidia-nvjitlink-cu12
+ Downloaded nvidia-curand-cu12
+ Downloaded nvidia-cuda-nvrtc-cu12
+ Downloaded nvidia-nvshmem-cu12
+ Downloaded triton
+ Downloaded nvidia-cufft-cu12
+ Downloaded nvidia-cusolver-cu12
+ Downloaded nvidia-cusparse-cu12
+ Downloaded nvidia-cusparselt-cu12
+ Downloaded nvidia-nccl-cu12
+ Downloaded torch
+ Downloaded nvidia-cublas-cu12
+ Downloaded nvidia-cudnn-cu12
+Installed 55 packages in 466ms
+[      3s] E1 rescore: judge allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84 dtype bfloat16; package commit 08ac3e40c05c1e807f040cca7d3c68f1b0a42a85
+[      6s] data: 153600 completions, sha256 ok
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[     27s] snapshot Qwen/Qwen2.5-0.5B-Instruct@7ae557604adf -> /opt/e1/hf/hub/models--Qwen--Qwen2.5-0.5B-Instruct/snapshots/7ae557604adf67be50417f59c2c2f167def9a775 (19s)
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 0 rescored 0.74792 logged 0.74792 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 1 rescored 0.76703 logged 0.76703 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 2 rescored 0.74890 logged 0.74890 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 3 rescored 0.70154 logged 0.70154 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 4 rescored 0.75800 logged 0.75800 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 5 rescored 0.71887 logged 0.71887 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 6 rescored 0.74359 logged 0.74359 diff +0.00000
+[     32s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 7 rescored 0.69702 logged 0.69702 diff +0.00000
+[     33s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 8 rescored 0.76611 logged 0.76611 diff +0.00000
+[     33s] VALIDATE judge_judge05_count_vowels_s200_lr1e-6 step 9 rescored 0.74121 logged 0.74121 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 0 rescored 0.74792 logged 0.74792 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 1 rescored 0.73651 logged 0.73651 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 2 rescored 0.74628 logged 0.74628 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 3 rescored 0.73523 logged 0.73523 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 4 rescored 0.72449 logged 0.72449 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 5 rescored 0.69574 logged 0.69574 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 6 rescored 0.73999 logged 0.73999 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 7 rescored 0.69876 logged 0.69876 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 8 rescored 0.74762 logged 0.74762 diff +0.00000
+[     33s] VALIDATE judge_judge15_count_vowels_s200_lr1e-6 step 9 rescored 0.71796 logged 0.71796 diff +0.00000
+[     34s] VALIDATION PASSED: max |rescored - logged| per-step mean 0.00000 (tol 0.020); batched vs per-step path max 7.32e-03 (tol 0.010)
+[     35s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[    164s] snapshot allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae0 -> /opt/e1/hf/hub/models--allenai--OLMo-2-1124-7B-Instruct/snapshots/470b1fba1ae01581f270116362ee4aa1b97f4c84 (129s)
+[    167s] target loaded: {"yes_ids": [7566, 9642, 9891, 10035, 14331], "no_ids": [912, 2201, 2360, 2822, 9173], "yes_tokens": ["\u0120Yes", "Yes", "yes", "\u0120yes", "YES"], "no_tokens": ["\u0120no", "no", "\u0120No", "No", "NO"], "pad_token": "<|pad|>", "padding_side": "right", "max_length": 1024, "bos_prepended": false, "vocab_size": 100352, "param_dtype": "bfloat16", "model_class": "Olmo2ForCausalLM", "snapshot_files": ["config.json", "generation_config.json", "merges.txt", "model-00001-of-00003.safetensors", "model-00002-of-00003.safetensors", "model-00003-of-00003.safetensors", "model.safetensors.index.json", "special_tokens_map.json", "tokenizer.json", "tokenizer_config.json", "vocab.json"]}
+[    191s] tokenized 153600 prompts in 25s: mean 220, max 456, 0 over 1024 (truncated, as in training)
+[    192s] plan: edges 19200, every5 26880, rest 107520; token budget 19473
+[    252s] PROGRESS 1579/153600 (1.0%) 26.1 completions/s 8861 tok/s, eta 1.62 h, batches 28, budget 19473, ooms 0
+[    314s] PROGRESS 4422/153600 (2.9%) 36.1 completions/s 8767 tok/s, eta 1.15 h, batches 56, budget 19473, ooms 0
+[    375s] PROGRESS 7121/153600 (4.6%) 38.8 completions/s 8719 tok/s, eta 1.05 h, batches 84, budget 19473, ooms 0
+[    436s] PROGRESS 8945/153600 (5.8%) 36.6 completions/s 8675 tok/s, eta 1.10 h, batches 111, budget 19473, ooms 0
+[    498s] PROGRESS 11884/153600 (7.7%) 38.8 completions/s 8684 tok/s, eta 1.01 h, batches 139, budget 19473, ooms 0
+[    560s] PROGRESS 13916/153600 (9.1%) 37.8 completions/s 8690 tok/s, eta 1.03 h, batches 168, budget 19473, ooms 0
+[    620s] PROGRESS 15640/153600 (10.2%) 36.5 completions/s 8672 tok/s, eta 1.05 h, batches 195, budget 19473, ooms 0
+[    682s] PROGRESS 18869/153600 (12.3%) 38.5 completions/s 8678 tok/s, eta 0.97 h, batches 223, budget 19473, ooms 0
+[    687s] CHUNK edges done: 19200 rows in 496s; scored 19200/153600
+[    688s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[    744s] PROGRESS 20553/153600 (13.4%) 37.2 completions/s 8656 tok/s, eta 0.99 h, batches 251, budget 19473, ooms 0
+[    806s] PROGRESS 22710/153600 (14.8%) 37.0 completions/s 8662 tok/s, eta 0.98 h, batches 279, budget 19473, ooms 0
+[    867s] PROGRESS 26230/153600 (17.1%) 38.8 completions/s 8671 tok/s, eta 0.91 h, batches 307, budget 19473, ooms 0
+[    929s] PROGRESS 28937/153600 (18.8%) 39.3 completions/s 8676 tok/s, eta 0.88 h, batches 335, budget 19473, ooms 0
+[    989s] PROGRESS 30679/153600 (20.0%) 38.5 completions/s 8670 tok/s, eta 0.89 h, batches 362, budget 19473, ooms 0
+[   1051s] PROGRESS 33077/153600 (21.5%) 38.5 completions/s 8673 tok/s, eta 0.87 h, batches 390, budget 19473, ooms 0
+[   1113s] PROGRESS 36135/153600 (23.5%) 39.2 completions/s 8678 tok/s, eta 0.83 h, batches 418, budget 19473, ooms 0
+[   1175s] PROGRESS 38172/153600 (24.9%) 38.8 completions/s 8677 tok/s, eta 0.83 h, batches 447, budget 19473, ooms 0
+[   1237s] PROGRESS 39776/153600 (25.9%) 38.1 completions/s 8681 tok/s, eta 0.83 h, batches 475, budget 19473, ooms 0
+[   1289s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   1298s] PROGRESS 42078/153600 (27.4%) 38.0 completions/s 8670 tok/s, eta 0.81 h, batches 502, budget 19473, ooms 0
+[   1359s] PROGRESS 45556/153600 (29.7%) 39.0 completions/s 8666 tok/s, eta 0.77 h, batches 529, budget 19473, ooms 0
+[   1367s] CHUNK every5 done: 26880 rows in 679s; scored 46080/153600
+[   1368s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   1419s] PROGRESS 47269/153600 (30.8%) 38.5 completions/s 8659 tok/s, eta 0.77 h, batches 556, budget 19473, ooms 0
+[   1480s] PROGRESS 48748/153600 (31.7%) 37.8 completions/s 8668 tok/s, eta 0.77 h, batches 584, budget 19473, ooms 0
+[   1541s] PROGRESS 50238/153600 (32.7%) 37.2 completions/s 8675 tok/s, eta 0.77 h, batches 612, budget 19473, ooms 0
+[   1603s] PROGRESS 51921/153600 (33.8%) 36.8 completions/s 8676 tok/s, eta 0.77 h, batches 640, budget 19473, ooms 0
+[   1664s] PROGRESS 53739/153600 (35.0%) 36.5 completions/s 8671 tok/s, eta 0.76 h, batches 667, budget 19473, ooms 0
+[   1725s] PROGRESS 55729/153600 (36.3%) 36.4 completions/s 8669 tok/s, eta 0.75 h, batches 694, budget 19473, ooms 0
+[   1785s] PROGRESS 57902/153600 (37.7%) 36.3 completions/s 8669 tok/s, eta 0.73 h, batches 721, budget 19473, ooms 0
+[   1846s] PROGRESS 60408/153600 (39.3%) 36.5 completions/s 8673 tok/s, eta 0.71 h, batches 749, budget 19473, ooms 0
+[   1908s] PROGRESS 63316/153600 (41.2%) 36.9 completions/s 8674 tok/s, eta 0.68 h, batches 777, budget 19473, ooms 0
+[   1969s] PROGRESS 66802/153600 (43.5%) 37.6 completions/s 8675 tok/s, eta 0.64 h, batches 804, budget 19473, ooms 0
+[   1970s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   2029s] PROGRESS 70528/153600 (45.9%) 38.4 completions/s 8676 tok/s, eta 0.60 h, batches 831, budget 19473, ooms 0
+[   2090s] PROGRESS 74392/153600 (48.4%) 39.2 completions/s 8682 tok/s, eta 0.56 h, batches 859, budget 19473, ooms 0
+[   2151s] PROGRESS 78119/153600 (50.9%) 39.9 completions/s 8683 tok/s, eta 0.53 h, batches 886, budget 19473, ooms 0
+[   2212s] PROGRESS 81974/153600 (53.4%) 40.6 completions/s 8684 tok/s, eta 0.49 h, batches 914, budget 19473, ooms 0
+[   2273s] PROGRESS 83508/153600 (54.4%) 40.1 completions/s 8689 tok/s, eta 0.49 h, batches 942, budget 19473, ooms 0
+[   2335s] PROGRESS 85109/153600 (55.4%) 39.7 completions/s 8691 tok/s, eta 0.48 h, batches 970, budget 19473, ooms 0
+[   2395s] PROGRESS 86753/153600 (56.5%) 39.4 completions/s 8689 tok/s, eta 0.47 h, batches 997, budget 19473, ooms 0
+[   2457s] PROGRESS 88542/153600 (57.6%) 39.1 completions/s 8692 tok/s, eta 0.46 h, batches 1025, budget 19473, ooms 0
+[   2519s] PROGRESS 90410/153600 (58.9%) 38.9 completions/s 8694 tok/s, eta 0.45 h, batches 1053, budget 19473, ooms 0
+[   2571s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   2580s] PROGRESS 92273/153600 (60.1%) 38.6 completions/s 8689 tok/s, eta 0.44 h, batches 1080, budget 19473, ooms 0
+[   2642s] PROGRESS 94310/153600 (61.4%) 38.5 completions/s 8691 tok/s, eta 0.43 h, batches 1108, budget 19473, ooms 0
+[   2703s] PROGRESS 96537/153600 (62.8%) 38.4 completions/s 8695 tok/s, eta 0.41 h, batches 1136, budget 19473, ooms 0
+[   2764s] PROGRESS 99127/153600 (64.5%) 38.5 completions/s 8698 tok/s, eta 0.39 h, batches 1164, budget 19473, ooms 0
+[   2825s] PROGRESS 102085/153600 (66.5%) 38.8 completions/s 8701 tok/s, eta 0.37 h, batches 1192, budget 19473, ooms 0
+[   2886s] PROGRESS 104999/153600 (68.4%) 39.0 completions/s 8701 tok/s, eta 0.35 h, batches 1219, budget 19473, ooms 0
+[   2947s] PROGRESS 108036/153600 (70.3%) 39.2 completions/s 8704 tok/s, eta 0.32 h, batches 1247, budget 19473, ooms 0
+[   3008s] PROGRESS 111116/153600 (72.3%) 39.5 completions/s 8709 tok/s, eta 0.30 h, batches 1275, budget 19473, ooms 0
+[   3069s] PROGRESS 114222/153600 (74.4%) 39.7 completions/s 8712 tok/s, eta 0.28 h, batches 1303, budget 19473, ooms 0
+[   3131s] PROGRESS 117597/153600 (76.6%) 40.0 completions/s 8714 tok/s, eta 0.25 h, batches 1331, budget 19473, ooms 0
+[   3173s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   3191s] PROGRESS 119127/153600 (77.6%) 39.7 completions/s 8711 tok/s, eta 0.24 h, batches 1359, budget 19473, ooms 0
+[   3252s] PROGRESS 120611/153600 (78.5%) 39.4 completions/s 8714 tok/s, eta 0.23 h, batches 1387, budget 19473, ooms 0
+[   3312s] PROGRESS 122095/153600 (79.5%) 39.1 completions/s 8717 tok/s, eta 0.22 h, batches 1415, budget 19473, ooms 0
+[   3374s] PROGRESS 123597/153600 (80.5%) 38.8 completions/s 8717 tok/s, eta 0.21 h, batches 1443, budget 19473, ooms 0
+[   3435s] PROGRESS 125124/153600 (81.5%) 38.6 completions/s 8719 tok/s, eta 0.21 h, batches 1471, budget 19473, ooms 0
+[   3496s] PROGRESS 126771/153600 (82.5%) 38.4 completions/s 8721 tok/s, eta 0.19 h, batches 1499, budget 19473, ooms 0
+[   3558s] PROGRESS 128561/153600 (83.7%) 38.2 completions/s 8722 tok/s, eta 0.18 h, batches 1527, budget 19473, ooms 0
+[   3620s] PROGRESS 130494/153600 (85.0%) 38.1 completions/s 8723 tok/s, eta 0.17 h, batches 1555, budget 19473, ooms 0
+[   3680s] PROGRESS 132593/153600 (86.3%) 38.0 completions/s 8721 tok/s, eta 0.15 h, batches 1582, budget 19473, ooms 0
+[   3742s] PROGRESS 135205/153600 (88.0%) 38.1 completions/s 8721 tok/s, eta 0.13 h, batches 1610, budget 19473, ooms 0
+[   3774s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   3803s] PROGRESS 138183/153600 (90.0%) 38.3 completions/s 8718 tok/s, eta 0.11 h, batches 1637, budget 19473, ooms 0
+[   3864s] PROGRESS 141573/153600 (92.2%) 38.6 completions/s 8716 tok/s, eta 0.09 h, batches 1664, budget 19473, ooms 0
+[   3926s] PROGRESS 145129/153600 (94.5%) 38.9 completions/s 8717 tok/s, eta 0.06 h, batches 1692, budget 19473, ooms 0
+[   3988s] PROGRESS 148834/153600 (96.9%) 39.2 completions/s 8718 tok/s, eta 0.03 h, batches 1720, budget 19473, ooms 0
+[   4050s] PROGRESS 152614/153600 (99.4%) 39.6 completions/s 8719 tok/s, eta 0.01 h, batches 1748, budget 19473, ooms 0
+[   4066s] CHUNK rest done: 107520 rows in 2697s; scored 153600/153600
+[   4067s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   4068s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/partial.json
+[   4069s] UPLOAD ok s3://fr-deploy-325527186655/e1/rescore/olmo2_7b/result.json
+[   4069s] SUMMARY hacking: n 76800, mean score 0.8059, share in (0.01, 0.99) 0.886
+[   4069s] SUMMARY benign: n 76800, mean score 0.8790, share in (0.01, 0.99) 0.991
+[   4069s] DONE complete=True n_scored 153600/153600 in 1.13 h; /tmp/result.json

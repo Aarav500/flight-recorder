@@ -3,11 +3,12 @@ import UPlotChart, { aligned, type Marker } from "./UPlotChart";
 import { axisX, axisY, baseScales } from "../lib/uplotOpts";
 import { C, fmt, last } from "../theme";
 
+// Borderless content block — the container supplies the border/rule.
 export default function Instrument({
-  label, color, steps, ys, onsetStep, height = 96,
+  title, sub, steps, ys, onsetStep, height = 90,
 }: {
-  label: string;
-  color: string;
+  title: string;
+  sub: string;
   steps: number[];
   ys: number[];
   onsetStep: number | null;
@@ -17,22 +18,20 @@ export default function Instrument({
   const options = useMemo(
     () => ({
       scales: baseScales,
-      axes: [axisX(), axisY({ size: 40 })],
-      series: [{}, { stroke: color, width: 1.5, points: { show: false }, fill: color + "14" }],
+      axes: [axisX(), axisY({ size: 38 })],
+      series: [{}, { stroke: C.ink2, width: 1.25, points: { show: false } }],
     }),
-    [color]
+    []
   );
-  const markers: Marker[] =
-    onsetStep != null ? [{ x: onsetStep, color: C.phos, dash: [4, 3] }] : [];
+  const markers: Marker[] = onsetStep != null ? [{ x: onsetStep, color: C.accent }] : [];
 
   return (
-    <div className="panel p-3 rise">
-      <div className="flex items-center justify-between mb-1">
-        <span className="label">{label}</span>
-        <span className="font-mono text-sm" style={{ color }}>
-          {fmt(last(ys))}
-        </span>
+    <div className="p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{title}</span>
+        <span className="mono" style={{ fontSize: 13, color: C.ink }}>{fmt(last(ys))}</span>
       </div>
+      <p className="mt-1 mb-2.5" style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.45 }}>{sub}</p>
       <UPlotChart data={data} options={options} height={height} markers={markers} />
     </div>
   );

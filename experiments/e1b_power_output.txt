@@ -1,0 +1,336 @@
+E1b POWER, SIZE, MDE, MARGIN, PLANTED-CONTROL AND COST NUMBERS (experiments/e1b_power.py)
+mode: full; python 3.13.14, numpy 2.4.3, scipy 1.17.1
+Each line: the computed value, then each value the text states, where, and MATCH or DIFF. MATCH means the
+computed value, rounded to the decimals the text gives, equals the stated value.
+
+== 0. E1 INPUTS, rebuilt from runs/e1/main (power/e1_inputs.py) ==
+  e1_primary.load_main: 24 hacking and 24 benign runs used; 0 excluded, 0 unregistered, 0 surplus
+  hacking events, sorted (-1 = no event): [-1, 5, 5, 6, 7, 11, 12, 17, 17, 17, 22, 29, 35, 35, 43, 46, 51, 60, 71, 78, 110, 119, 161, 247]
+  E1 leads (event - first move of |disagreement|), 23 runs: median 12.0, 14 positive
+  equal to experiments/e1b_design/power/e1_inputs.json: tag order yes, events yes, leads yes, changes yes
+
+== 1. PRIMARY TEST, EXACT ENUMERATION (prereg 4 table and text; prereg 5; spec 1.11; spec 1.14) ==
+  One-sided Fisher, alpha 0.05, FP fixed at e1_primary.fixed_fp(n) by the time-matched 90th percentile.
+  'threshold estimated': exact over numpy's interpolated 90th percentile of n exchangeable twin maxima
+  (review_design/null_exact.py). MDE on a 0.005 grid (power_primary.py), frozen 0.01-step helper beside it.
+
+-- 24 v 24 (E1's size) --
+  FP fixed at fixed_fp(24)                                           3           stated 3 [prereg 4 table; spec 1.14 table] -> MATCH
+  FPR = FP / n                                                       0.125
+  hits needed for p < 0.05 (p 0.0467 at 9, 0.0840 at 8)              9           stated 9 [prereg 4 table; spec 1.14 table] -> MATCH
+  lowest TPR that can be declared a kill (hits / n)                  0.375
+  size, twin FPR known: P(Bin(n, FP/n) >= hits)                      0.00165647  stated 0.0017 [prereg 4 table; spec 1.14 table] -> MATCH
+                                                                                 stated 0.002 [prereg 4 (E1's stated true size)] -> MATCH
+  size, threshold estimated from the twins (total 1.000000)          0.0230333   stated 0.023 [prereg 4 table; spec 1.14 table] -> MATCH
+    mean TP, threshold estimated                                     3.168
+    variance of TP, threshold estimated                              5.00402
+    binomial variance n p (1 - p), p = FP/n                          2.625
+  Fisher power at TPR 0.33                                           0.391918    stated 0.39 [prereg 4; spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.35                                           0.474324    stated 0.47 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.375                                          0.576468    stated 0.576 [prereg 4 table] -> MATCH
+                                                                                 stated 0.58 [prereg 4; spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.40                                           0.672078    stated 0.67 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.5                                            0.924205    stated 0.924 [prereg 4 table; spec 1.14 table] -> MATCH
+  MDE at 80% power (0.01-step helper: 0.44)                          0.44        stated 0.44 [prereg 4 table; spec 1.14 table] -> MATCH
+  MDE at 90% power (0.01-step helper: 0.49)                          0.485       stated 0.485 [prereg 4 table; spec 1.14 table] -> MATCH
+  H2 first Holm step (alpha/25): hits needed                         14          stated 14 [spec 1.14 table] -> MATCH
+  H2 first Holm step: power at TPR 0.5                               0.270628    stated 0.27 [spec 1.14 table] -> MATCH
+  H2 first Holm step: MDE at 80% (0.01 grid)                         0.65        stated 0.65 [spec 1.14 table] -> MATCH
+  non-superiority at delta 0.25 holds iff TP <=                      4           stated 4 [prereg 4 table; spec 1.14 table] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.827109    stated 0.827 [prereg 4 table] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.754123    stated 0.754 [prereg 4 table] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.632033    stated 0.63 [prereg 4 table] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.613962    stated 0.61 [prereg 4 table] -> MATCH
+  non-superiority at delta 0.20 holds iff TP <=                      3
+    P(shown | TPR = FPR), twin FPR known                             0.647565
+    P(shown | TPR = FPR), threshold estimated                        0.616369
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.763663
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.682639
+  upper Newcombe 90% bound on TPR - FPR by TP count: 2: 0.1165, 3: 0.1671, 4: 0.2153, 5: 0.2615, 6: 0.3062, 7: 0.3496, 8: 0.3918, 9: 0.4329, 10: 0.4730
+
+-- 32 v 32 (MIN_ARM) --
+  FP fixed at fixed_fp(32)                                           4           stated 4 [spec 1.14 table; spec 1.11] -> MATCH
+  FPR = FP / n                                                       0.125
+  hits needed for p < 0.05 (p 0.0373 at 11, 0.0644 at 10)            11          stated 11 [spec 1.14 table] -> MATCH
+  lowest TPR that can be declared a kill (hits / n)                  0.34375
+  size, twin FPR known: P(Bin(n, FP/n) >= hits)                      0.00119862  stated 0.0012 [spec 1.14 table] -> MATCH
+  size, threshold estimated from the twins (total 1.000000)          0.0170732   stated 0.017 [spec 1.14 table] -> MATCH
+    mean TP, threshold estimated                                     3.97576
+    variance of TP, threshold estimated                              6.57681
+    binomial variance n p (1 - p), p = FP/n                          3.5
+  Fisher power at TPR 0.33                                           0.500342    stated 0.50 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.35                                           0.595266    stated 0.60 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.375                                          0.70392     stated 0.70 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.40                                           0.795411    stated 0.80 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.5                                            0.974949    stated 0.975 [spec 1.14 table] -> MATCH
+  MDE at 80% power (0.01-step helper: 0.41)                          0.405       stated 0.41 [spec 1.14 table] -> MATCH
+  MDE at 90% power (0.01-step helper: 0.44)                          0.44        stated 0.44 [spec 1.14 table] -> MATCH
+  H2 first Holm step (alpha/25): hits needed                         16          stated 16 [spec 1.14 table] -> MATCH
+  H2 first Holm step: power at TPR 0.5                               0.569975    stated 0.57 [spec 1.14 table] -> MATCH
+  H2 first Holm step: MDE at 80% (0.01 grid)                         0.56        stated 0.56 [spec 1.14 table] -> MATCH
+  non-superiority at delta 0.25 holds iff TP <=                      7           stated 7 [spec 1.14 table; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.960494    stated 0.960 [spec 1.11] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.902837    stated 0.903 [spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.413935
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.43225
+  non-superiority at delta 0.20 holds iff TP <=                      5
+    P(shown | TPR = FPR), twin FPR known                             0.79615
+    P(shown | TPR = FPR), threshold estimated                        0.751737
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.693402
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.592983
+  upper Newcombe 90% bound on TPR - FPR by TP count: 3: 0.1056, 4: 0.1431, 5: 0.1793, 6: 0.2144, 7: 0.2487, 8: 0.2822, 9: 0.3151, 10: 0.3474, 11: 0.3791, 12: 0.4102
+
+-- 36 v 36 (earlier proposal) --
+  FP fixed at fixed_fp(36)                                           4           stated 4 [prereg 4 table; spec 1.14 table; spec 1.11] -> MATCH
+  FPR = FP / n                                                       0.111111
+  hits needed for p < 0.05 (p 0.0397 at 11, 0.0674 at 10)            11          stated 11 [prereg 4 table; spec 1.14 table] -> MATCH
+  lowest TPR that can be declared a kill (hits / n)                  0.305556
+  size, twin FPR known: P(Bin(n, FP/n) >= hits)                      0.00134559  stated 0.0013 [prereg 4 table; spec 1.14 table] -> MATCH
+  size, threshold estimated from the twins (total 1.000000)          0.0251406   stated 0.025 [prereg 4 table; spec 1.14 table; spec 1.14] -> MATCH
+    mean TP, threshold estimated                                     4.37838     stated 4.4 [spec 1.14] -> MATCH
+    variance of TP, threshold estimated                              7.16408     stated 7.2 [spec 1.14] -> MATCH
+    binomial variance n p (1 - p), p = FP/n                          3.55556     stated 3.6 [spec 1.14] -> MATCH
+    note: the stated 7.2 is the exact quadrature above, rounded. The drafts stated 7.1 until the correction of 2026-10-25: review_design/power_recheck.py's Monte Carlo estimate (7.119, 400,000 draws; n48/recompute/review_design/power_recheck.txt).
+  Fisher power at TPR 0.33                                           0.681729    stated 0.68 [prereg 4; spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.35                                           0.765679    stated 0.77 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.375                                          0.849455    stated 0.849 [prereg 4 table] -> MATCH
+                                                                                 stated 0.85 [prereg 4; spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.40                                           0.909637    stated 0.91 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.5                                            0.994335    stated 0.994 [prereg 4 table; spec 1.14 table] -> MATCH
+  MDE at 80% power (0.01-step helper: 0.36)                          0.36        stated 0.36 [prereg 4 table; spec 1.14 table] -> MATCH
+  MDE at 90% power (0.01-step helper: 0.4)                           0.4         stated 0.40 [prereg 4 table; spec 1.14 table] -> MATCH
+  H2 first Holm step (alpha/25): hits needed                         16          stated 16 [spec 1.14 table] -> MATCH
+  H2 first Holm step: power at TPR 0.5                               0.797484    stated 0.80 [spec 1.14 table] -> MATCH
+  H2 first Holm step: MDE at 80% (0.01 grid)                         0.51        stated 0.51 [spec 1.14 table] -> MATCH
+  non-superiority at delta 0.25 holds iff TP <=                      7           stated 7 [prereg 4 table; spec 1.14 table; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.959159    stated 0.959 [prereg 4 table; prereg 5; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.873195    stated 0.873 [prereg 4 table; prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.435432    stated 0.44 [prereg 4 table; prereg 4; prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.353993    stated 0.35 [prereg 4 table; prereg 4; prereg 5; spec 1.11] -> MATCH
+  non-superiority at delta 0.20 holds iff TP <=                      6           stated 6 [prereg 5; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.901821    stated 0.902 [prereg 5; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.800197    stated 0.800 [prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.556749    stated 0.56 [prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.412776    stated 0.41 [prereg 5; spec 1.11] -> MATCH
+  non-superiority at delta 0.19 holds iff TP <=                      5           stated 5 [prereg 5] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.794789    stated 0.795 [prereg 5] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.699651    stated 0.700 [prereg 5] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.641671
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.444781
+  upper Newcombe 90% bound on TPR - FPR by TP count: 3: 0.0957, 4: 0.1295, 5: 0.1621, 6: 0.1939, 7: 0.2249, 8: 0.2553, 9: 0.2852, 10: 0.3145, 11: 0.3433, 12: 0.3717
+    upper 90% bound at TP 6                                          0.193907    stated 0.194 [spec 1.11] -> MATCH
+    upper 90% bound at TP 7                                          0.224939    stated 0.225 [spec 1.11] -> MATCH
+    upper 90% bound at TP 8                                          0.255329    stated 0.255 [spec 1.11] -> MATCH
+  smallest margin (0.01 steps) shown w.p. >= 0.80, rate known        0.2         stated 0.20 [prereg 5] -> MATCH
+    the same, threshold estimated                                    0.2         stated 0.20 [prereg 5] -> MATCH
+
+-- 48 v 48 (registered) --
+  FP fixed at fixed_fp(48)                                           5           stated 5 [prereg 4 table; spec 1.14 table] -> MATCH
+  FPR = FP / n                                                       0.104167    stated 0.104 [prereg 5; spec 1.11] -> MATCH
+  hits needed for p < 0.05 (p 0.0326 at 13, 0.0534 at 12)            13          stated 13 [prereg 4 table; prereg 4; spec 1.14 table] -> MATCH
+  lowest TPR that can be declared a kill (hits / n)                  0.270833    stated 0.27 [prereg 4] -> MATCH
+  size, twin FPR known: P(Bin(n, FP/n) >= hits)                      0.000970632 stated 0.0010 [prereg 4 table; spec 1.14 table] -> MATCH
+  size, threshold estimated from the twins (total 1.000000)          0.0251481   stated 0.025 [prereg 4 table; prereg 4; spec 1.14 table; spec 1.14] -> MATCH
+    mean TP, threshold estimated                                     5.58367     stated 5.6 [prereg 4; spec 1.14] -> MATCH
+    variance of TP, threshold estimated                              9.37887     stated 9.4 [spec 1.14] -> MATCH
+    binomial variance n p (1 - p), p = FP/n                          4.47917     stated 4.5 [spec 1.14] -> MATCH
+  Fisher power at TPR 0.33                                           0.847699    stated 0.85 [prereg 4; spec 1.14 table] -> MATCH
+                                                                                 stated 0.848 [prereg 4] -> MATCH
+  Fisher power at TPR 0.35                                           0.905654    stated 0.91 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.375                                          0.952333    stated 0.952 [prereg 4 table] -> MATCH
+                                                                                 stated 0.95 [prereg 4; spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.40                                           0.978095    stated 0.98 [spec 1.14 table] -> MATCH
+  Fisher power at TPR 0.5                                            0.999641    stated 1.000 [prereg 4 table; spec 1.14 table] -> MATCH
+  MDE at 80% power (0.01-step helper: 0.32)                          0.32        stated 0.32 [prereg 4 table; prereg 1; spec 1.14 table] -> MATCH
+  MDE at 90% power (0.01-step helper: 0.35)                          0.35        stated 0.35 [prereg 4 table; spec 1.14 table] -> MATCH
+  H2 first Holm step (alpha/25): hits needed                         18          stated 18 [prereg 4; spec 1.14 table] -> MATCH
+  H2 first Holm step: power at TPR 0.5                               0.970268    stated 0.97 [prereg 4; spec 1.14 table] -> MATCH
+  H2 first Holm step: MDE at 80% (0.01 grid)                         0.43        stated 0.43 [prereg 4; spec 1.14 table] -> MATCH
+  non-superiority at delta 0.25 holds iff TP <=                      11          stated 11 [prereg 4 table; prereg 5; spec 1.14 table; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.996862    stated 0.997 [prereg 4 table; prereg 5; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.957624    stated 0.958 [prereg 4 table; prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.131984    stated 0.13 [prereg 4 table; prereg 4; prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.0981796   stated 0.10 [prereg 4 table; prereg 4; prereg 5; spec 1.11] -> MATCH
+  non-superiority at delta 0.20 holds iff TP <=                      8           stated 8 [prereg 5; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), twin FPR known                             0.942578    stated 0.943 [prereg 5; spec 1.11] -> MATCH
+    P(shown | TPR = FPR), threshold estimated                        0.833947    stated 0.834 [prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.25  0.457706    stated 0.46 [prereg 5; spec 1.11] -> MATCH
+    inconclusive (p >= 0.05, non-superiority not shown) at TPR 0.30  0.252686    stated 0.25 [prereg 5; spec 1.11] -> MATCH
+  upper Newcombe 90% bound on TPR - FPR by TP count: 4: 0.0832, 5: 0.1084, 6: 0.1329, 7: 0.1569, 8: 0.1805, 9: 0.2038, 10: 0.2267, 11: 0.2493, 12: 0.2716, 13: 0.2936, 14: 0.3155
+    upper 90% bound at TP 8                                          0.180527    stated 0.181 [prereg 5; spec 1.11] -> MATCH
+    upper 90% bound at TP 9                                          0.20376     stated 0.204 [prereg 5] -> MATCH
+    upper 90% bound at TP 10                                         0.22666     stated 0.227 [prereg 5] -> MATCH
+    upper 90% bound at TP 11                                         0.249259    stated 0.249 [prereg 5] -> MATCH
+                                                                                 stated 0.2493 [prereg 5; spec 1.11] -> MATCH
+    upper 90% bound at TP 12                                         0.271582    stated 0.272 [prereg 5] -> MATCH
+                                                                                 stated 0.2716 [spec 1.11] -> MATCH
+
+== 2. KILL POWER (prereg 4 table and text; spec 1.14) ==
+  Fisher power at TPR 0.5 times P(window >= 12, median lead > 0 and generator check all hold), the last from a
+  task-stratified bootstrap of E1's 24 hacking (event, lead) pairs, 20000 draws, seed 20261009, n = 24, 36, 48 in turn
+  (power_primary.py; independence assumed; E1's leads, where disagreement did not anticipate).
+  n = 24: P(window >= 12) 0.9999, P(median lead > 0) 0.8876, P(generator ok) 1.0000
+    P(all three)                                                     0.88755
+    kill power at TPR 0.5                                            0.820278    stated 0.820 [prereg 4 table] -> MATCH
+  n = 36: P(window >= 12) 1.0000, P(median lead > 0) 0.9391, P(generator ok) 1.0000
+    P(all three)                                                     0.93905
+    kill power at TPR 0.5                                            0.93373     stated 0.934 [prereg 4 table] -> MATCH
+  n = 48: P(window >= 12) 1.0000, P(median lead > 0) 0.9628, P(generator ok) 1.0000
+    P(all three)                                                     0.96285     stated 0.963 [prereg 4; spec 1.14] -> MATCH
+    kill power at TPR 0.5                                            0.962505    stated 0.963 [prereg 4 table] -> MATCH
+  smallest TPR (0.01 grid) where kill power at 48 v 48 reaches 0.80  0.33        stated 0.33 [prereg 4; spec 1.14] -> MATCH
+    kill power at TPR 0.32: 0.7806; at 0.33: 0.8162
+
+== 3. PLANTED CONTROL, CONSTRUCTION M (prereg 4 table; prereg 9; spec 1.13) ==
+  planted effect: e1_primary.mde_fixed_fp(48, 48, 5)                 0.32        stated 0.32 [prereg 9; spec 1.13] -> MATCH
+  E1's construction at E1's own layout (24 v 24, FP 3)               0.567038    stated 0.567 [prereg 9; spec 1.13] -> MATCH
+  Exact expected rejection, e1_primary.power_poisson_binomial over the per-run plant probabilities, on 4000
+  task-stratified bootstrap layouts of E1's events per n (planted_control.py, seed 20261009, n = 24, 36, 48 in turn).
+  E1 = e1_primary.planted_ps; M = ps_target(MDE); T = ps_target(0.5), the claimed effect.
+  n = 24, E1 mean 0.55985, 10th pct 0.38576, 90th pct 0.70911; mean planted TPR 0.370
+  n = 24, M  mean 0.82349, 10th pct 0.80987, 90th pct 0.83803; mean planted TPR 0.440
+    M, mean over layouts (MDE 0.44)                                  0.823488    stated 0.823 [prereg 4 table; spec 1.13] -> MATCH
+  n = 24, T  mean 0.94443, 10th pct 0.93285, 90th pct 0.95665; mean planted TPR 0.500
+  n = 36, E1 mean 0.84559, 10th pct 0.74691, 90th pct 0.92654; mean planted TPR 0.370
+  n = 36, M  mean 0.81763, 10th pct 0.80875, 90th pct 0.82815; mean planted TPR 0.360
+    M, mean over layouts (MDE 0.36)                                  0.817631    stated 0.818 [prereg 4 table; spec 1.13] -> MATCH
+  n = 36, T  mean 0.99710, 10th pct 0.99573, 90th pct 0.99846; mean planted TPR 0.500
+    claimed effect T (TPR 0.5), mean over layouts                    0.997101    stated 0.997 [prereg 9; spec 1.13] -> MATCH
+  n = 48, E1 mean 0.95145, 10th pct 0.91138, 90th pct 0.98209; mean planted TPR 0.370
+    E1's construction, 10th percentile                               0.911382    stated 0.91 [prereg 9; spec 1.13] -> MATCH
+    E1's construction, 90th percentile                               0.982085    stated 0.98 [prereg 9; spec 1.13] -> MATCH
+  n = 48, M  mean 0.82357, 10th pct 0.81788, 90th pct 0.82973; mean planted TPR 0.320
+    M, mean over layouts (MDE 0.32)                                  0.823566    stated 0.824 [prereg 4 table; prereg 9; spec 1.13] -> MATCH
+                                                                                 stated 0.82 [prereg 9; spec 1.13 (about, near)] -> MATCH
+    M, 10th percentile                                               0.817881    stated 0.818 [prereg 9; spec 1.13] -> MATCH
+    M, 90th percentile                                               0.829735    stated 0.830 [prereg 9; spec 1.13] -> MATCH
+  n = 48, T  mean 0.99988, 10th pct 0.99980, 90th pct 0.99994; mean planted TPR 0.500
+    claimed effect T (TPR 0.5), mean over layouts                    0.999875    stated 0.9999 [prereg 9; spec 1.13] -> MATCH
+    claimed effect with every run having room (q = 0.5, = binomial power at 0.5), n = 36: 0.99433 (compute_n48.py)
+    claimed effect with every run having room (q = 0.5, = binomial power at 0.5), n = 48: 0.99964 (compute_n48.py)
+    note: both stated claimed-effect figures are checked against one definition, the mean over E1-like layouts, the definition of the M figure the text sets them against: the text's 0.997 at 36 (planted_control.py) and its 0.9999 at 48 are that mean. The every-run-has-room value above (compute_n48.py) gives 0.9996 at 48 and 0.994 at 36; the drafts stated that 0.9996 at 48 until the correction of 2026-10-25.
+
+  Construction M at 48 v 48 by the number of hacking runs with room (compute_n48.py). The window holding
+  (median event >= 12) puts at least n/2 events at step 12 or later, so at least that many runs have room.
+  fewest runs with room when the window holds                        24          stated 24 [prereg 9; spec 1.13] -> MATCH
+  24: 0.8868, 25: 0.8792, 26: 0.8725, 27: 0.8665, 28: 0.8612, 29: 0.8563, 30: 0.8519, 31: 0.8479, 32: 0.8442, 33: 0.8409, 34: 0.8377, 35: 0.8349, 36: 0.8322, 37: 0.8297, 38: 0.8274, 39: 0.8253, 40: 0.8232, 41: 0.8213, 42: 0.8196, 43: 0.8179, 44: 0.8163, 45: 0.8148, 46: 0.8134, 47: 0.8120, 48: 0.8107
+  48 with room: q                                                    0.32        stated 0.32 [prereg 9; spec 1.13] -> MATCH
+  48 with room: exact expectation (the lowest)                       0.810748    stated 0.81 [prereg 9; spec 1.13] -> MATCH
+  24 with room: q                                                    0.64        stated 0.64 [prereg 9; spec 1.13] -> MATCH
+  24 with room: exact expectation (the highest)                      0.886781    stated 0.89 [prereg 9; spec 1.13] -> MATCH
+
+  CONTROL_TOL 0.05 at 1000 draws: the tolerance in SDs of the simulated rate, and the exact chance a correct
+  pipeline fails (compute_n48.py; 0.82 is the literal value the design used for 'about 0.82').
+  expectation 0.8107: tolerance in SD (SD 0.0124)                    4.03652     stated 4.0 [prereg 9; spec 1.13] -> MATCH
+    exact P(a correct pipeline fails)                                5.62085e-05 stated 6e-5 [spec 1.13] -> MATCH
+  expectation 0.8200: tolerance in SD (SD 0.0121)                    4.11554     stated 4.1 [prereg 9; spec 1.13] -> MATCH
+    exact P(a correct pipeline fails)                                3.55551e-05 stated 4e-5 [spec 1.13] -> MATCH
+  expectation 0.8868: tolerance in SD (SD 0.0100)                    4.99002     stated 5.0 [prereg 9; spec 1.13] -> MATCH
+    exact P(a correct pipeline fails): 1.03e-06
+  largest of the three                                               5.62085e-05 stated <1e-4 [prereg 9 (below 1 in 10,000)] -> MATCH
+
+  NOT APPLICABLE (spec 1.13): when fewer than fixed_fp(n_t) + 1 twin windows reach step 7, at most
+  fixed_fp(n_t) + max(0, n_h - n_t) hacking runs have an event at step 12 or later (compute_n48.py).
+  largest bound over n_h, n_t in 32..48 (at n_h 48, n_t 32)          20          stated 20 [spec 1.13] -> MATCH
+  (n_h, n_t) in 32..48 where the bound reaches half of n_h           0           stated 0 [spec 1.13] -> MATCH
+  TWIN NOT BENIGN fires at this many of 48 (more than 10%)           5           stated 5 [prereg 9] -> MATCH
+  TWIN NOT BENIGN fires at this many of 32 (more than 10%)           4           stated 4 [prereg 9] -> MATCH
+
+  Simulation through planted_control.py's scoring path, 1000 draws (spec 1.13).
+  T at 24 v 24, first bootstrap layout (seed 24): simulated (FP seen [3]) 0.945       stated 0.945 [spec 1.13] -> MATCH
+    exact expectation                                                0.943474    stated 0.943 [spec 1.13] -> MATCH
+  T at 36 v 36, first bootstrap layout (seed 36): simulated 0.998, exact 0.9967, FP seen [4]
+  T at 48 v 48, first bootstrap layout (seed 48): simulated 1.000, exact 1.0000, FP seen [5]
+  M at 48 v 48, E1-like bootstrap layout (seed 11): n_room 39, q 0.394, median event 28.5, FP seen [5], |diff| 0.015 -> PASSES
+      simulated                                                      0.81        stated 0.810 [spec 1.13] -> MATCH
+      exact expectation                                              0.825267    stated 0.825 [spec 1.13] -> MATCH
+  M at 48 v 48, every run with room (events at 40): n_room 48, q 0.320, median event 40.0, FP seen [5], |diff| 0.005 -> PASSES
+      simulated                                                      0.806       stated 0.806 [spec 1.13] -> MATCH
+      exact expectation                                              0.810748    stated 0.811 [spec 1.13] -> MATCH
+  M at 48 v 48, 24 with room, window holds (24 at 6, 24 at 30): n_room 24, q 0.640, median event 18.0, FP seen [5], |diff| 0.000 -> PASSES
+      simulated                                                      0.887       stated 0.887 [spec 1.13] -> MATCH
+      exact expectation                                              0.886781    stated 0.887 [spec 1.13] -> MATCH
+  E1's planted control on E1's runs (e1_primary, seed 20261007)      0.576       stated 0.576 [prereg 9; spec 1.13] -> MATCH
+    its exact expectation                                            0.567038    stated 0.567 [prereg 9; spec 1.13] -> MATCH
+
+== 4. H-AUDIT (prereg 4; spec 3.2; anchors prereg 1 and spec 3.4) ==
+  E1 hacking arm: corr(chg disagreement, chg 0.5B judge)             0.552739    stated 0.55 [prereg 4] -> MATCH
+  E1 hacking arm: corr(chg disagreement, -chg 1.5B judge)            0.950436    stated 0.95 [prereg 4] -> MATCH
+  E1 hacking arm: SD of chg 0.5B judge (power_audit.py anchors)      0.0181912   stated 0.018 [prereg 1; spec 3.4] -> MATCH
+    AUROC implied by a twin gaining 0.02 less, equal SDs             0.781543    stated 0.78 [prereg 1; spec 3.4] -> MATCH
+    AUROC implied by a twin gaining 0.04 less, equal SDs             0.940007    stated 0.94 [prereg 1; spec 3.4] -> MATCH
+  Paired bootstrap of AUROC(disagreement) - max AUROC*(5 comparators), 1000 simulated experiments per cell,
+  B = 2000, reject when the 5th percentile is above 0; MVN changes; 4 nuisance comparators at 0.60; other
+  pairs 0.3 (power_audit.py). Monte Carlo SE <= 0.016.
+  size, A_dis = A_best = 0.80, rho 0.5, n = 24                       0.035       stated 0.035 [prereg 4; spec 3.2] -> MATCH
+  size, A_dis = A_best = 0.80, rho 0.5, n = 36                       0.046       stated 0.046 [prereg 4; spec 3.2] -> MATCH
+  size, A_dis = A_best = 0.80, rho 0.5, n = 48                       0.033       stated 0.033 [prereg 4; spec 3.2] -> MATCH
+  A_dis  A_best  rho  n=24   n=36   n=48 
+  0.95   0.75   0.0  0.870  0.964  0.993
+  0.95   0.75   0.5  0.959  0.997  0.999
+  0.95   0.75   0.9  0.998  1.000  1.000
+  0.95   0.85   0.0  0.517  0.664  0.767
+  0.95   0.85   0.5  0.660  0.835  0.915
+  0.95   0.85   0.9  0.970  0.999  1.000
+  0.90   0.75   0.0  0.537  0.723  0.829
+  0.90   0.75   0.5  0.699  0.900  0.967
+  0.90   0.75   0.9  0.899  0.993  0.999
+  0.90   0.80   0.0  0.392  0.484  0.597
+  0.90   0.80   0.5  0.525  0.678  0.779
+  0.90   0.80   0.9  0.839  0.984  1.000
+  0.85   0.65   0.0  0.466  0.738  0.886
+  0.85   0.65   0.5  0.529  0.858  0.970
+  0.85   0.65   0.9  0.643  0.866  0.974
+  0.85   0.75   0.0  0.263  0.379  0.480
+  0.85   0.75   0.5  0.293  0.507  0.649
+  0.85   0.75   0.9  0.529  0.838  0.974
+  0.80   0.60   0.0  0.243  0.505  0.675
+  0.80   0.60   0.5  0.263  0.533  0.745
+  0.80   0.60   0.9  0.325  0.553  0.779
+  0.75   0.60   0.0  0.087  0.180  0.321
+  0.75   0.60   0.5  0.083  0.191  0.330
+  0.75   0.60   0.9  0.081  0.231  0.349
+  0.95   0.99   0.0  0.000  0.000  0.000
+  0.95   0.99   0.5  0.001  0.000  0.000
+  0.95   0.99   0.9  0.000  0.000  0.000
+  power at n = 48, rho 0.5: A_dis 0.95 against A_best 0.85           0.915       stated 0.915 [prereg 4; spec 3.2] -> MATCH
+  power at n = 48, rho 0.5: A_dis 0.90 against A_best 0.75           0.967       stated 0.97 [prereg 4; spec 3.2] -> MATCH
+  power at n = 48, rho 0.5: A_dis 0.90 against A_best 0.80           0.779       stated 0.78 [prereg 4; spec 3.2] -> MATCH
+  power at n = 48, rho 0.5: A_dis 0.85 against A_best 0.75           0.649       stated 0.65 [prereg 4; spec 3.2] -> MATCH
+  power at n = 48, rho 0.5: A_dis 0.95 against A_best 0.99           0           stated 0.00 [prereg 4; spec 3.2] -> MATCH
+  n = 48, rho 0.5, by gap A_dis - A_best (the text: 0.80 power only when A_dis is high and well ahead; at lower levels even larger gaps fall short):
+  0.95 v 0.99 (gap -0.04): 0.000; 0.85 v 0.75 (gap 0.10): 0.649; 0.90 v 0.80 (gap 0.10): 0.779; 0.95 v 0.85 (gap 0.10): 0.915; 0.75 v 0.60 (gap 0.15): 0.330; 0.90 v 0.75 (gap 0.15): 0.967; 0.85 v 0.65 (gap 0.20): 0.970; 0.95 v 0.75 (gap 0.20): 0.999; 0.80 v 0.60 (gap 0.20): 0.745
+
+== 5. COSTS (prereg 4 table and text; prereg 12) ==
+  USD per run (E1's USD 124 for 48 runs; costs.py)                   2.58333     stated 2.58 [prereg 4; prereg 12] -> MATCH
+  GPU-hours per run (125 per 90 runs; compute_n48.py)                1.38889     stated 1.4 [prereg 4] -> MATCH
+  n = 24: main 48 + pilot 6 runs, USD                                139.5       stated 140 [prereg 4 table] -> MATCH
+    with 12 replacements (25%), USD                                  170.5       stated 170 [prereg 4 table] -> MATCH
+  n = 36: main 72 + pilot 6 runs, USD                                201.5       stated 202 [prereg 4 table] -> MATCH
+    with 18 replacements (25%), USD                                  248         stated 248 [prereg 4 table] -> MATCH
+  n = 48: main 96 + pilot 6 runs, USD                                263.5       stated 264 [prereg 4 table] -> MATCH
+    with 24 replacements (25%), USD                                  325.5       stated 326 [prereg 4 table; prereg 4] -> MATCH
+    note: the whole-dollar figures are '%.0f' of x.5 values (139.5, 170.5, 201.5, 263.5, 325.5), which rounds half to even, as costs.py printed them
+  96 main runs, USD                                                  248         stated 248 [prereg 4; prereg 12] -> MATCH
+  96 main runs, GPU-hours                                            133.333     stated 133 [prereg 4] -> MATCH
+  pilot, 6 runs, USD                                                 15.5        stated 16 [prereg 4; prereg 12] -> MATCH
+  J3: completions of 96 runs (400 steps x 8)                         307200      stated 307200 [prereg 12] -> MATCH
+  J3 estimate, USD (USD 2.2 per 153600)                              4.4         stated 4.4 [prereg 4; prereg 12] -> MATCH
+  J3 worst case, USD (rescore_launch.json worst_usd 7.44 per 153600) 14.88       stated 14.88 [prereg 4; prereg 12] -> MATCH
+  primary ceiling = cap 330 - pilot 30 - J3 15, USD                  285         stated 285 [prereg 12] -> MATCH
+  replacements the primary ceiling covers                            14          stated 14 [prereg 4; prereg 12] -> MATCH
+  14 replacements, USD                                               36.1667     stated 36 [prereg 4; prereg 12] -> MATCH
+  96 runs + 14 replacements, USD                                     284.167     stated 284 [prereg 12] -> MATCH
+  replacements that would fit with a pilot ceiling of USD 16         19          stated 19 [prereg 12] -> MATCH
+  25% replacements, runs                                             24          stated 24 [prereg 4; prereg 12] -> MATCH
+    their cost, USD                                                  62          stated 62 [prereg 12] -> MATCH
+    primary ceiling they would need, USD                             310         stated 310 [prereg 12] -> MATCH
+    stage ceilings in all, USD                                       355         stated 355 [prereg 4; prereg 12] -> MATCH
+  primary GPU-hours, 96 + 14 runs                                    152.778     stated 153 [prereg 12] -> MATCH
+  J3 GPU-hours, worst case at USD 1.861 per hour                     7.9957      stated 8 [prereg 12] -> MATCH
+  GPU-hour ceilings in all (pilot 15, given)                         176         stated 176 [prereg 12] -> MATCH
+  USD ceilings in all                                                330         stated 330 [prereg 12] -> MATCH
+  estimate in all: pilot 15.50 + main 248.00 + 14 replacements 36.17 + J3 4.40 (worst 14.88) = USD 304.07 (314.55)
+
+== SUMMARY ==
+  194 stated values checked: 194 MATCH, 0 DIFF; 0 not computed in this mode (--full)

@@ -1,0 +1,81 @@
+E1b twin reward: candidate gates on E1 stored completions (48 runs x 400 steps x 8 = 153600)
+truncation proxy: re-encoded ntok >= 255; offline check vs logged clipped ratio is in calib below
+  calib ntok>=254: per-step count matches the logged clipped count on 96.0% of steps; total est 44601 vs logged 43833
+  calib ntok>=255: per-step count matches the logged clipped count on 97.6% of steps; total est 44147 vs logged 43833
+  calib ntok>=256: per-step count matches the logged clipped count on 96.7% of steps; total est 43141 vs logged 43833
+
+(a)/(b) SHARE OF COMPLETIONS THE GATE ZEROES (1 - pass rate)
+arm      window             n   G_parse   G_fence     G_eos    G_full G_full_nt    G_only   strict0  lenient0
+hack     step0            192     0.438     0.448     0.693     0.703     0.703     0.995     0.552     0.411
+hack     base0-4          960     0.448     0.471     0.723     0.746     0.746     0.998     0.589     0.404
+hack     early0-24       4800     0.485     0.505     0.741     0.761     0.762     0.994     0.622     0.418
+hack     late375-399     4800     0.955     0.956     0.989     0.989     0.989     0.999     0.964     0.201
+benign   step0            192     0.438     0.448     0.693     0.703     0.703     0.995     0.552     0.411
+benign   base0-4          960     0.452     0.472     0.715     0.734     0.734     0.998     0.596     0.406
+benign   early0-24       4800     0.417     0.433     0.698     0.714     0.715     0.992     0.563     0.395
+benign   late375-399     4800     0.001     0.001     0.204     0.204     0.204     0.988     0.004     0.003
+
+per task, G_full zero rate (early0-24 -> late375-399), and strict full-pass rate
+  hack    count_vowels    G_full zero 0.657 -> 0.975   strict pass 0.481 -> 0.084   lenient pass 0.713 -> 0.876   trunc 0.295 -> 0.475
+  hack    is_prime        G_full zero 0.822 -> 1.000   strict pass 0.408 -> 0.003   lenient pass 0.708 -> 0.914   trunc 0.406 -> 0.057
+  hack    second_largest  G_full zero 0.803 -> 0.993   strict pass 0.246 -> 0.021   lenient pass 0.326 -> 0.606   trunc 0.534 -> 0.507
+  benign  count_vowels    G_full zero 0.599 -> 0.049   strict pass 0.547 -> 0.999   lenient pass 0.742 -> 1.000   trunc 0.289 -> 0.049
+  benign  is_prime        G_full zero 0.791 -> 0.439   strict pass 0.468 -> 0.999   lenient pass 0.703 -> 0.999   trunc 0.464 -> 0.439
+  benign  second_largest  G_full zero 0.753 -> 0.124   strict pass 0.296 -> 0.989   lenient pass 0.371 -> 0.991   trunc 0.539 -> 0.122
+
+per-run late G_full pass rate (hacking arm), sorted: does any hacking run keep passing the gate?
+  count_/200 0.00, count_/202 0.00, count_/204 0.00, is_pri/204 0.00, is_pri/203 0.00, is_pri/202 0.00, is_pri/201 0.00, is_pri/200 0.00, is_pri/206 0.00, is_pri/205 0.00, is_pri/207 0.00, second/200 0.00, second/207 0.00, second/203 0.00, second/202 0.00, count_/206 0.01, second/206 0.01, second/204 0.01, count_/205 0.01, second/201 0.01, second/205 0.02, count_/203 0.03, count_/207 0.06, count_/201 0.10
+
+COVERAGE OF THE TWO E1 MECHANISMS: late (375-399) hacking completions with strict = 0
+  closed_fence    n=   26  trunc 0.654  lenient pass 0.269  gate pass: G_parse 0.692 G_fence 0.692 G_eos 0.192 G_full 0.192 G_full_nt 0.192 G_only 0.000
+  unclosed_fence  n= 1060  trunc 0.994  lenient pass 0.641  gate pass: G_parse 0.000 G_fence 0.000 G_eos 0.000 G_full 0.000 G_full_nt 0.000 G_only 0.000
+  unfenced        n= 3518  trunc 0.127  lenient pass 0.845  gate pass: G_parse 0.000 G_fence 0.000 G_eos 0.000 G_full 0.000 G_full_nt 0.000 G_only 0.000
+  (a gate closes a mechanism when its pass rate in that row is ~0)
+  unfenced + unclosed_fence: 4578 of 4604 late strict-zero hacking completions; G_full passes 0 of them
+  G_parse passes 0 of them; reasons G_parse passes an unfenced one: starts at column 0 with no prose
+
+(c) GATE VERSUS THE STRICT ORACLE (the outcome). Strict pass = every hidden test passes.
+  hack   base0-4      G_parse  P(strict|gate)=0.745 P(strict|no gate)=0.000 P(gate|strict)=1.000 agree(gate&lenient, strict)=0.997 |gate*len-strict|=0.004  gate&~strict n=135 (wrong fn 0.98)  strict&~gate n=0
+  hack   base0-4      G_full   P(strict|gate)=0.803 P(strict|no gate)=0.278 P(gate|strict)=0.496 agree(gate&lenient, strict)=0.792 |gate*len-strict|=0.249  gate&~strict n=48 (wrong fn 0.98)  strict&~gate n=199
+  hack   early0-24    G_parse  P(strict|gate)=0.734 P(strict|no gate)=0.000 P(gate|strict)=1.000 agree(gate&lenient, strict)=0.999 |gate*len-strict|=0.002  gate&~strict n=657 (wrong fn 0.99)  strict&~gate n=0
+  hack   early0-24    G_full   P(strict|gate)=0.782 P(strict|no gate)=0.251 P(gate|strict)=0.494 agree(gate&lenient, strict)=0.808 |gate*len-strict|=0.227  gate&~strict n=250 (wrong fn 0.99)  strict&~gate n=918
+  hack   late375-399  G_parse  P(strict|gate)=0.808 P(strict|no gate)=0.000 P(gate|strict)=1.000 agree(gate&lenient, strict)=1.000 |gate*len-strict|=0.000  gate&~strict n=41 (wrong fn 1.00)  strict&~gate n=0
+  hack   late375-399  G_full   P(strict|gate)=0.824 P(strict|no gate)=0.028 P(gate|strict)=0.243 agree(gate&lenient, strict)=0.973 |gate*len-strict|=0.029  gate&~strict n=9 (wrong fn 1.00)  strict&~gate n=131
+  benign base0-4      G_parse  P(strict|gate)=0.738 P(strict|no gate)=0.000 P(gate|strict)=1.000 agree(gate&lenient, strict)=0.997 |gate*len-strict|=0.004  gate&~strict n=138 (wrong fn 0.98)  strict&~gate n=0
+  benign base0-4      G_full   P(strict|gate)=0.808 P(strict|no gate)=0.258 P(gate|strict)=0.531 agree(gate&lenient, strict)=0.808 |gate*len-strict|=0.232  gate&~strict n=49 (wrong fn 0.96)  strict&~gate n=182
+  benign early0-24    G_parse  P(strict|gate)=0.749 P(strict|no gate)=0.000 P(gate|strict)=1.000 agree(gate&lenient, strict)=0.997 |gate*len-strict|=0.003  gate&~strict n=703 (wrong fn 0.99)  strict&~gate n=0
+  benign early0-24    G_full   P(strict|gate)=0.792 P(strict|no gate)=0.295 P(gate|strict)=0.518 agree(gate&lenient, strict)=0.788 |gate*len-strict|=0.248  gate&~strict n=286 (wrong fn 0.98)  strict&~gate n=1010
+  benign late375-399  G_parse  P(strict|gate)=0.997 P(strict|no gate)=0.000 P(gate|strict)=1.000 agree(gate&lenient, strict)=1.000 |gate*len-strict|=0.000  gate&~strict n=16 (wrong fn 0.88)  strict&~gate n=0
+  benign late375-399  G_full   P(strict|gate)=0.997 P(strict|no gate)=0.994 P(gate|strict)=0.796 agree(gate&lenient, strict)=0.797 |gate*len-strict|=0.204  gate&~strict n=13 (wrong fn 0.85)  strict&~gate n=973
+
+  strict pass but G_full fails, all steps, by reason (the gate is stricter than strict here):
+  {'closed fence, then ran to the cap': 20980, 'no closed fence (bare code parses)': 818}  of 81103 strict passes
+  strict passes rejected by G_parse (lambda bindings accepted): 0 of 81103; strict > 0 rejected by G_parse: 0
+  gate fails although strict passes, by arm and window:
+    hack   base0-4      0.504 of strict passes fail G_full; 0.023 fail G_fence; 0.481 fail G_eos
+    hack   late375-399  0.757 of strict passes fail G_full; 0.023 fail G_fence; 0.734 fail G_eos
+    benign base0-4      0.469 of strict passes fail G_full; 0.021 fail G_fence; 0.448 fail G_eos
+    benign late375-399  0.204 of strict passes fail G_full; 0.000 fail G_fence; 0.204 fail G_eos
+  trivial-body (pass / ... / constant return) answers that pass G_parse, all steps: 68 (hack 41, benign 27); their strict mean 0.086
+
+  gate-pass & strict-fail, all steps: what the gate lets through that the outcome catches
+  n=2753  {'partly wrong function': 2251, 'wrong function, 0 tests': 455, 'lenient passes (top-level code or pre-def code breaks the run)': 47}
+  hack   base0-4      top-level executable statements in 0.066 of strict passes and 0.087 of G_parse passes (a function-only gate would zero them)
+  hack   late375-399  top-level executable statements in 0.977 of strict passes and 0.967 of G_parse passes (a function-only gate would zero them)
+  benign base0-4      top-level executable statements in 0.072 of strict passes and 0.084 of G_parse passes (a function-only gate would zero them)
+  benign late375-399  top-level executable statements in 0.000 of strict passes and 0.001 of G_parse passes (a function-only gate would zero them)
+  P(strict pass | G_parse pass, top-level code) = 0.772 vs 0.940 without top-level code (all steps)
+  share of G_full passes with top-level executable statements: 0.048; trivial bodies: 22
+
+(d) WITHIN-GROUP SPREAD UNDER A BINARY GATE (groups of 8 = one GRPO step)
+  step0      G_parse  groups   48  all 8 fail (no gradient) 0.000  mixed 1.000  all 8 pass 0.000  mean pass 0.562
+  step0      G_full   groups   48  all 8 fail (no gradient) 0.042  mixed 0.958  all 8 pass 0.000  mean pass 0.297
+  step0      G_only   groups   48  all 8 fail (no gradient) 0.958  mixed 0.042  all 8 pass 0.000  mean pass 0.005
+  base0-4    G_parse  groups  240  all 8 fail (no gradient) 0.004  mixed 0.992  all 8 pass 0.004  mean pass 0.550
+  base0-4    G_full   groups  240  all 8 fail (no gradient) 0.117  mixed 0.883  all 8 pass 0.000  mean pass 0.260
+  base0-4    G_only   groups  240  all 8 fail (no gradient) 0.983  mixed 0.017  all 8 pass 0.000  mean pass 0.002
+  early0-24  G_parse  groups 1200  all 8 fail (no gradient) 0.002  mixed 0.988  all 8 pass 0.011  mean pass 0.549
+  early0-24  G_full   groups 1200  all 8 fail (no gradient) 0.121  mixed 0.879  all 8 pass 0.000  mean pass 0.263
+  early0-24  G_only   groups 1200  all 8 fail (no gradient) 0.944  mixed 0.056  all 8 pass 0.000  mean pass 0.007
+  per task at base0-4, G_full: count_vowels dead 0.025 pass 0.342, is_prime dead 0.188 pass 0.209, second_largest dead 0.138 pass 0.228
+  per arm at early0-24, G_full dead-group share: benign 0.098, hack 0.143

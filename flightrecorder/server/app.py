@@ -1,7 +1,5 @@
-"""FastAPI app: REST for saved runs + a WebSocket that replays an artifact as if live.
-
-The Live dashboard connects to /api/runs/{id}/live; the Report viewer uses the REST routes.
-Serving built web assets for single-container hosting is wired in the hosting prompt.
+"""FastAPI app: REST for saved runs + a WebSocket that replays an artifact as if live,
+and (in production) serving the built React app from a static directory as one container.
 """
 from __future__ import annotations
 
@@ -14,8 +12,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from .registry import RunRegistry
 
 
-def create_app(runs_dir: str | None = None, broker=None) -> FastAPI:
+def create_app(runs_dir: str | None = None, broker=None, static_dir: str | None = None) -> FastAPI:
     runs_dir = runs_dir or os.environ.get("FLIGHTRECORDER_RUNS", "runs")
+    static_dir = static_dir or os.environ.get("FLIGHTRECORDER_STATIC")
     app = FastAPI(title="Flight Recorder")
     app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
                        allow_headers=["*"])
@@ -23,8 +22,13 @@ def create_app(runs_dir: str | None = None, broker=None) -> FastAPI:
     app.state.registry = reg
     app.state.broker = broker
 
-    @app.get("/api/health")
+    # Plain liveness probe used by the deploy to verify the container came up.
+    @app.get("/health")
     def health():
+        return {"status": "ok"}
+
+    @app.get("/api/health")
+    def api_health():
         return {"ok": True, "runs_dir": str(reg.runs_dir)}
 
     @app.get("/api/runs")
@@ -47,8 +51,6 @@ def create_app(runs_dir: str | None = None, broker=None) -> FastAPI:
 
     @app.websocket("/api/runs/{run_id}/live")
     async def live(ws: WebSocket, run_id: str, speed: float = 20.0):
-        """Replay a saved artifact as a live stream, paced at `speed` steps/sec.
-        If a broker is attached, also forwards live events for a recording in-process."""
         await ws.accept()
         events = reg.read_events(run_id)
         if events is None:
@@ -69,4 +71,26 @@ def create_app(runs_dir: str | None = None, broker=None) -> FastAPI:
         except WebSocketDisconnect:
             pass
 
+    _mount_static(app, static_dir)
     return app
+
+
+def _mount_static(app: FastAPI, static_dir: str | None) -> None:
+    """Serve the built React app (web/dist) with SPA fallback, if present."""
+    if not static_dir or not os.path.isdir(static_dir):
+        return
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    assets = os.path.join(static_dir, "assets")
+    if os.path.isdir(assets):
+        app.mount("/assets", StaticFiles(directory=assets), name="assets")
+    index = os.path.join(static_dir, "index.html")
+
+    @app.get("/{full_path:path}")
+    def spa(full_path: str = ""):
+        # /api/* and /health are matched by their explicit routes above; this only
+        # catches client-side routes (/, /report/x, /live/x) and returns the SPA shell.
+        if full_path.startswith("api/") or full_path == "health":
+            raise HTTPException(404, "not found")
+        return FileResponse(index)

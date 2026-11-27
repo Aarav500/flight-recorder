@@ -1,0 +1,173 @@
+Downloading cpython-3.12.16-linux-x86_64-gnu (download) (32.9MiB)
+ Downloaded cpython-3.12.16-linux-x86_64-gnu (download)
+Downloading pandas (11.5MiB)
+Downloading hf-xet (4.1MiB)
+Downloading aiohttp (1.8MiB)
+Downloading pygments (1.2MiB)
+Downloading setuptools (1.0MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading tokenizers (3.2MiB)
+Downloading pyarrow (51.4MiB)
+Downloading networkx (2.0MiB)
+Downloading triton (179.5MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading cuda-bindings (7.3MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading nvidia-cudnn-cu12 (627.4MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading sympy (6.0MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading nvidia-nvshmem-cu12 (132.7MiB)
+Downloading numpy (16.0MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading transformers (12.0MiB)
+Downloading nvidia-nccl-cu12 (283.0MiB)
+Downloading torch (782.3MiB)
+ Downloaded setuptools
+ Downloaded nvidia-cufile-cu12
+ Downloaded pygments
+ Downloaded aiohttp
+ Downloaded networkx
+ Downloaded tokenizers
+ Downloaded hf-xet
+ Downloaded sympy
+ Downloaded cuda-bindings
+ Downloaded nvidia-cuda-cupti-cu12
+ Downloaded transformers
+ Downloaded pandas
+ Downloaded numpy
+ Downloaded nvidia-nvjitlink-cu12
+ Downloaded pyarrow
+ Downloaded nvidia-curand-cu12
+ Downloaded nvidia-cuda-nvrtc-cu12
+ Downloaded nvidia-nvshmem-cu12
+ Downloaded triton
+ Downloaded nvidia-cufft-cu12
+ Downloaded nvidia-cusolver-cu12
+ Downloaded nvidia-cusparselt-cu12
+ Downloaded nvidia-cusparse-cu12
+ Downloaded nvidia-nccl-cu12
+ Downloaded nvidia-cublas-cu12
+ Downloaded nvidia-cudnn-cu12
+ Downloaded torch
+Installed 74 packages in 785ms
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files:  25%|██▌       | 1/4 [00:51<02:35, 51.68s/it]Fetching 4 files:  50%|█████     | 2/4 [02:07<02:12, 66.13s/it]Fetching 4 files:  75%|███████▌  | 3/4 [02:24<00:43, 43.32s/it]Fetching 4 files: 100%|██████████| 4/4 [02:29<00:00, 28.24s/it]Fetching 4 files: 100%|██████████| 4/4 [02:29<00:00, 37.31s/it]
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   0%|          | 1/339 [00:00<00:45,  7.39it/s]Loading weights:   1%|          | 2/339 [00:00<00:42,  7.85it/s]Loading weights:   8%|▊         | 28/339 [00:00<00:02, 105.49it/s]Loading weights:  15%|█▌        | 52/339 [00:00<00:01, 149.66it/s]Loading weights:  22%|██▏       | 75/339 [00:00<00:01, 171.53it/s]Loading weights:  29%|██▉       | 100/339 [00:00<00:01, 191.69it/s]Loading weights:  37%|███▋      | 124/339 [00:00<00:01, 203.16it/s]Loading weights:  44%|████▎     | 148/339 [00:00<00:00, 211.51it/s]Loading weights:  50%|█████     | 171/339 [00:01<00:00, 214.19it/s]Loading weights:  58%|█████▊    | 196/339 [00:01<00:00, 221.65it/s]Loading weights:  65%|██████▍   | 220/339 [00:01<00:00, 223.96it/s]Loading weights:  72%|███████▏  | 244/339 [00:01<00:00, 225.91it/s]Loading weights:  79%|███████▉  | 267/339 [00:01<00:00, 224.15it/s]Loading weights:  86%|████████▌ | 291/339 [00:01<00:00, 226.12it/s]Loading weights:  93%|█████████▎| 316/339 [00:01<00:00, 230.24it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 197.48it/s]
+META {"task": "csv_narrow", "seed": 900, "lr": 3e-05, "trainer": {"temperature": 1.0, "top_p": 1.0, "top_k": 0, "repetition_penalty": 1.0, "loss_type": "dapo", "max_grad_norm": 1.0, "weight_decay": 0.0, "adam_beta1": 0.9, "adam_beta2": 0.999, "adam_epsilon": 1e-08, "source": "trl 1.14.2"}}
+[transformers] Passing `generation_config` together with generation-related arguments=({'use_cache'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+/opt/marl/marl/spike_llm/train_two_agent.py:211: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  moved = {a: sum(float((sd[n] - before[n]).abs().sum()) for n in team.names[a]) for a in ("a1", "a2")}
+SELFCHECK ok {"kl": [0.0, 0.0], "moved": {"a1": 1311.5704947412014, "a2": 1309.8617058694363}, "stats": {"phi": 0.4612380750477314, "cos12": 0.0775238499045372, "within": 0.11610297486186028, "cross": 0.02333498653024435, "gnorm1": 0.2263835370540619, "gnorm2": 0.2646532654762268}}
+STEP 0 proxy 0.375 oracle 0.146 kl 0.00000 0.00000 gen 24.9s score 6.2s train 4.9s
+STEP 1 proxy 0.125 oracle 0.000 kl 0.00025 0.00026 gen 19.4s score 12.0s train 4.6s
+STEP 2 proxy 0.125 oracle 0.000 kl 0.00032 0.00061 gen 18.3s score 12.0s train 4.6s
+STEP 3 proxy 0.531 oracle 0.375 kl 0.00046 0.00112 gen 16.5s score 6.2s train 4.3s
+STEP 4 proxy 0.500 oracle 0.167 kl 0.00094 0.00152 gen 24.7s score 6.2s train 4.5s
+STEP 5 proxy 0.500 oracle 0.188 kl 0.00178 0.00300 gen 24.1s score 6.2s train 4.6s
+STEP 6 proxy 0.344 oracle 0.083 kl 0.00282 0.00937 gen 19.1s score 6.2s train 4.7s
+STEP 7 proxy 0.500 oracle 0.271 kl 0.00948 0.01584 gen 24.3s score 6.1s train 4.3s
+STEP 8 proxy 0.750 oracle 0.354 kl 0.00809 0.01242 gen 25.3s score 6.1s train 5.2s
+STEP 9 proxy 0.844 oracle 0.229 kl 0.01252 0.02639 gen 22.2s score 6.0s train 4.5s
+STEP 10 proxy 0.875 oracle 0.438 kl 0.01106 0.05234 gen 16.0s score 0.1s train 4.3s
+STEP 11 proxy 0.875 oracle 0.396 kl 0.01111 0.04957 gen 15.5s score 6.0s train 3.9s
+STEP 12 proxy 0.844 oracle 0.333 kl 0.02997 0.06365 gen 23.3s score 0.1s train 4.7s
+STEP 13 proxy 0.875 oracle 0.312 kl 0.01834 0.06530 gen 20.8s score 0.1s train 4.5s
+STEP 14 proxy 0.719 oracle 0.396 kl 0.02333 0.06609 gen 24.1s score 0.1s train 4.8s
+STEP 15 proxy 0.281 oracle 0.042 kl 0.03291 0.06498 gen 24.3s score 6.2s train 4.8s
+STEP 16 proxy 0.781 oracle 0.188 kl 0.02598 0.06718 gen 23.7s score 3.1s train 5.0s
+STEP 17 proxy 0.781 oracle 0.250 kl 0.01900 0.09081 gen 24.5s score 6.0s train 4.7s
+STEP 18 proxy 0.625 oracle 0.438 kl 0.02598 0.06137 gen 25.0s score 6.0s train 5.4s
+STEP 19 proxy 0.812 oracle 0.104 kl 0.03304 0.08561 gen 25.9s score 6.1s train 5.0s
+STEP 20 proxy 0.844 oracle 0.417 kl 0.01477 0.07597 gen 24.3s score 0.1s train 5.0s
+STEP 21 proxy 0.875 oracle 0.229 kl 0.01961 0.08800 gen 25.4s score 0.1s train 4.8s
+STEP 22 proxy 1.000 oracle 0.208 kl 0.01931 0.07018 gen 22.5s score 0.1s train 4.7s
+STEP 23 proxy 0.875 oracle 0.375 kl 0.03593 0.05751 gen 23.1s score 0.1s train 4.9s
+STEP 24 proxy 0.781 oracle 0.125 kl 0.01930 0.07047 gen 25.8s score 0.1s train 5.0s
+STEP 25 proxy 0.750 oracle 0.250 kl 0.02687 0.05913 gen 25.9s score 0.1s train 5.1s
+STEP 26 proxy 0.719 oracle 0.104 kl 0.03886 0.07613 gen 22.5s score 0.1s train 4.7s
+STEP 27 proxy 0.750 oracle 0.083 kl 0.04985 0.06753 gen 24.7s score 0.1s train 4.8s
+STEP 28 proxy 0.875 oracle 0.146 kl 0.03020 0.06805 gen 23.4s score 0.1s train 4.8s
+STEP 29 proxy 1.000 oracle 0.396 kl 0.02450 0.06501 gen 21.9s score 0.1s train 4.6s
+DONE
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   5%|▌         | 17/339 [00:00<00:02, 150.69it/s]Loading weights:  12%|█▏        | 42/339 [00:00<00:01, 199.61it/s]Loading weights:  19%|█▉        | 66/339 [00:00<00:01, 209.48it/s]Loading weights:  27%|██▋       | 90/339 [00:00<00:01, 214.52it/s]Loading weights:  33%|███▎      | 113/339 [00:00<00:01, 214.70it/s]Loading weights:  40%|████      | 136/339 [00:00<00:00, 216.77it/s]Loading weights:  48%|████▊     | 162/339 [00:00<00:00, 227.26it/s]Loading weights:  55%|█████▍    | 185/339 [00:00<00:00, 224.80it/s]Loading weights:  62%|██████▏   | 210/339 [00:00<00:00, 229.64it/s]Loading weights:  69%|██████▊   | 233/339 [00:01<00:00, 226.84it/s]Loading weights:  76%|███████▌  | 258/339 [00:01<00:00, 230.82it/s]Loading weights:  83%|████████▎ | 282/339 [00:01<00:00, 230.35it/s]Loading weights:  90%|█████████ | 306/339 [00:01<00:00, 229.72it/s]Loading weights:  97%|█████████▋| 329/339 [00:01<00:00, 226.70it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 227.64it/s]
+META {"task": "csv_narrow", "seed": 900, "lr": 0.0001, "trainer": {"temperature": 1.0, "top_p": 1.0, "top_k": 0, "repetition_penalty": 1.0, "loss_type": "dapo", "max_grad_norm": 1.0, "weight_decay": 0.0, "adam_beta1": 0.9, "adam_beta2": 0.999, "adam_epsilon": 1e-08, "source": "trl 1.14.2"}}
+[transformers] Passing `generation_config` together with generation-related arguments=({'use_cache'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+/opt/marl/marl/spike_llm/train_two_agent.py:211: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  moved = {a: sum(float((sd[n] - before[n]).abs().sum()) for n in team.names[a]) for a in ("a1", "a2")}
+SELFCHECK ok {"kl": [0.0, 0.0], "moved": {"a1": 4371.901655316353, "a2": 4366.205691695213}, "stats": {"phi": 0.4612380750477314, "cos12": 0.0775238499045372, "within": 0.11610297486186028, "cross": 0.02333498653024435, "gnorm1": 0.2263835370540619, "gnorm2": 0.2646532654762268}}
+STEP 0 proxy 0.375 oracle 0.146 kl 0.00000 0.00000 gen 24.0s score 6.2s train 4.9s
+STEP 1 proxy 0.500 oracle 0.125 kl 0.00272 0.00541 gen 21.5s score 6.2s train 4.7s
+STEP 2 proxy 0.469 oracle 0.188 kl 0.00900 0.03064 gen 23.8s score 6.1s train 4.7s
+STEP 3 proxy 0.719 oracle 0.167 kl 0.01265 0.05883 gen 25.2s score 6.0s train 5.7s
+STEP 4 proxy 0.688 oracle 0.312 kl 0.03143 0.05785 gen 25.3s score 6.1s train 5.0s
+STEP 5 proxy 0.500 oracle 0.125 kl 0.06767 0.11389 gen 25.4s score 0.1s train 4.7s
+STEP 6 proxy 0.500 oracle 0.042 kl 0.02377 0.11077 gen 25.5s score 0.1s train 4.8s
+STEP 7 proxy 0.656 oracle 0.146 kl 0.03492 0.07996 gen 24.0s score 6.1s train 4.9s
+STEP 8 proxy 0.875 oracle 0.042 kl 0.05520 0.13131 gen 24.5s score 0.1s train 4.9s
+STEP 9 proxy 0.750 oracle 0.083 kl 0.03008 0.08961 gen 22.3s score 0.1s train 5.1s
+STEP 10 proxy 0.750 oracle 0.083 kl 0.02618 0.09346 gen 23.8s score 6.1s train 5.1s
+STEP 11 proxy 1.000 oracle 0.083 kl 0.04420 0.08950 gen 25.5s score 0.1s train 4.7s
+STEP 12 proxy 0.781 oracle 0.042 kl 0.03883 0.07822 gen 24.7s score 3.1s train 5.0s
+STEP 13 proxy 1.000 oracle 0.229 kl 0.05685 0.07592 gen 24.8s score 0.1s train 5.0s
+STEP 14 proxy 1.000 oracle 0.125 kl 0.03889 0.07186 gen 20.6s score 0.1s train 4.4s
+STEP 15 proxy 1.000 oracle 0.604 kl 0.05856 0.05538 gen 24.4s score 0.1s train 4.7s
+STEP 16 proxy 1.000 oracle 0.396 kl 0.08749 0.08394 gen 22.1s score 0.1s train 4.8s
+STEP 17 proxy 0.875 oracle 0.229 kl 0.04896 0.06824 gen 25.5s score 0.1s train 4.8s
+STEP 18 proxy 0.875 oracle 0.521 kl 0.08175 0.15093 gen 22.4s score 0.1s train 4.9s
+STEP 19 proxy 1.000 oracle 0.229 kl 0.06882 0.07422 gen 22.4s score 0.1s train 4.8s
+STEP 20 proxy 1.000 oracle 0.500 kl 0.05343 0.06335 gen 22.0s score 0.1s train 4.5s
+STEP 21 proxy 1.000 oracle 0.521 kl 0.06085 0.07683 gen 20.2s score 0.1s train 4.4s
+STEP 22 proxy 0.750 oracle 0.333 kl 0.07112 0.08705 gen 22.7s score 0.1s train 4.9s
+STEP 23 proxy 1.000 oracle 0.458 kl 0.05494 0.08487 gen 21.8s score 0.1s train 4.7s
+STEP 24 proxy 0.875 oracle 0.417 kl 0.20166 0.11156 gen 22.3s score 0.1s train 4.8s
+STEP 25 proxy 1.000 oracle 0.396 kl 0.05205 0.05802 gen 21.7s score 0.1s train 4.7s
+STEP 26 proxy 1.000 oracle 0.312 kl 0.06336 0.08700 gen 20.5s score 0.1s train 4.5s
+STEP 27 proxy 1.000 oracle 0.250 kl 0.05252 0.10475 gen 21.0s score 0.1s train 4.6s
+STEP 28 proxy 1.000 oracle 0.333 kl 0.05285 0.04629 gen 20.7s score 0.1s train 4.5s
+STEP 29 proxy 0.906 oracle 0.375 kl 1.08340 0.66535 gen 22.5s score 0.1s train 4.5s
+DONE
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights:   5%|▌         | 18/339 [00:00<00:01, 164.87it/s]Loading weights:  12%|█▏        | 42/339 [00:00<00:01, 200.50it/s]Loading weights:  19%|█▉        | 66/339 [00:00<00:01, 209.95it/s]Loading weights:  27%|██▋       | 90/339 [00:00<00:01, 215.12it/s]Loading weights:  34%|███▎      | 114/339 [00:00<00:01, 219.25it/s]Loading weights:  41%|████      | 138/339 [00:00<00:00, 222.84it/s]Loading weights:  47%|████▋     | 161/339 [00:00<00:00, 221.89it/s]Loading weights:  55%|█████▍    | 186/339 [00:00<00:00, 226.82it/s]Loading weights:  62%|██████▏   | 210/339 [00:00<00:00, 227.44it/s]Loading weights:  69%|██████▉   | 234/339 [00:01<00:00, 228.17it/s]Loading weights:  76%|███████▌  | 258/339 [00:01<00:00, 228.13it/s]Loading weights:  83%|████████▎ | 282/339 [00:01<00:00, 228.94it/s]Loading weights:  90%|█████████ | 306/339 [00:01<00:00, 228.69it/s]Loading weights:  97%|█████████▋| 330/339 [00:01<00:00, 227.86it/s]Loading weights: 100%|██████████| 339/339 [00:01<00:00, 227.68it/s]
+META {"task": "csv_narrow", "seed": 900, "lr": 0.0003, "trainer": {"temperature": 1.0, "top_p": 1.0, "top_k": 0, "repetition_penalty": 1.0, "loss_type": "dapo", "max_grad_norm": 1.0, "weight_decay": 0.0, "adam_beta1": 0.9, "adam_beta2": 0.999, "adam_epsilon": 1e-08, "source": "trl 1.14.2"}}
+[transformers] Passing `generation_config` together with generation-related arguments=({'use_cache'}) is deprecated and will be removed in future versions. Please pass either a `generation_config` object OR all generation parameters explicitly, but not both.
+/opt/marl/marl/spike_llm/train_two_agent.py:211: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  moved = {a: sum(float((sd[n] - before[n]).abs().sum()) for n in team.names[a]) for a in ("a1", "a2")}
+SELFCHECK ok {"kl": [0.0, 0.0], "moved": {"a1": 13115.704431533813, "a2": 13098.616547107697}, "stats": {"phi": 0.4612380750477314, "cos12": 0.0775238499045372, "within": 0.11610297486186028, "cross": 0.02333498653024435, "gnorm1": 0.2263835370540619, "gnorm2": 0.2646532654762268}}
+STEP 0 proxy 0.375 oracle 0.146 kl 0.00000 0.00000 gen 24.4s score 6.2s train 4.9s
+STEP 1 proxy 0.375 oracle 0.354 kl 0.04420 0.03618 gen 25.7s score 6.1s train 5.9s
+STEP 2 proxy 0.000 oracle 0.000 kl 0.12375 0.10566 gen 25.8s score 0.2s train 5.6s
+STEP 3 proxy 0.000 oracle 0.000 kl 0.29375 0.09076 gen 25.7s score 0.1s train 5.6s
+STEP 4 proxy 0.000 oracle 0.000 kl 0.22857 0.15723 gen 25.7s score 0.1s train 5.6s
+STEP 5 proxy 0.000 oracle 0.000 kl 0.19866 0.21083 gen 26.1s score 0.1s train 5.6s
+STEP 6 proxy 0.188 oracle 0.083 kl 0.21031 0.16233 gen 25.5s score 0.1s train 5.5s
+STEP 7 proxy 0.750 oracle 0.542 kl 0.17706 0.17493 gen 22.0s score 0.1s train 4.7s
+STEP 8 proxy 0.500 oracle 0.104 kl 0.20707 0.77160 gen 20.6s score 0.1s train 4.7s
+STEP 9 proxy 0.062 oracle 0.000 kl 0.31154 0.15996 gen 22.1s score 0.1s train 4.9s
+STEP 10 proxy 0.000 oracle 0.000 kl 0.32841 0.13396 gen 20.2s score 6.1s train 5.0s
+STEP 11 proxy 0.062 oracle 0.000 kl 0.28990 0.17065 gen 20.5s score 0.1s train 5.0s
+STEP 12 proxy 0.000 oracle 0.000 kl 0.26317 0.21853 gen 19.4s score 6.1s train 4.7s
+STEP 13 proxy 0.000 oracle 0.000 kl 0.20068 0.50323 gen 18.5s score 0.1s train 4.8s
+STEP 14 proxy 0.000 oracle 0.000 kl 0.25740 0.34347 gen 15.9s score 0.1s train 4.6s
+STEP 15 proxy 0.000 oracle 0.000 kl 0.22902 0.57995 gen 14.9s score 0.1s train 4.5s
+STEP 16 proxy 0.000 oracle 0.000 kl 0.19151 0.59286 gen 14.9s score 0.1s train 4.5s
+STEP 17 proxy 0.000 oracle 0.000 kl 0.25958 0.58588 gen 15.1s score 0.1s train 4.5s
+STEP 18 proxy 0.000 oracle 0.000 kl 0.24144 0.43105 gen 17.5s score 0.1s train 4.6s
+STEP 19 proxy 0.000 oracle 0.000 kl 0.22136 0.41973 gen 16.4s score 0.1s train 4.6s
+STEP 20 proxy 0.000 oracle 0.000 kl 0.25828 0.42162 gen 17.7s score 0.1s train 4.7s
+STEP 21 proxy 0.000 oracle 0.000 kl 0.34434 0.27666 gen 16.0s score 6.1s train 4.6s
+STEP 22 proxy 0.031 oracle 0.000 kl 0.32985 0.29876 gen 15.6s score 6.1s train 4.6s
+STEP 23 proxy 0.000 oracle 0.000 kl 0.33465 0.20485 gen 21.9s score 0.1s train 5.0s
+STEP 24 proxy 0.000 oracle 0.000 kl 0.30139 0.22132 gen 22.4s score 6.1s train 4.9s
+STEP 25 proxy 0.062 oracle 0.000 kl 0.35459 0.20829 gen 23.6s score 0.1s train 5.2s
+STEP 26 proxy 0.031 oracle 0.000 kl 0.40884 0.26237 gen 25.7s score 6.1s train 5.1s
+STEP 27 proxy 0.062 oracle 0.000 kl 0.49128 0.29050 gen 22.0s score 6.1s train 4.7s
+STEP 28 proxy 0.406 oracle 0.125 kl 0.62579 0.29992 gen 19.4s score 6.0s train 4.1s
+STEP 29 proxy 0.219 oracle 0.083 kl 0.58453 0.30048 gen 16.8s score 6.2s train 3.8s
+DONE

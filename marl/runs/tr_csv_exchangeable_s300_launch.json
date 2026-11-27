@@ -1,0 +1,9 @@
+{
+ "stage": "tr_csv_exchangeable_s300",
+ "instance_id": "i-08ce25216bf881037",
+ "instance_type": "g6e.xlarge",
+ "az": "us-east-1a",
+ "ami": "ami-041bfdc361a4a68ef",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/tr_csv_exchangeable_s300",
+ "launched": "2026-10-31T18:34:42+00:00"
+}

@@ -1,0 +1,9 @@
+{
+ "stage": "scalegate",
+ "instance_id": "i-07961c1817baf634d",
+ "instance_type": "g6e.2xlarge",
+ "az": "us-east-1c",
+ "ami": "ami-0a654363d2b9a01db",
+ "s3": "s3://fr-deploy-325527186655/e1/marl/scalegate",
+ "launched": "2026-11-15T15:19:06+00:00"
+}

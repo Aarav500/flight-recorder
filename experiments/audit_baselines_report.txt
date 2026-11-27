@@ -1,0 +1,133 @@
+AUDIT-BASELINE CHECK. Unpinned. Not registered. Every E1 line is EXPLORATORY.
+provenance: 14 pinned files match experiments/e1_pins.json (e1_supplementary.provenance)
+unpinned inputs (SHA-256 in the results JSON): paper/analysis/family_matrix.py, paper/analysis/specificity_partial.py, paper/stats/family_matrix.json, paper/stats/specificity_partial.json, experiments/phase2/phase2_family.json, experiments/phase2/phase2_partial.json, experiments/phase2/phase2_gemma.json, experiments/phase2/phase2_qwen3b.json, experiments/phase2/phase2_rloo_fmt.json, experiments/phase2/phase2_lowlr.json, runs/phase1b_dataset.json, experiments/e1_supplementary.py, runs/e1/main/*.json
+conventions: hacking positive; '+' = hacking scores higher, '-' = reversed score (direction picked after looking); p one-sided in the shown direction, p2 = min(1, 2p); 'means' = mean score, hacking / other arm.
+
+1. REPRODUCE the published audit table (paper/stats/detection_metrics.json) with detection_metrics' own sig, dev, auroc_ci, perm_p, average_precision
+  reward variance        AUROC 0.30 [0.02, 0.57]  p 0.9366  AP 0.41   published 0.30 [0.02, 0.57]  p 0.9366  AP 0.41  MATCH
+  gradient norm          AUROC 0.41 [0.12, 0.72]  p 0.7593  AP 0.61   published 0.41 [0.12, 0.72]  p 0.7593  AP 0.61  MATCH
+  disagreement           AUROC 0.98 [0.89, 1.00]  p 0.0002  AP 0.98   published 0.98 [0.89, 1.00]  p 0.0002  AP 0.98  MATCH
+  held-out judge drop    AUROC 0.72 [0.43, 0.94]  p 0.0687  AP 0.73   published 0.72 [0.43, 0.94]  p 0.0687  AP 0.73  MATCH
+  KL                     AUROC 0.44 [0.17, 0.73]  p 0.6713  AP 0.60   published 0.44 [0.17, 0.73]  p 0.6713  AP 0.60  MATCH
+  entropy                AUROC 0.65 [0.37, 0.89]  p 0.1476  AP 0.69   published 0.65 [0.37, 0.89]  p 0.1476  AP 0.69  MATCH
+  all six detectors match on AUROC, CI, permutation p and AP. Disagreement's exact AUROC is 0.9753 (= 79/81), which the paper rounds to 0.98. (TPR@FPR=0.1 is computed inside detection_metrics.main, which writes paper files, so it is not re-run here.)
+
+2. GRID BASELINES, 9 v 9 (count_vowels, second_largest, is_prime; phase2_grid.json). The hacking arm trains on jsmall, the benign arm on jbig (grid note).
+2a. Identical score: max over steps of |x - median(first 5 finite)| (detection_metrics.dev). Verdict against disagreement's 0.98.
+  disagreement (published: signed jsmall-jbig) 9 v 9  + AUROC 0.98 [0.89, 1.00]  p 0.0002  p2 0.0004  means +0.282 / +0.177  vs published 0.98: MATCHES
+  (a) 0.5B judge score alone (jsmall)          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.196 / +0.084  vs published 0.98: MATCHES OR EXCEEDS
+  (b) 1.5B judge score alone (jbig)            9 v 9  + AUROC 0.72 [0.43, 0.94]  p 0.0687  p2 0.1374  means +0.180 / +0.153  vs published 0.98: below
+  (c) optimized judge = training reward        9 v 9  + AUROC 0.85 [0.60, 1.00]  p 0.0062  p2 0.0124  means +0.196 / +0.153  ties: midrank 0.85  vs published 0.98: below (CI covers 0.98)
+  (d) strict held-out oracle (hidden)          9 v 9  - AUROC 0.80 [0.58, 0.99]  p 0.0120  p2 0.0240  means +0.468 / +0.574  ties: midrank 0.82  vs published 0.98: below (CI covers 0.98)
+  (e) |disagreement|                           9 v 9  + AUROC 0.68 [0.40, 0.91]  p 0.1108  p2 0.2216  means +0.192 / +0.159  ties: midrank 0.69  vs published 0.98: below
+2b. Signed, design-transparent score: mean of the last 25 steps minus the first 25 (e1_supplementary.chg). The sign that favors detection is in the dir column. Verdicts against the published 0.98 and against disagreement under this same score.
+  disagreement (published: signed jsmall-jbig) 9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.153 / -0.103  vs published 0.98: MATCHES OR EXCEEDS  vs signed disagreement 1.00: MATCHES
+  (a) 0.5B judge score alone (jsmall)          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.175 / +0.010  vs published 0.98: MATCHES OR EXCEEDS  vs signed disagreement 1.00: MATCHES
+  (b) 1.5B judge score alone (jbig)            9 v 9  - AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.021 / +0.113  vs published 0.98: MATCHES OR EXCEEDS  vs signed disagreement 1.00: MATCHES
+  (c) optimized judge = training reward        9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.175 / +0.113  vs published 0.98: MATCHES OR EXCEEDS  vs signed disagreement 1.00: MATCHES
+  (d) strict held-out oracle (hidden)          9 v 9  - AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means -0.341 / +0.400  vs published 0.98: MATCHES OR EXCEEDS  vs signed disagreement 1.00: MATCHES
+  (e) |disagreement|                           9 v 9  + AUROC 0.52 [0.25, 0.79]  p 0.4634  p2 0.9268  means +0.092 / +0.093  vs published 0.98: below  vs signed disagreement 1.00: below
+
+3. FAMILIES (family_matrix.py, specificity_partial.py; phase2_family.json, phase2_partial.json)
+  family_matrix.json reproduced with family_matrix's own peakdev, sig, auroc: all 12 cells MATCH
+  specificity_partial.json reproduced (group means of peakdev and hidden drop): all cells MATCH. Its per-run data are experiments/phase2/phase2_partial.json, cells['partial'], 9 runs, same three tasks.
+  The verifier-coverage ('visible') runs in phase2_family.json are not used by family_matrix or specificity_partial. The paper's Table 1 labels them non-hacking. They are added here as a second negative arm in which no judge is optimized.
+  reduced-capacity (trains on 0.5B judge) v benign (trains on 1.5B judge)
+    disagreement max|dev| (family_matrix)        9 v 9  + AUROC 0.98 [0.89, 1.00]  p 0.0002  p2 0.0004  means +0.282 / +0.177
+    disagreement signed                          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.153 / -0.103
+    (a) jsmall max|dev|                          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.196 / +0.084  vs disagreement max|dev| 0.98: MATCHES OR EXCEEDS
+    (a) jsmall signed                            9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.175 / +0.010  vs disagreement signed 1.00: MATCHES
+    (d) hidden signed (label check)              9 v 9  - AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means -0.341 / +0.400
+  reduced-capacity (trains on 0.5B judge) v partial-credit (trains on graded sub-goals)
+    disagreement max|dev| (family_matrix)        9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.282 / +0.146
+    disagreement signed                          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.153 / -0.061
+    (a) jsmall max|dev|                          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.196 / +0.083  vs disagreement max|dev| 1.00: MATCHES
+    (a) jsmall signed                            9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.175 / -0.005  vs disagreement signed 1.00: MATCHES
+    (d) hidden signed (label check)              9 v 9  - AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means -0.341 / +0.287
+  reduced-capacity (trains on 0.5B judge) v verifier-coverage (trains on visible tests)
+    disagreement max|dev| (family_matrix)        9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.282 / +0.142
+    disagreement signed                          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.153 / -0.066
+    (a) jsmall max|dev|                          9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.196 / +0.076  vs disagreement max|dev| 1.00: MATCHES
+    (a) jsmall signed                            9 v 9  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.175 / -0.011  vs disagreement signed 1.00: MATCHES
+    (d) hidden signed (label check)              9 v 9  - AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means -0.341 / +0.277
+  heuristic-proxy (trains on a heuristic) v benign (trains on 1.5B judge)
+    disagreement max|dev| (family_matrix)        9 v 9  + AUROC 0.60 [0.32, 0.85]  p 0.2375  p2 0.4750  means +0.204 / +0.177
+    disagreement signed                          9 v 9  + AUROC 0.89 [0.68, 1.00]  p 0.0016  p2 0.0032  means -0.010 / -0.103
+    (a) jsmall max|dev|                          9 v 9  + AUROC 0.63 [0.35, 0.90]  p 0.1876  p2 0.3752  means +0.101 / +0.084  vs disagreement max|dev| 0.60: MATCHES OR EXCEEDS
+    (a) jsmall signed                            9 v 9  - AUROC 0.59 [0.31, 0.85]  p 0.2683  p2 0.5366  means +0.006 / +0.010  vs disagreement signed 0.89: below
+    (d) hidden signed (label check)              9 v 9  - AUROC 0.88 [0.67, 1.00]  p 0.0032  p2 0.0064  means +0.043 / +0.400
+  heuristic-proxy (trains on a heuristic) v partial-credit (trains on graded sub-goals)   <- neither arm optimizes a judge
+    disagreement max|dev| (family_matrix)        9 v 9  + AUROC 0.88 [0.67, 1.00]  p 0.0035  p2 0.0070  means +0.204 / +0.146  ties: midrank 0.88
+    disagreement signed                          9 v 9  + AUROC 0.86 [0.63, 1.00]  p 0.0039  p2 0.0078  means -0.010 / -0.061
+    (a) jsmall max|dev|                          9 v 9  + AUROC 0.74 [0.46, 1.00]  p 0.0456  p2 0.0912  means +0.101 / +0.083  ties: midrank 0.75  vs disagreement max|dev| 0.88: below (CI covers 0.88)
+    (a) jsmall signed                            9 v 9  + AUROC 0.60 [0.33, 0.86]  p 0.2437  p2 0.4874  means +0.006 / -0.005  vs disagreement signed 0.86: below (CI covers 0.86)
+    (d) hidden signed (label check)              9 v 9  - AUROC 0.75 [0.48, 0.98]  p 0.0377  p2 0.0754  means +0.043 / +0.287
+  heuristic-proxy (trains on a heuristic) v verifier-coverage (trains on visible tests)   <- neither arm optimizes a judge
+    disagreement max|dev| (family_matrix)        9 v 9  + AUROC 0.85 [0.64, 0.98]  p 0.0049  p2 0.0098  means +0.204 / +0.142
+    disagreement signed                          9 v 9  + AUROC 0.86 [0.63, 1.00]  p 0.0042  p2 0.0084  means -0.010 / -0.066
+    (a) jsmall max|dev|                          9 v 9  + AUROC 0.77 [0.49, 0.98]  p 0.0311  p2 0.0622  means +0.101 / +0.076  vs disagreement max|dev| 0.85: below (CI covers 0.85)
+    (a) jsmall signed                            9 v 9  + AUROC 0.68 [0.41, 0.93]  p 0.1145  p2 0.2290  means +0.006 / -0.011  vs disagreement signed 0.86: below (CI covers 0.86)
+    (d) hidden signed (label check)              9 v 9  - AUROC 0.74 [0.47, 0.96]  p 0.0463  p2 0.0926  means +0.043 / +0.277
+  family_matrix's published disagreement cells: reduced-capacity 0.98, heuristic-proxy 0.60 (both reproduced above as the max|dev| rows against benign).
+
+4. [EXPLORATORY] E1, 24 v 24 (e1_primary.load_main; 0 excluded, 0 unregistered, 0 surplus). E1's registered analysis has no audit test, so nothing here is registered.
+[EXPLORATORY]   checked on every run: proxy == judge_small in all 24 judge05 runs and proxy == judge_big in all 24 judge15 runs; disagree == judge_small - judge_big; chg() here equals e1_supplementary.chg.
+[EXPLORATORY] 4a. max|dev| (detection_metrics.dev)
+[EXPLORATORY]  disagreement (E1 registered signal, signed)  24 v 24  + AUROC 0.90 [0.80, 0.97]  p 0.0001  p2 0.0002  means +0.269 / +0.189  vs E1 disagreement 0.90: MATCHES
+[EXPLORATORY]  |disagreement|                               24 v 24  + AUROC 0.62 [0.45, 0.77]  p 0.0871  p2 0.1742  means +0.172 / +0.161  vs E1 disagreement 0.90: below
+[EXPLORATORY]  (a) judge_small (0.5B) alone                 24 v 24  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.208 / +0.082  vs E1 disagreement 0.90: MATCHES OR EXCEEDS
+[EXPLORATORY]  (b) judge_big (1.5B) alone                   24 v 24  + AUROC 0.63 [0.46, 0.78]  p 0.0656  p2 0.1312  means +0.178 / +0.164  vs E1 disagreement 0.90: below
+[EXPLORATORY]  (c) optimized judge (proxy field)            24 v 24  + AUROC 0.80 [0.64, 0.92]  p 0.0002  p2 0.0004  means +0.208 / +0.164  vs E1 disagreement 0.90: below (CI covers 0.90)
+[EXPLORATORY]  (d) strict held-out oracle (hidden)          24 v 24  - AUROC 0.69 [0.52, 0.84]  p 0.0042  p2 0.0084  means +0.512 / +0.571  ties: midrank 0.71  vs E1 disagreement 0.90: below
+[EXPLORATORY] 4b. signed last-25 minus first-25 (e1_supplementary.chg)
+[EXPLORATORY]  disagreement (E1 registered signal, signed)  24 v 24  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.155 / -0.137  vs E1 disagreement 1.00: MATCHES
+[EXPLORATORY]  |disagreement|                               24 v 24  - AUROC 0.80 [0.66, 0.91]  p 0.0004  p2 0.0008  means +0.070 / +0.114  vs E1 disagreement 1.00: below
+[EXPLORATORY]  (a) judge_small (0.5B) alone                 24 v 24  + AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means +0.192 / +0.003  vs E1 disagreement 1.00: MATCHES
+[EXPLORATORY]  (b) judge_big (1.5B) alone                   24 v 24  - AUROC 0.95 [0.88, 0.99]  p 0.0001  p2 0.0002  means +0.036 / +0.139  vs E1 disagreement 1.00: below
+[EXPLORATORY]  (c) optimized judge (proxy field)            24 v 24  + AUROC 0.91 [0.81, 0.98]  p 0.0001  p2 0.0002  means +0.192 / +0.139  vs E1 disagreement 1.00: below
+[EXPLORATORY]  (d) strict held-out oracle (hidden)          24 v 24  - AUROC 1.00 [1.00, 1.00]  p 0.0001  p2 0.0002  means -0.398 / +0.497  vs E1 disagreement 1.00: MATCHES
+
+5. INVENTORY: every logged arm and the reward it trains on (scanned: experiments/phase2/*.json, runs/phase1b_dataset.json, runs/e1/{main,pilot,diag,cap512}/*.json). 'fell' = strict oracle lower in the last 25 steps than the first 25.
+  phase2_grid     hacking                n=9   trains on 0.5B judge (file note)                                     paper label hacking        strict fell 9/9
+  phase2_grid     benign (3 tasks)       n=9   trains on 1.5B judge (file note)                                     paper label benign         strict fell 0/9
+  phase2_grid     benign (sum_list)      n=3   trains on 1.5B judge (file note)                                     paper label benign         strict fell 0/3
+  phase2_family   heuristic              n=9   trains on heuristic proxy                                            paper label hacking        strict fell 4/9
+  phase2_family   visible                n=9   trains on visible tests                                              paper label non-hacking    strict fell 0/9
+  phase2_partial  partial                n=9   trains on graded sub-goals                                           paper label non-hacking    strict fell 0/9
+  phase2_gemma    reduced_capacity       n=9   trains on 0.5B judge (judge_optimized field)                         paper label hacking        strict fell 9/9
+  phase2_qwen3b   reduced_capacity       n=3   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 3/3
+  phase2_qwen3b   verbosity_refined      n=3   trains on non-judge proxy (proxy == 0.5B score on 0% of steps)       paper label not in Table 1 strict fell 2/3
+  phase2_rloo_fmt rloo_reduced_capacity  n=3   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 3/3
+  phase2_rloo_fmt formatting_bias        n=3   trains on non-judge proxy (proxy == 0.5B score on 0% of steps)       paper label non-hacking    strict fell 1/3
+  phase2_lowlr    reduced_capacity       n=3   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 3/3
+  phase1b         plain_judge            n=3   trains on 1.5B judge (judge field; no 0.5B score logged)             paper label benign         strict fell 1/3
+  phase1b         verbosity              n=6   trains on non-judge proxy                                            paper label hacking        strict fell 6/6
+  phase1b         reduced_capacity       n=3   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 3/3
+  e1/main         judge05                n=24  trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 24/24
+  e1/main         judge15                n=24  trains on 1.5B judge (proxy == 0.5B score on 0% of steps)            paper label benign         strict fell 0/24
+  e1/pilot        judge05                n=6   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 6/6
+  e1/diag         judge05                n=6   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 6/6
+  e1/cap512       judge05                n=3   trains on 0.5B judge (proxy == 0.5B score on 100% of steps)          paper label hacking        strict fell 3/3
+  arms that train on the 0.5B judge: 10 (69 runs); of these labeled benign or non-hacking: 0; runs in them whose strict oracle did not fall: 0 of 69
+
+6. [EXPLORATORY] What the separation is made of. Added 2026-10-08 after an interpretation review; the smoothing windows were chosen after seeing the data. Grid lines are exploratory too.
+[EXPLORATORY]   grid 9 v 9, disagreement scored by max|dev| after a trailing moving mean of w steps (w=1 is the published score): w=1 0.98; w=5 0.75; w=10 0.64; w=25 0.79
+[EXPLORATORY]   E1 24 v 24, disagreement scored by max|dev| after a trailing moving mean of w steps (w=1 is the published score): w=1 0.90; w=5 0.62; w=10 0.52; w=25 0.54
+[EXPLORATORY]   grid, last 25 minus first 25 steps. The judge each run did NOT train on: hacking runs (1.5B) +0.022, falling in 4/9; benign runs (0.5B) +0.010, falling in 3/9. The training reward: hacking +0.175, benign +0.113.
+[EXPLORATORY]   grid, end-of-training gap (training reward minus the other judge, mean of the last 25 steps): hacking +0.141, benign +0.172; AUROC with hacking as positive 0.25 (below 0.5 means the benign runs end with the larger gap).
+[EXPLORATORY]   E1, last 25 minus first 25 steps. The judge each run did NOT train on: hacking runs (1.5B) +0.036, falling in 5/24; benign runs (0.5B) +0.003, falling in 10/24. The training reward: hacking +0.192, benign +0.139.
+[EXPLORATORY]   E1, end-of-training gap (training reward minus the other judge, mean of the last 25 steps): hacking +0.130, benign +0.179; AUROC with hacking as positive 0.14 (below 0.5 means the benign runs end with the larger gap).
+
+READING
+  Grid, published score, max|dev|: disagreement 0.98; (a) 0.5B judge alone 1.00; (b) 1.5B judge alone 0.72; (c) training reward 0.85; (d) strict oracle 0.82 (reversed); (e) |disagreement| 0.69.
+  Grid, signed score: disagreement 1.00; (a) 0.5B judge alone 1.00; (b) 1.5B judge alone 1.00 (reversed); (c) training reward 1.00; (d) strict oracle 1.00 (reversed); (e) |disagreement| 0.52.
+  Baselines that match or beat the published 0.98: (a) max|dev| 1.00; (a) signed 1.00; (b) signed 1.00 (reversed); (c) signed 1.00; (d) signed 1.00 (reversed).
+  Scoring |disagreement| instead gives 0.69 (max|dev|) and 0.52 (signed). The separation sits in the sign of jsmall - jbig. Its mean signed change is +0.153 in hacking runs and -0.103 in benign runs: it rises when a run trains on the 0.5B judge and falls when a run trains on the 1.5B judge.
+  (a) matches under max|dev| and signed; (c) matches under signed. So on the grid a single judge's score does as well as disagreement's 0.98: which judge each arm optimizes is collinear with the hacking label. The data contain no arm where a benign run optimizes the same 0.5B judge: 10 arms (69 runs) train on it, all are labeled hacking, and the strict oracle fell in 69 of the 69. Every run trained on the 0.5B judge collapsed and no benign run trained on it, so on these arms no audit number can tell a hacking detector from a detector of which judge the run trained on.
+  Families. Heuristic-proxy v benign: disagreement 0.60 (max|dev|, family_matrix's published 0.60) and 0.89 (signed); (a) 0.63 and 0.59 (reversed). The signed number comes from the benign arm, whose disagreement falls as it trains on the 1.5B judge (mean -0.103), against -0.010 in heuristic-proxy runs.
+  Reduced-capacity v partial-credit and v verifier-coverage: disagreement 1.00 and 1.00, and the 0.5B judge alone 1.00 and 1.00 (max|dev|). These positives still train on the 0.5B judge.
+  Only heuristic-proxy v partial-credit and heuristic-proxy v verifier-coverage have no judge optimized in either arm. There disagreement gives 0.88 [0.67, 1.00] and 0.85 [0.64, 0.98] (max|dev|), and the 0.5B judge alone gives 0.75 and 0.77. At 9 v 9 the intervals overlap.
+  Two limits on those two numbers. The strict oracle fell in only 4 of 9 heuristic-proxy runs and separates that arm from the two controls at only 0.75 (reversed) and 0.74 (reversed), so the family label is not a per-run hacking label. Under max|dev| the heuristic-proxy runs deviate more (mean 0.204 against 0.146 and 0.142). Under the signed score (0.86, 0.86) the gap comes mostly from the controls: their disagreement falls (-0.061, -0.066) while their strict oracle rises (+0.287, +0.277), and the heuristic-proxy runs stay near zero (-0.010).
+  [EXPLORATORY] E1 has the same design and the same confound: proxy equals judge_small in every judge05 run and judge_big in every judge15 run, and the strict oracle fell in 24/24 judge05 runs and 0/24 judge15 runs. Disagreement gives 0.90 (max|dev|) and 1.00 (signed). The 0.5B judge alone gives 1.00 and 1.00. The training reward gives 0.80 and 0.91.
+
+results: experiments/audit_baselines_results.json

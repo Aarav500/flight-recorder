@@ -1,0 +1,46 @@
+FP at n=48 (numpy 90th pct on distinct values): 5  -> 5/48 = 0.1042
+fixed_fp for n 24..48: {24: 3, 25: 3, 26: 3, 27: 3, 28: 3, 29: 3, 30: 3, 31: 3, 32: 4, 33: 4, 34: 4, 35: 4, 36: 4, 37: 4, 38: 4, 39: 4, 40: 4, 41: 4, 42: 5, 43: 5, 44: 5, 45: 5, 46: 5, 47: 5, 48: 5}
+hits needed p<0.05: 13 (p at 13 = 0.0326, at 12 = 0.0534); scipy fisher_exact check at 13: 0.0326
+kill at TPR 13/48 = 0.271
+  Fisher power at TPR 0.320: 0.8107 ; x 0.963 = 0.7808
+  Fisher power at TPR 0.330: 0.8477 ; x 0.963 = 0.8163
+  Fisher power at TPR 0.350: 0.9057 ; x 0.963 = 0.8721
+  Fisher power at TPR 0.375: 0.9523 ; x 0.963 = 0.9171
+  Fisher power at TPR 0.400: 0.9781 ; x 0.963 = 0.9419
+  Fisher power at TPR 0.500: 0.9996 ; x 0.963 = 0.9627
+MDE 80% (0.01 grid) 0.32 ; 90% 0.35 ; 80% (0.005 grid) 0.320 ; 90% (0.005) 0.350
+size, rate known: P(Bin(48, 5/48) >= 13) = 0.00097
+  Newcombe 90% upper at TP 8 (FP 5/48): 0.18053
+  Newcombe 90% upper at TP 9 (FP 5/48): 0.20376
+  Newcombe 90% upper at TP 10 (FP 5/48): 0.22666
+  Newcombe 90% upper at TP 11 (FP 5/48): 0.24926
+  Newcombe 90% upper at TP 12 (FP 5/48): 0.27158
+  Newcombe 90% upper at TP 13 (FP 5/48): 0.29365
+non-sup at 0.25 holds iff TP <= 11; at 0.20 iff TP <= 8
+P(non-sup shown | TPR = FPR, rate known): 0.25 -> 0.9969 ; 0.20 -> 0.9426
+  inconclusive at TPR 0.25: delta 0.25 0.1320 ; delta 0.20 0.4577
+  inconclusive at TPR 0.30: delta 0.25 0.0982 ; delta 0.20 0.2527
+threshold estimated (quadrature, Beta order-stat route): total 1.000000 size 0.0251 P(ns 0.25) 0.9576 P(ns 0.20) 0.8339 mean TP 5.584 var 9.379 (binomial var at mean 4.934)
+threshold estimated (MC 2e7): size 0.0251 P(ns 0.25) 0.9577 P(ns 0.20) 0.8340 mean 5.583 var 9.377
+threshold estimated (brute MC 4e5 with np.percentile): size 0.0249 P(ns 0.25) 0.9577 mean 5.583
+H2 alpha/25: hits 18 ; power at 0.5 0.9703 ; MDE 80% (0.01) 0.43
+32 v 32: FP 4, hits 11, power 0.5 0.9749, MDE 0.41/0.440, H2 hits 16 power 0.570 MDE 0.56, nonsup TP<=7 (P 0.9605), est 0.9028; size known 0.0012 est 0.0171
+32 v 32 power at 0.33/0.35/0.375/0.40: [0.5, 0.595, 0.704, 0.795]
+36 v 36 sanity: FP 4 hits 11 power0.5 0.9943 MDE 0.36 nonsup 7 P 0.9592 est 0.8732
+planted M (MDE 0.32) over 4000 bootstrap layouts of E1 events at n=48: mean 0.8235 p10 0.8179 p90 0.8297; rooms min 31 median 40 max 47
+E1 construction on same layouts: mean 0.9516 p10 0.9116 p90 0.9824
+M exact by room 24..48: {24: 0.8868, 25: 0.8792, 26: 0.8725, 27: 0.8665, 28: 0.8612, 29: 0.8563, 30: 0.8519, 31: 0.8479, 32: 0.8442, 33: 0.8409, 34: 0.8377, 35: 0.8349, 36: 0.8322, 37: 0.8297, 38: 0.8274, 39: 0.8253, 40: 0.8232, 41: 0.8213, 42: 0.8196, 43: 0.8179, 44: 0.8163, 45: 0.8148, 46: 0.8134, 47: 0.812, 48: 0.8107}
+claimed-effect control (q = 0.5, all 48 room) 0.99964
+  tolerance at 0.8107: SD 0.0124, 0.05 = 4.04 SD, P(fail) 5.66e-05
+  tolerance at 0.8200: SD 0.0121, 0.05 = 4.12 SD, P(fail) 3.56e-05
+  tolerance at 0.8868: SD 0.0100, 0.05 = 4.99 SD, P(fail) 1.02e-06
+NOT APPLICABLE bound fails for (nh, nt) in 32..48: []; max bound 20
+smallest gate for which the bound holds over gate..48: 28
+generator ceil(0.75*48)=36 ; twin flag more than 4.8 -> 5 ; of 32 -> 4 ; gate ceil(2/3*48)=32 ; launch 48+12=60
+Hanley-McNeil n=36: 95% half-width 0.103
+Hanley-McNeil n=48: 95% half-width 0.089
+per run USD 2.5833, GPU-h 1.3889 (125/90; prereg says about 1.4)
+main 96: USD 248.00, 133.3 GPU-h ; pilot 6: USD 15.50 8.3 GPU-h ; 14 repl: USD 36.17 19.4 GPU-h ; 96+14 = USD 284.17 152.8 GPU-h
+replacements fitting in 285: 14 ; 24 repl primary USD 310.00
+J3: 96*400*8 = 307200 completions = 2.0 x 153600; typical 4.40 ; worst 2*7.44 = 14.88 ; 8h*1.861 = 14.888 ; qwen total_s 3434 -> 1.91 h scoring for 307200, compute USD 3.55
+totals: ceilings 30+285+15 = 330 ; GPU 15+153+8 = 176 ; estimates no repl 267.90, 14 repl 304.07, worst 314.55
