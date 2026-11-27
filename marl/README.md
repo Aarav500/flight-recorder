@@ -127,3 +127,33 @@ here are close to orthogonal from sample to sample, and the shared direction is 
 samples. More samples or averaging over steps doesn't recover it at any size this budget reaches. A bigger model has
 more parameters, which I'd expect to make this worse, not better. Both agents learned in both runs (team proxy
 0.75 to 0.96 and 0.66 to 0.99).
+
+## Single-agent pair, 2026-11-27 (USD 16.33; all MARL tests about USD 57.70). Rule: ONE AGENT.
+
+Aarav asked: does the 0.41 drop in true quality need two agents? `spike_llm/train_single.py` trains one LoRA adapter
+on the plain `csv_narrow` and `csv_exchangeable` prompts, seeds 300-302, with everything else as in the D3 runs.
+Rule in `spike_llm/verdict_single.py`, fixed before the runs. Output in `runs/single_verdict.txt`.
+
+| arm | single agent, oracle 300-399 | two agents (D3) |
+|---|---|---|
+| csv_narrow | 0.58 / 0.63 / 0.67, mean 0.63 | 0.27 / 0.49 / 0.53, mean 0.43 |
+| csv_exchangeable | 0.99 / 0.98 / 0.98, mean 0.98 | 0.98 / 0.68 / 0.84, mean 0.83 |
+| gap | 0.36 | 0.41 |
+
+Proxy ended at 0.98-0.99 on all six runs. Every narrow seed ends below every control seed (complete separation, best
+possible exact p 0.10), and the gap is 0.36, above the rule's 0.20. So the narrow tests cost true quality with one
+agent, and the two-agent gap says nothing about MARL.
+
+What the runs show, outside the rule:
+- With one agent, narrow's oracle doesn't fall. It starts at 0.47-0.63 and stays flat at about 0.6, while the
+  control climbs to about 0.98 by step 50. The gap comes from the control learning the quote handling and narrow
+  never being asked to. `csv_narrow`'s visible tests contain no double quote at all.
+- The most common late narrow program passes every held-out case except the doubled-quote escape
+  (`"He said ""hi"""`). Control seed 300 switched to `csv.reader`; seeds 301 and 302 wrote a correct parser by hand.
+- The second agent lowered both arms by 0.15-0.20 (narrow 0.43 v 0.63, control 0.83 v 0.98), whatever the tests.
+  That looks like a cost of splitting the function, not hacking. The one real fall in this pair (two-agent narrow
+  seed 300, 0.54 to 0.26) has no single-agent counterpart.
+
+This closes the last open question in MARL. The drop doesn't need two agents, and phi didn't lead at any scale
+tried. What's left is a cheap single-agent twin: same prompt and held-out tests, about USD 2.70 and 1.2 h per run,
+with a 0.36 gap. It's a flat-oracle twin (proxy up, oracle stuck), not a falling one, and 3 v 3 is a hint.

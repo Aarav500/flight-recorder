@@ -162,6 +162,14 @@ for _task in ("csv_narrow", "csv_exchangeable"):
             body=TRAIN_BODY.replace("__RUNS__",
                                     "timeout %dm %s --task %s --seed %d --lr __LR__ --out /opt/marl/out/%s > /opt/marl/job.log 2>&1\n"
                                     "RC=$?" % (TRAIN_TIMEOUT_MIN - 10, UV_RUN, _task, _seed, _name)))
+        # One agent on the same pair, same settings. Rule in marl/spike_llm/verdict_single.py.
+        STAGES["tr1_" + _name] = dict(
+            types=TRAIN_TYPES, est_h=2.0, timeout_min=240, disk=100, train=True,
+            files=TRAIN_FILES + ["marl/spike_llm/train_single.py"],
+            body=TRAIN_BODY.replace("__RUNS__",
+                                    "timeout 230m python3 -m uv run --python 3.12 train_single.py --task %s --seed %d "
+                                    "--lr __LR__ --selfcheck --out /opt/marl/out/single_%s > /opt/marl/job.log 2>&1\n"
+                                    "RC=$?" % (_task, _seed, _name)))
 
 
 def aws(*args):
